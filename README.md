@@ -1,6 +1,6 @@
 # bitewise
 
-A new Flutter application.
+Coming soon
 
 ## Getting Started
 
