@@ -1,3 +1,4 @@
+import 'package:bitewise/services/auth.dart';
 import 'package:flutter/material.dart';
 
 class SignIn extends StatefulWidget {
@@ -10,6 +11,8 @@ class _SignInState extends State<SignIn> {
   //Text Field State
   String username = '';
   String password = '';
+
+  final AuthService _auth = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +50,13 @@ class _SignInState extends State<SignIn> {
                 onPressed: () async {
                   print(username);
                   print(password);
-                  // Connection to Firebase Here
+                  dynamic result = await _auth.signInAnon();
+                  if (result == null) {
+                    print('error signing in');
+                  } else {
+                    print('signed in');
+                    print(result);
+                  }
                 },
                 child: Text('Sign Up',  style: TextStyle(color: Colors.black, fontSize: 20),),
                 color: Colors.yellow[600],

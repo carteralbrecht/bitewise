@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "288084259165",
+    "firebase_url": "https://bitewwisemaybelol.firebaseio.com",
+    "project_id": "bitewwisemaybelol",
+    "storage_bucket": "bitewwisemaybelol.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:288084259165:android:76312b7ca52b186bd478b4",
+        "android_client_info": {
+          "package_name": "com.bitewise"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "288084259165-iddqmt5qinas10c44v94n9497a7hu25f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArWh-0Qgf_oasWVJi3dGG-aj0UB-TLncQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "288084259165-iddqmt5qinas10c44v94n9497a7hu25f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
