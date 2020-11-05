@@ -1,0 +1,1 @@
+// Conection to Firebase and Authorization Logic Here
