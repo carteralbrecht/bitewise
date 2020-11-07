@@ -15,5 +15,51 @@ class AuthService {
       return null;
     }
   }
+
+  Future registerByEmail(String email, String password) async {
+    try {
+      AuthResult res = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password
+      );
+      FirebaseUser user = res.user;
+      return user;
+    }
+    catch(e)
+    {
+      print(e.toString());
+      return null;
+    }
+  }
+
+  Future signInByEmail(String email, String password) async {
+    try {
+      AuthResult res = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password
+      );
+      FirebaseUser user = res.user;
+      return user;
+    }
+    catch(e)
+    {
+      print(e.toString());
+      return null;
+    }
+  }
+
+  Future signOut() async {
+    try {
+      _auth.signOut();
+      return null;
+    }
+    catch(e)
+    {
+      print(e.toString());
+      return _auth.currentUser();
+    }
+  }
+
+
 }
 

@@ -9,7 +9,7 @@ class SignIn extends StatefulWidget {
 class _SignInState extends State<SignIn> {
 
   //Text Field State
-  String username = '';
+  String email = '';
   String password = '';
 
   final AuthService _auth = AuthService();
@@ -32,7 +32,7 @@ class _SignInState extends State<SignIn> {
               TextFormField(
                 onChanged: (val) {
                   setState(() {
-                    username = val;
+                    email = val;
                   });
                 },
               ),
@@ -48,9 +48,9 @@ class _SignInState extends State<SignIn> {
               SizedBox(height: 20),
               RaisedButton(
                 onPressed: () async {
-                  print(username);
+                  print(email);
                   print(password);
-                  dynamic result = await _auth.signInAnon();
+                  dynamic result = await _auth.registerByEmail(email,password);
                   if (result == null) {
                     print('error signing in');
                   } else {
@@ -60,7 +60,39 @@ class _SignInState extends State<SignIn> {
                 },
                 child: Text('Sign Up',  style: TextStyle(color: Colors.black, fontSize: 20),),
                 color: Colors.yellow[600],
-              )
+              ),
+              SizedBox(height: 20),
+              RaisedButton(
+                onPressed: () async {
+                  print(email);
+                  print(password);
+                  dynamic result = await _auth.signInByEmail(email,password);
+                  if (result == null) {
+                    print('error signing in');
+                  } else {
+                    print('signed in');
+                    print(result);
+                  }
+                },
+                child: Text('Sign In',  style: TextStyle(color: Colors.black, fontSize: 20),),
+                color: Colors.yellow[600],
+              ),
+              SizedBox(height: 20),
+              RaisedButton(
+                onPressed: () async {
+                  print(email);
+                  print(password);
+                  dynamic result = await _auth.signOut();
+                  if (result == null) {
+                    print('signed out succesfully');
+                  } else {
+                    print(result);
+                  }
+                },
+                child: Text('Sign Out',  style: TextStyle(color: Colors.black, fontSize: 20),),
+                color: Colors.yellow[600],
+              ),
+              
             ],
           ),
         )
