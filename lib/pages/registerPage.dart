@@ -1,12 +1,12 @@
 import 'package:bitewise/services/auth.dart';
 import 'package:flutter/material.dart';
 
-class SignIn extends StatefulWidget {
+class Register extends StatefulWidget {
   @override
-  _SignInState createState() => _SignInState();
+  _RegisterState createState() => _RegisterState();
 }
 
-class _SignInState extends State<SignIn> {
+class _RegisterState extends State<Register> {
 
   //Text Field State
   String email = '';
@@ -20,7 +20,7 @@ class _SignInState extends State<SignIn> {
       backgroundColor: Colors.white70,
       appBar: AppBar(
         backgroundColor: Colors.yellow[600],
-        title: Text('Sign In', style: TextStyle(color: Colors.black,  ),),
+        title: Text('Sign Up', style: TextStyle(color: Colors.black,  ),),
         centerTitle: true,
         
       ),
@@ -53,47 +53,33 @@ class _SignInState extends State<SignIn> {
                 ),
               ),
               SizedBox(height: 20),
+              TextFormField(
+                obscureText: true,
+                onChanged: (val) {
+                  setState(() {
+                    password = val;
+                  });
+                },
+                decoration: InputDecoration(
+                  hintText: 'confirm password'
+                ),
+              ),
+              SizedBox(height: 20),
               RaisedButton(
                 onPressed: () async {
                   print(email);
                   print(password);
-                  dynamic result = await _auth.signInByEmail(email,password);
+                  dynamic result = await _auth.registerByEmail(email,password);
                   if (result == null) {
-                    print('error signing in');
+                    print('error registering');
                   } else {
-                    print('signed in');
+                    print('registered');
                     print(result);
                   }
                 },
-                child: Text('Sign In',  style: TextStyle(color: Colors.black, fontSize: 20),),
+                child: Text('Register',  style: TextStyle(color: Colors.black, fontSize: 20),),
                 color: Colors.yellow[600],
               ),
-              SizedBox(height: 20),
-              Text("Don't have an account? Sign up below!", style: TextStyle(fontSize: 15, color: Colors.black),),
-              SizedBox(height: 20),
-              RaisedButton(
-                onPressed: () async {
-                  Navigator.pushNamed(context, '/register');
-                },
-                child: Text('Sign Up',  style: TextStyle(color: Colors.black, fontSize: 20),),
-                color: Colors.yellow[600],
-              ),
-              // SizedBox(height: 20),
-              // RaisedButton(
-              //   onPressed: () async {
-              //     print(email);
-              //     print(password);
-              //     dynamic result = await _auth.signOut();
-              //     if (result == null) {
-              //       print('signed out succesfully');
-              //     } else {
-              //       print(result);
-              //     }
-              //   },
-              //   child: Text('Sign Out',  style: TextStyle(color: Colors.black, fontSize: 20),),
-              //   color: Colors.yellow[600],
-              // ),
-              
             ],
           ),
         )
