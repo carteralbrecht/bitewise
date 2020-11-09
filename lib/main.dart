@@ -1,7 +1,9 @@
 import 'package:bitewise/pages/homePage.dart';
-import 'package:bitewise/pages/loginPage.dart';
+import 'package:bitewise/pages/signInPage.dart';
 import 'package:bitewise/pages/registerPage.dart';
 import 'package:flutter/material.dart';
+
+import 'package:bitewise/pages/backendTestPage.dart';
 
 void main() {
   runApp(MyApp());
@@ -14,6 +16,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       initialRoute: '/home',
       routes: {
+        '/test' : (context) => Test(),
+
         // '/' : (context) => HomePage(),
         '/home' : (context) => HomePage(),
         '/signin' : (context) => SignIn(),

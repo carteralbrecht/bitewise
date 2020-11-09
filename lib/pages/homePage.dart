@@ -25,13 +25,16 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Colors.lightBlue[100],
       appBar: AppBar(
-        backgroundColor: Colors.yellow[400],
+        backgroundColor: Colors.yellow[600],
         elevation: 0,
         title: Text('bitewise',
             style: TextStyle(color: Colors.black, fontSize: 25)),
-        leading: Icon(
-          Icons.fastfood,
+        leading: IconButton(
+          icon: Icon(Icons.fastfood),
           color: Colors.black,
+          onPressed: () {
+            Navigator.pushNamed(context, '/test');
+          },
         ),
         actions: <Widget>[
           Padding(
