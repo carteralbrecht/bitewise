@@ -123,8 +123,6 @@ def main():
     lon = -81.200632
     distance = 1
 
-    print(get_restaurants_by_geo(lat, lon, distance, 1))
-
     # Get all the restaurants across multiple pages of results
     restaurant_pages = get_all_restaurant_pages(lat, lon, distance)
 
