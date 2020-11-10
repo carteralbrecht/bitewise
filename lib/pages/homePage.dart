@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:bitewise/services/auth.dart';
 import 'package:flutter/material.dart';
+// import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -23,7 +24,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.lightBlue[100],
       appBar: AppBar(
         backgroundColor: Colors.yellow[600],
         elevation: 0,
@@ -40,16 +40,6 @@ class _HomePageState extends State<HomePage> {
           Padding(
               padding: EdgeInsets.only(right: 20.0),
               child: GestureDetector(
-                onTap: () {},
-                child: Icon(
-                  Icons.search,
-                  size: 26.0,
-                  color: Colors.black,
-                ),
-              )),
-          Padding(
-              padding: EdgeInsets.only(right: 20.0),
-              child: GestureDetector(
                 onTap: () {
                   Navigator.pushNamed(context, '/signin');
                 },
@@ -61,30 +51,59 @@ class _HomePageState extends State<HomePage> {
         ],
         centerTitle: true,
       ),
-      body: Container(
-        child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Container(
-                color: Colors.lightGreen[100],
-                height: 350,
-                alignment: Alignment.center,
-                child: Text(
-                  'Map',
-                  style: TextStyle(
-                    fontSize: 25,
-                    color: Colors.black,
-                  ),
-                  textAlign: TextAlign.center,
+      body: Stack(
+        children: <Widget> [
+          Container(
+              color: Colors.lightGreen[200],
+              child: Text('Map', style: TextStyle(fontSize:20, color: Colors.black,), textAlign: TextAlign.center,),
+              alignment: Alignment.center,
+          ),
+          DraggableScrollableSheet(
+            initialChildSize: 0.3,
+            minChildSize: 0.1,
+            maxChildSize: .8,
+            builder: (BuildContext context, myscrollController) {
+              return Container(
+                color: Colors.lightBlue[200],
+                child: ListView.builder(
+                  controller: myscrollController,
+                  itemCount: 25,
+                  itemBuilder: (BuildContext context, int index) {
+                    if (index == 0) {
+                      return AppBar(
+                        title: Text('Search', style:TextStyle(fontSize: 20, color: Colors.black)),
+                        backgroundColor: Colors.grey[300],
+                        elevation: 0,
+                        centerTitle: true,
+                        actions: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.only(right: 20.0),
+                            child: GestureDetector(
+                              onTap: () {
+                                // Search bar implementation. Probably showSearch()
+                              },
+                              child: Icon(
+                                Icons.search,
+                                size: 26.0,
+                                color: Colors.black,
+                              ),
+                            )
+                          ),
+                        ],
+                      );
+                    }
+                    return ListTile(
+                      title: Text(
+                        // place holder for restaurants nearby
+                        'Dish $index',
+                        style: TextStyle(color: Colors.black54),
+                    ));
+                  },
                 ),
-              ),
-              Text(
-                'home page',
-                style: TextStyle(color: Colors.black, fontSize: 25),
-                textAlign: TextAlign.center,
-              ),
-            ]),
+              );
+            },
+          ),
+        ]
       ),
     );
   }
