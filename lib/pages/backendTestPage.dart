@@ -1,3 +1,4 @@
+import 'package:bitewise/services/geoquery.dart';
 import 'package:bitewise/services/ratings.dart';
 import 'package:flutter/material.dart';
 
@@ -12,6 +13,7 @@ class _TestState extends State<Test> {
   num field2 = 0;
 
   final RatingManager _rateMan = RatingManager();
+  final GeoQueryManager _geoQueryManager = GeoQueryManager();
 
   @override
   Widget build(BuildContext context) {
