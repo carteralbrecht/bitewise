@@ -69,9 +69,8 @@ class _RegisterState extends State<Register> {
                       print(email);
                       print(password);
                       // Get current account, and upgrade it to an email/pass account
-                      FirebaseUser current = await _auth.getUser();
                       dynamic result =
-                          await _auth.anonToEmail(current, email, password);
+                          await _auth.registerByEmail(email, password);
                       if (result == null) {
                         print('error registering');
                       } else {

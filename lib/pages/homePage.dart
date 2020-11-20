@@ -19,11 +19,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     getUserLocation();
-    // upon app load, sign in to anon user
-    print('calling signInOnLoad');
-    _auth.signInOnLoad().then((value) {
-      print('finished signInOnLoad: ' + value.toString());
-    });
     super.initState();
   }
 
@@ -52,98 +47,95 @@ class _HomePageState extends State<HomePage> {
   }
 
   Stack createMap() {
-    return Stack(
-        children: <Widget> [
-          GoogleMap(
-            onMapCreated: _onMapCreated,
-            initialCameraPosition: CameraPosition(
-              target: LatLng(currentLocation.latitude, currentLocation.longitude),
-              zoom: 11.0,
+    return Stack(children: <Widget>[
+      GoogleMap(
+        onMapCreated: _onMapCreated,
+        initialCameraPosition: CameraPosition(
+          target: LatLng(currentLocation.latitude, currentLocation.longitude),
+          zoom: 11.0,
+        ),
+        markers: _createUserMarker(),
+      ),
+      DraggableScrollableSheet(
+        initialChildSize: 0.3,
+        minChildSize: 0.1,
+        maxChildSize: .8,
+        builder: (BuildContext context, myscrollController) {
+          return Container(
+            color: Colors.lightBlue[200],
+            child: ListView.builder(
+              controller: myscrollController,
+              itemCount: 25,
+              itemBuilder: (BuildContext context, int index) {
+                if (index == 0) {
+                  return AppBar(
+                    title: Text('Search',
+                        style: TextStyle(fontSize: 20, color: Colors.black)),
+                    backgroundColor: Colors.grey[300],
+                    elevation: 0,
+                    centerTitle: true,
+                    actions: <Widget>[
+                      Padding(
+                          padding: EdgeInsets.only(right: 20.0),
+                          child: GestureDetector(
+                            onTap: () {
+                              // Search bar implementation. Probably showSearch()
+                            },
+                            child: Icon(
+                              Icons.search,
+                              size: 26.0,
+                              color: Colors.black,
+                            ),
+                          )),
+                    ],
+                  );
+                }
+                return ListTile(
+                    title: Text(
+                  // place holder for restaurants nearby
+                  'Dish $index',
+                  style: TextStyle(color: Colors.black54),
+                ));
+              },
             ),
-            markers: _createUserMarker(),
-          ),
-          DraggableScrollableSheet(
-            initialChildSize: 0.3,
-            minChildSize: 0.1,
-            maxChildSize: .8,
-            builder: (BuildContext context, myscrollController) {
-              return Container(
-                color: Colors.lightBlue[200],
-                child: ListView.builder(
-                  controller: myscrollController,
-                  itemCount: 25,
-                  itemBuilder: (BuildContext context, int index) {
-                    if (index == 0) {
-                      return AppBar(
-                        title: Text('Search', style:TextStyle(fontSize: 20, color: Colors.black)),
-                        backgroundColor: Colors.grey[300],
-                        elevation: 0,
-                        centerTitle: true,
-                        actions: <Widget>[
-                          Padding(
-                              padding: EdgeInsets.only(right: 20.0),
-                              child: GestureDetector(
-                                onTap: () {
-                                  // Search bar implementation. Probably showSearch()
-                                },
-                                child: Icon(
-                                  Icons.search,
-                                  size: 26.0,
-                                  color: Colors.black,
-                                ),
-                              )
-                          ),
-                        ],
-                      );
-                    }
-                    return ListTile(
-                        title: Text(
-                          // place holder for restaurants nearby
-                          'Dish $index',
-                          style: TextStyle(color: Colors.black54),
-                        ));
-                  },
-                ),
-              );
-            },
-          ),
-        ]
-    );
+          );
+        },
+      ),
+    ]);
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.yellow[600],
-          elevation: 0,
-          title: Text('bitewise',
-              style: TextStyle(color: Colors.black, fontSize: 25)),
-          leading: IconButton(
-            icon: Icon(Icons.fastfood),
-            color: Colors.black,
-            onPressed: () {
-              Navigator.pushNamed(context, '/test');
-            },
-          ),
-          actions: <Widget>[
-            Padding(
-                padding: EdgeInsets.only(right: 20.0),
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(context, '/signin');
-                  },
-                  child: Icon(
-                    Icons.person,
-                    color: Colors.black,
-                  ),
-                )),
-          ],
-          centerTitle: true,
+        home: Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.yellow[600],
+        elevation: 0,
+        title: Text('bitewise',
+            style: TextStyle(color: Colors.black, fontSize: 25)),
+        leading: IconButton(
+          icon: Icon(Icons.fastfood),
+          color: Colors.black,
+          onPressed: () {
+            Navigator.pushNamed(context, '/test');
+          },
         ),
-        body: _homePage,
-      )
-    );
+        actions: <Widget>[
+          Padding(
+              padding: EdgeInsets.only(right: 20.0),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, '/signin');
+                },
+                child: Icon(
+                  Icons.person,
+                  color: Colors.black,
+                ),
+              )),
+        ],
+        centerTitle: true,
+      ),
+      body: _homePage,
+    ));
   }
 }
