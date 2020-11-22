@@ -7,7 +7,6 @@ load_dotenv()
 # https://googleapis.dev/python/google-api-core/latest/auth.html
 db = firestore.Client()
 
-
 def reformat_collection(collection_name):
     docs = db.collection(collection_name).get()
     for doc_snapshot in docs:
