@@ -283,6 +283,8 @@ PODS:
     - GoogleUtilities/UserDefaults (~> 6.7)
     - PromisesObjC (~> 1.2)
   - Flutter (1.0.0)
+  - geoflutterfire (0.0.1):
+    - Flutter
   - "geolocator (5.3.2+2)":
     - Flutter
   - google_maps_flutter (0.0.1):
@@ -361,6 +363,7 @@ DEPENDENCIES:
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - Flutter (from `Flutter`)
+  - geoflutterfire (from `.symlinks/plugins/geoflutterfire/ios`)
   - geolocator (from `.symlinks/plugins/geolocator/ios`)
   - google_maps_flutter (from `.symlinks/plugins/google_maps_flutter/ios`)
   - location_permissions (from `.symlinks/plugins/location_permissions/ios`)
@@ -396,6 +399,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/firebase_core/ios"
   Flutter:
     :path: Flutter
+  geoflutterfire:
+    :path: ".symlinks/plugins/geoflutterfire/ios"
   geolocator:
     :path: ".symlinks/plugins/geolocator/ios"
   google_maps_flutter:
@@ -406,7 +411,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   abseil: 6c8eb7892aefa08d929b39f9bb108e5367e3228f
   BoringSSL-GRPC: 8edf627ee524575e2f8d19d56f068b448eea3879
-  cloud_firestore: 10fd4a09ebffc33efd64708106e2e7de701fe9ae
+  cloud_firestore: c5d1e4d114eecb1dfb535f008435685bcf6063f1
   Firebase: c23a36d9e4cdf7877dfcba8dd0c58add66358999
   firebase_auth: d99b993c1405096e66c58211b1cd956c23eed1c5
   firebase_core: ae55ea92448ec8675d325da4db22cf3b4d58a54d
@@ -417,6 +422,7 @@ SPEC CHECKSUMS:
   FirebaseFirestore: 9b2f1b9b9a6f2f0b6fb7484b9e32ab7e39243554
   FirebaseInstallations: 466c7b4d1f58fe16707693091da253726a731ed2
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  geoflutterfire: 2a6493e01fb6eef1a6c9046b1baf9a943d0c5ffe
   geolocator: f7622e0e7e2a24718285b73916d60c4a54b9f5b6
   google_maps_flutter: c7f9c73576de1fbe152a227bfd6e6c4ae8088619
   GoogleAppMeasurement: a6a3a066369828db64eda428cb2856dc1cdc7c4e

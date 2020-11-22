@@ -1,6 +1,7 @@
 import 'package:bitewise/pages/homePage.dart';
 import 'package:bitewise/pages/signInPage.dart';
 import 'package:bitewise/pages/registerPage.dart';
+import 'package:bitewise/pages/restaurantPage.dart';
 import 'package:flutter/material.dart';
 
 import 'package:bitewise/pages/backendTestPage.dart';
@@ -22,6 +23,7 @@ class MyApp extends StatelessWidget {
         '/home' : (context) => HomePage(),
         '/signin' : (context) => SignIn(),
         '/register' : (context) => Register(),
+        '/restaurant' : (context) => RestaurantPage(),
         // Ideas :
           // Home page
           // Restaurant Page
