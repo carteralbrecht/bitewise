@@ -59,12 +59,12 @@ class _HomePageState extends State<HomePage> {
       DraggableScrollableSheet(
         initialChildSize: 0.3,
         minChildSize: 0.1,
-        maxChildSize: .8,
-        builder: (BuildContext context, myscrollController) {
+        maxChildSize: 0.8,
+        builder: (BuildContext context, myScrollController) {
           return Container(
             color: Colors.lightBlue[200],
             child: ListView.builder(
-              controller: myscrollController,
+              controller: myScrollController,
               itemCount: 25,
               itemBuilder: (BuildContext context, int index) {
                 if (index == 0) {
@@ -90,12 +90,16 @@ class _HomePageState extends State<HomePage> {
                     ],
                   );
                 }
+                if (index.isOdd) return Divider();
                 return ListTile(
-                    title: Text(
-                  // place holder for restaurants nearby
-                  'Dish $index',
-                  style: TextStyle(color: Colors.black54),
-                ));
+                  title: Text(
+                    // placeholder for restaurants nearby
+                    'Restaurant $index',
+                    style: TextStyle(color: Colors.black54)),
+                  onTap: () {
+                    Navigator.pushNamed(context, '/restaurant');
+                  }
+                );
               },
             ),
           );
