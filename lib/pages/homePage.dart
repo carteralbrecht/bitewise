@@ -59,7 +59,7 @@ class _HomePageState extends State<HomePage> {
       DraggableScrollableSheet(
         initialChildSize: 0.3,
         minChildSize: 0.1,
-        maxChildSize: .8,
+        maxChildSize: 0.8,
         builder: (BuildContext context, myScrollController) {
           return Container(
             color: Colors.lightBlue[200],
@@ -90,6 +90,7 @@ class _HomePageState extends State<HomePage> {
                     ],
                   );
                 }
+                if (index.isOdd) return Divider();
                 return ListTile(
                   title: Text(
                     // placeholder for restaurants nearby

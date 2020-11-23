@@ -1,9 +1,6 @@
 import 'dart:ui';
 import 'package:bitewise/services/auth.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-// import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class RestaurantPage extends StatefulWidget {
   @override
@@ -11,8 +8,9 @@ class RestaurantPage extends StatefulWidget {
 }
 
 class _RestaurantPageState extends State<RestaurantPage> {
+
+  ButtonStyle rateButton = new ButtonStyle();
   final AuthService _auth = AuthService();
-  Stack _restaurantPage;
 
   // @override
   // void initState() {
@@ -20,57 +18,34 @@ class _RestaurantPageState extends State<RestaurantPage> {
   //   super.initState();
   // }
 
-  Stack dishList() {
-    return Stack(children: <Widget>[
-      DraggableScrollableSheet(
-        initialChildSize: 0.3,
-        minChildSize: 0.1,
-        maxChildSize: .8,
-        builder: (BuildContext context, myScrollController) {
-          return Container(
-            color: Colors.lightBlue[200],
-            child: ListView.builder(
-              controller: myScrollController,
-              itemCount: 25,
-              itemBuilder: (BuildContext context, int index) {
-                if (index == 0) {
-                  return AppBar(
-                    title: Text('Search',
-                        style: TextStyle(fontSize: 20, color: Colors.black)),
-                    backgroundColor: Colors.grey[300],
-                    elevation: 0,
-                    centerTitle: true,
-                    actions: <Widget>[
-                      Padding(
-                          padding: EdgeInsets.only(right: 20.0),
-                          child: GestureDetector(
-                            onTap: () {
-                              // Search bar implementation. Probably showSearch()
-                            },
-                            child: Icon(
-                              Icons.search,
-                              size: 26.0,
-                              color: Colors.black,
-                            ),
-                          )),
-                    ],
-                  );
-                }
-                return ListTile(
-                    title: Text(
-                      // placeholder for restaurants nearby
-                        'Restaurant $index',
-                        style: TextStyle(color: Colors.black54)),
-                    onTap: () {
-                      Navigator.pushNamed(context, '/restaurant');
-                    }
-                );
-              },
-            ),
-          );
-        },
-      ),
-    ]);
+  Widget _dishList() {
+    return ListView.builder(
+      padding: EdgeInsets.all(16.0),
+      itemBuilder: (context, i) {
+        // if (i.isOdd) return Divider();
+
+        return Card(
+          child: Container(
+            padding: EdgeInsets.all(20.0),
+            child: Stack(
+              children: <Widget> [
+              Text('Dish $i', style: TextStyle(color: Colors.black, fontSize: 20)),
+              Row(
+              children: <Widget>[
+                Column(
+                  children: <Widget> [Text('  Dish $i description', style: TextStyle(color: Colors.black38, fontSize: 15))]),
+                Padding(padding: EdgeInsets.all(32.0)),
+                Column(
+                  children: <Widget> [
+                    TextButton(
+                        child: Text("Rate", style: TextStyle(color: Colors.black)),
+                        onPressed: ( /*rate modal*/ ) {},
+                        style: TextButton.styleFrom(backgroundColor: Colors.yellow[600])
+                    )
+                ])
+              ],
+        )])));
+    });
   }
 
   @override
@@ -80,7 +55,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
         backgroundColor: Colors.yellow[600],
         elevation: 0,
         title: Text('bitewise',
-            style: TextStyle(color: Colors.black, fontSize: 25)),
+          style: TextStyle(color: Colors.black, fontSize: 25)),
         leading: IconButton(
           icon: Icon(Icons.fastfood),
           color: Colors.black,
@@ -90,7 +65,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
         ),
         centerTitle: true,
       ),
-      body: _restaurantPage,
+      body: _dishList(),
     );
   }
 }
