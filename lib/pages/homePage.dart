@@ -3,7 +3,7 @@ import 'package:bitewise/services/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-// import 'package:sliding_up_panel/sliding_up_panel.dart';
+import '../components/restaurantListTile.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -58,48 +58,36 @@ class _HomePageState extends State<HomePage> {
       ),
       DraggableScrollableSheet(
         initialChildSize: 0.3,
-        minChildSize: 0.1,
-        maxChildSize: 0.8,
+        minChildSize: 0.05,
+        maxChildSize: 1,
         builder: (BuildContext context, myScrollController) {
           return Container(
-            color: Colors.lightBlue[200],
+            padding: EdgeInsets.only(top:10),
+            decoration: new BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.rectangle,
+              borderRadius:  BorderRadius.only(topLeft:Radius.circular(20.0), topRight:Radius.circular(20.0)),
+            ),
             child: ListView.builder(
               controller: myScrollController,
-              itemCount: 25,
+              itemCount: restaurantList.length + 1,
               itemBuilder: (BuildContext context, int index) {
                 if (index == 0) {
-                  return AppBar(
-                    title: Text('Search',
-                        style: TextStyle(fontSize: 20, color: Colors.black)),
-                    backgroundColor: Colors.grey[300],
-                    elevation: 0,
-                    centerTitle: true,
-                    actions: <Widget>[
-                      Padding(
-                          padding: EdgeInsets.only(right: 20.0),
-                          child: GestureDetector(
-                            onTap: () {
-                              // Search bar implementation. Probably showSearch()
-                            },
-                            child: Icon(
-                              Icons.search,
-                              size: 26.0,
-                              color: Colors.black,
-                            ),
-                          )),
-                    ],
+                  return Container(
+                    alignment:Alignment.topCenter,
+                    child: Container(
+                      height: 10,
+                      width: 50,
+                      margin: EdgeInsetsDirectional.only(top:0, bottom:0),
+                      decoration: new BoxDecoration(
+                        color: Color.fromRGBO(228,236,238,1),
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                      ),
+                    )
                   );
                 }
-                if (index.isOdd) return Divider();
-                return ListTile(
-                  title: Text(
-                    // placeholder for restaurants nearby
-                    'Restaurant $index',
-                    style: TextStyle(color: Colors.black54)),
-                  onTap: () {
-                    Navigator.pushNamed(context, '/restaurant');
-                  }
-                );
+                return restaurantList[index-1];
               },
             ),
           );
@@ -112,34 +100,68 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.yellow[600],
-        elevation: 0,
-        title: Text('bitewise',
-            style: TextStyle(color: Colors.black, fontSize: 25)),
-        leading: IconButton(
-          icon: Icon(Icons.fastfood),
-          color: Colors.black,
-          onPressed: () {
-            Navigator.pushNamed(context, '/test');
-          },
-        ),
-        actions: <Widget>[
-          Padding(
-              padding: EdgeInsets.only(right: 20.0),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.pushNamed(context, '/signin');
-                },
-                child: Icon(
-                  Icons.person,
-                  color: Colors.black,
+          appBar: AppBar(
+            centerTitle: true,
+            backgroundColor: Color.fromRGBO(228,236,238,1),
+            elevation: 0,
+            title: Container(
+              margin: EdgeInsets.only(left: 20, right: 20),
+              padding: EdgeInsets.only(left: 10, right: 10),
+              height: 40,
+              decoration: new BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.all(Radius.circular(20.0)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Icon(Icons.search, size: 26.0, color: Colors.grey),
+                  Text('Search', style: TextStyle(fontSize: 20, color: Colors.grey)),
+                ]
+              ),
+            ),
+            leading: IconButton(
+              icon: Icon(Icons.fastfood),
+              color: Colors.grey,
+              onPressed: () {
+                // Navigator.pushNamed(context, '/test');
+              },
+            ),
+            actions: <Widget>[
+              Container(
+                height:35,
+                width: 35,
+                decoration: new BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
                 ),
-              )),
-        ],
-        centerTitle: true,
-      ),
+                margin: EdgeInsets.only(right: 10.0),
+                child: GestureDetector(
+                  onTap: () {
+                    // Navigator.pushNamed(context, '/signin');
+                  },
+                  child: Icon(
+                    Icons.person,
+                    color: Colors.grey,
+                  ),
+                )
+              ),
+            ],
+            
+          ),
       body: _homePage,
     ));
   }
 }
+
+// Temporary until RestaurantQuery is hooked up
+var restaurantList = [RestaurantListTile("Chili's", "this is the chilis address, hooray! gotta make it really long"),
+                      RestaurantListTile("Chic Fil A", "this is the Chic Fil A address, hooray! gotta make it really long"),
+                      RestaurantListTile("Dominoes", "this is the Dominoes address, hooray! gotta make it really long"),
+                      RestaurantListTile("Waffle House", "this is the Waffle House address, hooray! gotta make it really long"),
+                      RestaurantListTile("Chili's", "this is the chilis address, hooray! gotta make it really long"),
+                      RestaurantListTile("Chic Fil A", "this is the Chic Fil A address, hooray! gotta make it really long"),
+                      RestaurantListTile("Dominoes", "this is the Dominoes address, hooray! gotta make it really long"),
+                      RestaurantListTile("Waffle House", "this is the Waffle House address, hooray!, gotta make it really long")
+                    ];
