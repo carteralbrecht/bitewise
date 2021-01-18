@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'package:geolocator/geolocator.dart';
 
+// Menu Item data model from Documenu API
+// https://documenu.com/docs#get_menu_item
+
 MenuItem menuItemFromJson(String str) {
   final jsonData = json.decode(str);
   return MenuItem.fromJson(jsonData);

@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'package:geolocator/geolocator.dart';
 
+// Restaurant data model from Documenu API
+// https://documenu.com/docs#get_restaurant
+
 Restaurant restaurantFromJson(String str) {
   final jsonData = json.decode(str);
   return Restaurant.fromJson(jsonData);
