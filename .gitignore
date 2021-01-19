@@ -45,3 +45,9 @@ app.*.map.json
 
 # misc related
 venv/
+
+# gradle build cache
+.gradle
+
+# environment vars
+.env

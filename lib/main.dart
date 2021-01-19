@@ -2,11 +2,14 @@ import 'package:bitewise/pages/homePage.dart';
 import 'package:bitewise/pages/signInPage.dart';
 import 'package:bitewise/pages/registerPage.dart';
 import 'package:bitewise/pages/restaurantPage.dart';
-import 'package:flutter/material.dart';
-
 import 'package:bitewise/pages/backendTestPage.dart';
+import 'package:flutter/material.dart';
+import 'package:dotenv/dotenv.dart' show load;
 
-void main() {
+Future main() async {
+  // loads api key from .env
+  load();
+
   runApp(MyApp());
 }
 
