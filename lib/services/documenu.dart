@@ -1,20 +1,49 @@
+import 'package:dotenv/dotenv.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
-import 'dart:io';
 import 'package:bitewise/models/restaurant.dart';
 import 'package:bitewise/models/menuItem.dart';
 
-// TODO: Add API Key in Header
-// https://documenu.com/docs#api_endpoint
+final String authority = "api.documenu.com";
+final String key = env["DOCUMENU_KEY"];
 
-final String baseUrl = "https://api.documenu.xyz/v2";
+// TODO: Add Error Handling
+// TODO: Find better way to store key
 
 Future<Restaurant> getRestaurant(String id) async {
-  final response = await http.get(baseUrl + "/restaurant/" + id);
+  var uri = Uri.https(authority, "/v2/restaurant/$id");
+
+  final response = await http.get(uri, headers: {
+    "X-API-KEY": key
+  });
+
   return restaurantFromJson(response.body);
 }
 
 Future<MenuItem> getMenuItem(String id) async {
-  final response = await http.get(baseUrl + "/menuitem/" + id);
+  var uri = Uri.https(authority, "/v2/menuitem/$id");
+
+  final response = await http.get(uri, headers: {
+    "X-API-KEY": key
+  });
+
   return menuItemFromJson(response.body);
 }
+
+Future<List<Restaurant>> searchRestaurantsGeo(Position geo, int radius) async {
+  var queryParameters = {
+    'lat': geo.latitude.toString(),
+    'lon': geo.longitude.toString(),
+    'distance': radius.toString()
+  };
+
+  var uri = Uri.https(authority, "/v2/restaurants/search/geo", queryParameters);
+
+  final response = await http.get(uri, headers: {
+    "X-API-KEY": key
+  });
+
+  return restaurantsFromJson(response.body);
+}
+

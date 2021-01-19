@@ -48,3 +48,6 @@ venv/
 
 # gradle build cache
 .gradle
+
+# environment vars
+.env

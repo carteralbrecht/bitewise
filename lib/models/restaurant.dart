@@ -6,7 +6,21 @@ import 'package:geolocator/geolocator.dart';
 
 Restaurant restaurantFromJson(String str) {
   final jsonData = json.decode(str);
-  return Restaurant.fromJson(jsonData);
+  return Restaurant.fromJson(jsonData["result"]);
+}
+
+List<Restaurant> restaurantsFromJson(String str) {
+  final jsonData = json.decode(str);
+
+  var decodedRestaurants = jsonData["data"];
+
+  List<Restaurant> restaurants = new List();
+
+  for (Map<String, dynamic> json in decodedRestaurants) {
+    restaurants.add(Restaurant.fromJson(json));
+  }
+
+  return restaurants;
 }
 
 class Restaurant {
@@ -32,19 +46,19 @@ class Restaurant {
 
   factory Restaurant.fromJson(Map<String, dynamic> json) {
     var cuisinesFromJson = json["cuisines"];
-    List<String> cuisinesList = cuisinesFromJson.cast<String>();
+    List<String> cuisinesList = cuisinesFromJson?.cast<String>();
 
     var geoFromJson = json["geo"];
-    Position position = new Position(latitude: geoFromJson["lat"], longitude: geoFromJson["lon"]);
+    Position position = geoFromJson == null ? null : new Position(latitude: geoFromJson["lat"], longitude: geoFromJson["lon"]);
 
 
     return new Restaurant(
-        id: json["restaurant_id"],
-        name: json["restaurant_name"],
-        phone: json["restaurant_phone"],
-        website: json["restaurant_website"],
-        hours: json["hours"],
-        priceRange: json["price_range"],
+        id: json["restaurant_id"].toString(),
+        name: json["restaurant_name"].toString(),
+        phone: json["restaurant_phone"].toString(),
+        website: json["restaurant_website"].toString(),
+        hours: json["hours"].toString(),
+        priceRange: json["price_range"].toString(),
         cuisines: cuisinesList,
         geo: position
     );

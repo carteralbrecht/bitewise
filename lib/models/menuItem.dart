@@ -6,7 +6,7 @@ import 'package:geolocator/geolocator.dart';
 
 MenuItem menuItemFromJson(String str) {
   final jsonData = json.decode(str);
-  return MenuItem.fromJson(jsonData);
+  return MenuItem.fromJson(jsonData["result"]);
 }
 
 class MenuItem {
@@ -34,17 +34,17 @@ class MenuItem {
 
   factory MenuItem.fromJson(Map<String, dynamic> json) {
     var geoFromJson = json["geo"];
-    Position position = new Position(latitude: geoFromJson["lat"], longitude: geoFromJson["lon"]);
+    Position position = geoFromJson == null ? null : new Position(latitude: geoFromJson["lat"], longitude: geoFromJson["lon"]);
 
     return new MenuItem(
-        id: json["item_id"],
-        name: json["menu_item_name"],
-        description: json["menu_item_description"],
-        price: json["menu_item_price"],
-        priceRange: json["price_range"],
-        restaurantId: json["restaurant_id"],
-        subsection: json["subsection"],
-        subsectionDescription: json["subsection_description"],
+        id: json["item_id"].toString(),
+        name: json["menu_item_name"].toString(),
+        description: json["menu_item_description"].toString(),
+        price: json["menu_item_price"].toString(),
+        priceRange: json["price_range"].toString(),
+        restaurantId: json["restaurant_id"].toString(),
+        subsection: json["subsection"].toString(),
+        subsectionDescription: json["subsection_description"].toString(),
         geo: position
     );
   }
