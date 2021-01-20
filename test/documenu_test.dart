@@ -2,12 +2,14 @@ import 'package:bitewise/models/restaurant.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:test/test.dart';
 import 'package:bitewise/services/documenu.dart';
-import 'package:dotenv/dotenv.dart' show load;
+// import 'package:dotenv/dotenv.dart' show load;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 
 void main() async {
 
   // load api key from .env
-  load();
+  await load();
 
   setUp(() {
     // setup goes here

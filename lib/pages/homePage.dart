@@ -1,5 +1,7 @@
 import 'dart:ui';
 import 'package:bitewise/services/auth.dart';
+import 'package:bitewise/services/documenu.dart';
+import 'package:bitewise/models/restaurant.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -15,10 +17,12 @@ class _HomePageState extends State<HomePage> {
   GoogleMapController mapController;
   Position currentLocation;
   Stack _homePage;
+  var restaurantsNearUser;
 
   @override
   void initState() {
     getUserLocation();
+    getRestaurantsNearby();
     super.initState();
   }
 
@@ -32,6 +36,26 @@ class _HomePageState extends State<HomePage> {
     print(result);
     setState(() {
       currentLocation = result;
+      
+    });
+  }
+
+  void getRestaurantsNearby() async {
+    var restaurants = await searchRestaurantsGeo(
+        Position(longitude: -77.17103, latitude: 39.114805),
+        2);
+    
+
+    List<Restaurant> resultsNear = new List<Restaurant>();
+    
+    
+    for (Restaurant restaurant in restaurants) {
+      resultsNear.add(restaurant);
+    }
+    setState(() {
+      restaurantsNearUser = resultsNear;
+
+      // create the map when restaurants are finished being fetched
       _homePage = createMap();
     });
   }
@@ -70,7 +94,7 @@ class _HomePageState extends State<HomePage> {
             ),
             child: ListView.builder(
               controller: myScrollController,
-              itemCount: restaurantList.length + 1,
+              itemCount: restaurantsNearUser.length + 1,
               itemBuilder: (BuildContext context, int index) {
                 if (index == 0) {
                   return Container(
@@ -87,7 +111,7 @@ class _HomePageState extends State<HomePage> {
                     )
                   );
                 }
-                return restaurantList[index-1];
+                return new RestaurantListTile(restaurantsNearUser[index-1]);
               },
             ),
           );
@@ -156,12 +180,12 @@ class _HomePageState extends State<HomePage> {
 }
 
 // Temporary until RestaurantQuery is hooked up
-var restaurantList = [RestaurantListTile("Chili's", "this is the chilis address, hooray! gotta make it really long"),
-                      RestaurantListTile("Chic Fil A", "this is the Chic Fil A address, hooray! gotta make it really long"),
-                      RestaurantListTile("Dominoes", "this is the Dominoes address, hooray! gotta make it really long"),
-                      RestaurantListTile("Waffle House", "this is the Waffle House address, hooray! gotta make it really long"),
-                      RestaurantListTile("Chili's", "this is the chilis address, hooray! gotta make it really long"),
-                      RestaurantListTile("Chic Fil A", "this is the Chic Fil A address, hooray! gotta make it really long"),
-                      RestaurantListTile("Dominoes", "this is the Dominoes address, hooray! gotta make it really long"),
-                      RestaurantListTile("Waffle House", "this is the Waffle House address, hooray!, gotta make it really long")
-                    ];
+// var restaurantList = [RestaurantListTile("Chili's", "this is the chilis address, hooray! gotta make it really long"),
+//                       RestaurantListTile("Chic Fil A", "this is the Chic Fil A address, hooray! gotta make it really long"),
+//                       RestaurantListTile("Dominoes", "this is the Dominoes address, hooray! gotta make it really long"),
+//                       RestaurantListTile("Waffle House", "this is the Waffle House address, hooray! gotta make it really long"),
+//                       RestaurantListTile("Chili's", "this is the chilis address, hooray! gotta make it really long"),
+//                       RestaurantListTile("Chic Fil A", "this is the Chic Fil A address, hooray! gotta make it really long"),
+//                       RestaurantListTile("Dominoes", "this is the Dominoes address, hooray! gotta make it really long"),
+//                       RestaurantListTile("Waffle House", "this is the Waffle House address, hooray!, gotta make it really long")
+//                     ];

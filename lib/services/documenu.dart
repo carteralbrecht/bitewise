@@ -1,4 +1,6 @@
-import 'package:dotenv/dotenv.dart';
+// import 'package:dotenv/dotenv.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
@@ -6,7 +8,7 @@ import 'package:bitewise/models/restaurant.dart';
 import 'package:bitewise/models/menuItem.dart';
 
 final String authority = "api.documenu.com";
-final String key = env["DOCUMENU_KEY"];
+final String key = env['DOCUMENU_KEY'];
 
 // TODO: Add Error Handling
 // TODO: Find better way to store key

@@ -1,11 +1,11 @@
+import 'package:bitewise/models/restaurant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 class RestaurantListTile extends StatefulWidget {
 
-  final String name;
-  final String address;
-  const RestaurantListTile(this.name,this.address);
+  final Restaurant restaurant;
+  const RestaurantListTile(this.restaurant);
 
   @override
   _RestaurantListTileState createState() => _RestaurantListTileState();
@@ -30,9 +30,9 @@ class _RestaurantListTileState extends State<RestaurantListTile> {
             margin: EdgeInsets.only(left: 20),
             child: Icon(Icons.circle, color:Colors.white, size:50),
           ),
-          title: Text(widget.name, style: TextStyle(color: Colors.black, fontSize:25, fontWeight: FontWeight.bold)),
+          title: Text(widget.restaurant.name, style: TextStyle(color: Colors.black, fontSize:25, fontWeight: FontWeight.bold)),
           subtitle: Text(
-            widget.address,
+            widget.restaurant.website,
           ),
           isThreeLine: true,
         ),

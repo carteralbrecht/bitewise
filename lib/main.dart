@@ -4,11 +4,13 @@ import 'package:bitewise/pages/registerPage.dart';
 import 'package:bitewise/pages/restaurantPage.dart';
 import 'package:bitewise/pages/backendTestPage.dart';
 import 'package:flutter/material.dart';
-import 'package:dotenv/dotenv.dart' show load;
+// import 'package:dotenv/dotenv.dart' show load;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 
 Future main() async {
   // loads api key from .env
-  load();
+  await load();
 
   runApp(MyApp());
 }
