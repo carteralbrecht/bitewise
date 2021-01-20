@@ -15,13 +15,13 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final AuthService _auth = AuthService();
   GoogleMapController mapController;
-  Position currentLocation;
+  Position currentLocation = Position(longitude: -77.17103, latitude: 39.114805);
   Stack _homePage;
   var restaurantsNearUser;
 
   @override
   void initState() {
-    getUserLocation();
+    //getUserLocation();
     getRestaurantsNearby();
     super.initState();
   }
@@ -60,14 +60,25 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  Set<Marker> _createUserMarker() {
-    return <Marker>[
-      Marker(
+  Set<Marker> _createMarkers() {
+    final Set<Marker> markersSet = {};
+
+    markersSet.add(Marker(
         markerId: MarkerId("Current Location"),
         position: LatLng(currentLocation.latitude, currentLocation.longitude),
         infoWindow: InfoWindow(title: "Current Location"),
-      )
-    ].toSet();
+      ));
+
+    for (Restaurant restaurant in restaurantsNearUser)
+    {
+        markersSet.add(Marker(
+          markerId: MarkerId(restaurant.name),
+          position: LatLng(restaurant.geo.latitude, restaurant.geo.longitude),
+          infoWindow: InfoWindow(title: restaurant.name),
+        ));
+    }
+
+    return markersSet;
   }
 
   Stack createMap() {
@@ -78,7 +89,7 @@ class _HomePageState extends State<HomePage> {
           target: LatLng(currentLocation.latitude, currentLocation.longitude),
           zoom: 11.0,
         ),
-        markers: _createUserMarker(),
+        markers: _createMarkers(),
       ),
       DraggableScrollableSheet(
         initialChildSize: 0.3,
