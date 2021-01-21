@@ -5,6 +5,7 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // Gets the current signed in user
+  // test comment
   Future getUser() async {
     try {
       FirebaseUser user = await _auth.currentUser();
