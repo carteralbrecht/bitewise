@@ -15,13 +15,13 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final AuthService _auth = AuthService();
   GoogleMapController mapController;
-  Position currentLocation = Position(longitude: -77.17103, latitude: 39.114805);
+  Position currentLocation; 
   Stack _homePage;
   var restaurantsNearUser;
 
   @override
   void initState() {
-    //getUserLocation();
+    getUserLocation();
     getRestaurantsNearby();
     super.initState();
   }
@@ -41,8 +41,14 @@ class _HomePageState extends State<HomePage> {
   }
 
   void getRestaurantsNearby() async {
+
+    // Don't fetch restaurants until we have a current location for the user
+    while (currentLocation == null) {
+      await Future.delayed(Duration(milliseconds: 500));
+    }
+
     var restaurants = await searchRestaurantsGeo(
-        Position(longitude: -77.17103, latitude: 39.114805),
+        currentLocation,
         2);
     
 
@@ -52,9 +58,9 @@ class _HomePageState extends State<HomePage> {
     for (Restaurant restaurant in restaurants) {
       resultsNear.add(restaurant);
     }
+
     setState(() {
       restaurantsNearUser = resultsNear;
-
       // create the map when restaurants are finished being fetched
       _homePage = createMap();
     });
@@ -190,13 +196,3 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-// Temporary until RestaurantQuery is hooked up
-// var restaurantList = [RestaurantListTile("Chili's", "this is the chilis address, hooray! gotta make it really long"),
-//                       RestaurantListTile("Chic Fil A", "this is the Chic Fil A address, hooray! gotta make it really long"),
-//                       RestaurantListTile("Dominoes", "this is the Dominoes address, hooray! gotta make it really long"),
-//                       RestaurantListTile("Waffle House", "this is the Waffle House address, hooray! gotta make it really long"),
-//                       RestaurantListTile("Chili's", "this is the chilis address, hooray! gotta make it really long"),
-//                       RestaurantListTile("Chic Fil A", "this is the Chic Fil A address, hooray! gotta make it really long"),
-//                       RestaurantListTile("Dominoes", "this is the Dominoes address, hooray! gotta make it really long"),
-//                       RestaurantListTile("Waffle House", "this is the Waffle House address, hooray!, gotta make it really long")
-//                     ];
