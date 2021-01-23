@@ -18,9 +18,11 @@ class _HomePageState extends State<HomePage> {
   Position currentLocation; 
   Stack _homePage;
   var restaurantsNearUser;
+  BitmapDescriptor pinImage;
 
   @override
   void initState() {
+    setPinImage();
     getUserLocation();
     getRestaurantsNearby();
     super.initState();
@@ -28,6 +30,12 @@ class _HomePageState extends State<HomePage> {
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
+  }
+
+  void setPinImage() async {
+    pinImage = await BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(devicePixelRatio: 2.5),
+        'assets/location-pin-128px.png');
   }
 
   void getUserLocation() async {
@@ -81,6 +89,7 @@ class _HomePageState extends State<HomePage> {
           markerId: MarkerId(restaurant.name),
           position: LatLng(restaurant.geo.latitude, restaurant.geo.longitude),
           infoWindow: InfoWindow(title: restaurant.name),
+          icon: pinImage
         ));
     }
 
@@ -93,7 +102,7 @@ class _HomePageState extends State<HomePage> {
         onMapCreated: _onMapCreated,
         initialCameraPosition: CameraPosition(
           target: LatLng(currentLocation.latitude, currentLocation.longitude),
-          zoom: 11.0,
+          zoom: 13.0,
         ),
         markers: _createMarkers(),
       ),
