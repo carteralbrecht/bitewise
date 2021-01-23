@@ -34,8 +34,8 @@ class _HomePageState extends State<HomePage> {
 
   void setPinImage() async {
     pinImage = await BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(devicePixelRatio: 2.5),
-        'assets/location-pin-128px.png');
+        ImageConfiguration(devicePixelRatio: 2.5, size: Size(25, 35)),
+        'assets/pin.png');
   }
 
   void getUserLocation() async {
