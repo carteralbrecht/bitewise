@@ -48,6 +48,18 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  // calculates the distance to a restaurant from the current location (in miles)
+  Future<double> distanceToRestaurant(Restaurant restaurant) async {
+    var distanceMeters = await Geolocator().distanceBetween(
+        restaurant.geo.latitude,
+        restaurant.geo.longitude,
+        currentLocation.latitude,
+        currentLocation.longitude);
+
+    // meters to miles
+    return distanceMeters * 0.000621371192;
+  }
+
   void getRestaurantsNearby() async {
 
     // Don't fetch restaurants until we have a current location for the user
