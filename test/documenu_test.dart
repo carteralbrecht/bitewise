@@ -1,3 +1,4 @@
+import 'package:bitewise/models/menuItem.dart';
 import 'package:bitewise/models/restaurant.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:test/test.dart';
@@ -41,6 +42,26 @@ void main() async {
         break;
       }
     }
+    expect(doesContain, true);
+  });
+
+  // Gets the menu items for a restaurant by the restaurant id
+  // Checks one of the results
+  test('MenuItemsForRestaurant', () async {
+    var restaurant = await getRestaurant("2859723381214996");
+
+    var menuItems = await getMenuItemsForRestaurant(restaurant.id);
+
+    var shouldContain = "Sun Up Large Eggs";
+    var doesContain = false;
+
+    for (MenuItem item in menuItems) {
+      if (item.name == shouldContain) {
+        doesContain = true;
+        break;
+      }
+    }
+
     expect(doesContain, true);
   });
 }

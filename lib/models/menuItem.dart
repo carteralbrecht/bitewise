@@ -9,6 +9,20 @@ MenuItem menuItemFromJson(String str) {
   return MenuItem.fromJson(jsonData["result"]);
 }
 
+List<MenuItem> menuItemsFromJson(String str) {
+  final jsonData = json.decode(str);
+
+  var decodedMenuItems = jsonData["data"];
+
+  List<MenuItem> menuItems = new List();
+
+  for (Map<String, dynamic> json in decodedMenuItems) {
+    menuItems.add(MenuItem.fromJson(json));
+  }
+
+  return menuItems;
+}
+
 class MenuItem {
   final String id;
   final String name;

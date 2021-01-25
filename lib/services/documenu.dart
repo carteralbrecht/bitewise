@@ -47,3 +47,13 @@ Future<List<Restaurant>> searchRestaurantsGeo(Position geo, int radius) async {
   return restaurantsFromJson(response.body);
 }
 
+Future<List<MenuItem>> getMenuItemsForRestaurant(String id) async {
+  var uri = Uri.https(authority, "/v2/restaurant/$id/menuitems");
+
+  final response = await http.get(uri, headers: {
+    "X-API-KEY": key
+  });
+
+  return menuItemsFromJson(response.body);
+}
+
