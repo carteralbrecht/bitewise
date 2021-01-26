@@ -64,6 +64,7 @@ class _SignInState extends State<SignIn> {
                       } else {
                         print('signed in');
                         print(result);
+                        Navigator.pushNamed(context, '/');
                       }
                     },
                     child: Text(

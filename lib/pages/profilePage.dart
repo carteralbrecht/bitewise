@@ -18,6 +18,17 @@ class _ProfilePageState extends State<ProfilePage> {
     super.initState();
   }
 
+  void doSignOut() async {
+    var user = await _auth.signOut();
+
+    setState(() {
+      currentUser = user;
+    });
+
+    Navigator.pushNamed(context, '/signin');
+
+  }
+
   Future getCurrentUser() async {
     FirebaseUser user = await _auth.getUser();
     print("setting state: ");
@@ -71,7 +82,20 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       body: Container(
         alignment: Alignment.center,
-        child: Text(currentUser == null ? "loading.." : currentUser.toString(), style: TextStyle(color: Colors.black, fontSize: 20))
+        child: Column(
+          children: <Widget>[
+            Text(currentUser == null ? "loading.." : currentUser.toString(), style: TextStyle(color: Colors.black, fontSize: 20)),
+            FlatButton(
+              onPressed:  () async => {
+                doSignOut()
+              }, 
+              child: Text("Sign out"),
+              height: 40,
+              color: Colors.white,
+              textColor: Colors.black,
+            ),
+          ],
+        )
       ),
     );
   }
