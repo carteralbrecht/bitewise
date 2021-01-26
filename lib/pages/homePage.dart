@@ -19,6 +19,7 @@ class _HomePageState extends State<HomePage> {
   Position currentLocation; 
   Stack _homePage;
   var restaurantsNearUser;
+  var restaurantDistances;
   BitmapDescriptor pinImage;
 
   @override
@@ -74,14 +75,17 @@ class _HomePageState extends State<HomePage> {
     
 
     List<Restaurant> resultsNear = new List<Restaurant>();
+    List<double> restDistances = new List<double>();
     
     
     for (Restaurant restaurant in restaurants) {
       resultsNear.add(restaurant);
+      restDistances.add(await distanceToRestaurant(restaurant));
     }
 
     setState(() {
       restaurantsNearUser = resultsNear;
+      restaurantDistances = restDistances;
       // create the map when restaurants are finished being fetched
       _homePage = createMap();
     });
@@ -157,7 +161,7 @@ class _HomePageState extends State<HomePage> {
                       )
                     )
                   },
-                  child: RestaurantListTile(restaurantsNearUser[index-1])
+                  child: RestaurantListTile(restaurantsNearUser[index-1], restaurantDistances[index-1])
                 );
               },
             ),
