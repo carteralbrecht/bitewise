@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:bitewise/pages/restaurantPage.dart';
 import 'package:bitewise/services/auth.dart';
 import 'package:bitewise/services/documenu.dart';
 import 'package:bitewise/models/restaurant.dart';
@@ -137,7 +138,15 @@ class _HomePageState extends State<HomePage> {
                     )
                   );
                 }
-                return new RestaurantListTile(restaurantsNearUser[index-1]);
+                return new FlatButton(
+                  onPressed: () => {
+                    Navigator.push(context, 
+                      MaterialPageRoute(builder: (context) => RestaurantPage(restaurantsNearUser[index-1])
+                      )
+                    )
+                  },
+                  child: RestaurantListTile(restaurantsNearUser[index-1])
+                );
               },
             ),
           );
@@ -175,7 +184,7 @@ class _HomePageState extends State<HomePage> {
               icon: Icon(Icons.fastfood),
               color: Colors.grey,
               onPressed: () {
-                // Navigator.pushNamed(context, '/test');
+                Navigator.pushNamed(context, '/test');
               },
             ),
             actions: <Widget>[
@@ -188,8 +197,17 @@ class _HomePageState extends State<HomePage> {
                 ),
                 margin: EdgeInsets.only(right: 10.0),
                 child: GestureDetector(
-                  onTap: () {
-                    // Navigator.pushNamed(context, '/signin');
+                  onTap: () async {
+                    var user = await _auth.getUser();
+                    if (user == null)
+                    {
+                      Navigator.pushNamed(context, '/signin');
+                    }
+                    else
+                    {
+                      Navigator.pushNamed(context, '/profile');
+                    }
+                    
                   },
                   child: Icon(
                     Icons.person,

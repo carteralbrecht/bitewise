@@ -1,8 +1,15 @@
 import 'dart:ui';
 import 'package:bitewise/services/auth.dart';
 import 'package:flutter/material.dart';
+import 'package:bitewise/models/restaurant.dart';
+import 'package:bitewise/models/menuItem.dart';
 
 class RestaurantPage extends StatefulWidget {
+
+  final Restaurant restaurant;
+  const RestaurantPage(this.restaurant);
+
+
   @override
   _RestaurantPageState createState() => _RestaurantPageState();
 }
@@ -60,7 +67,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
           icon: Icon(Icons.fastfood),
           color: Colors.black,
           onPressed: () {
-            Navigator.pushNamed(context, '/test');
+            Navigator.pop(context);
           },
         ),
         centerTitle: true,
