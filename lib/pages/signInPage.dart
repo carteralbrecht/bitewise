@@ -73,6 +73,22 @@ class _SignInState extends State<SignIn> {
                     ),
                     color: Colors.yellow[600],
                   ),
+                  RaisedButton(
+                    onPressed: () async {
+                      dynamic result = await _auth.signInByGoogle();
+                      if (result == null) {
+                        print('error signing in by google!');
+                      } else {
+                        print('signed in');
+                        print(result);
+                      }
+                    },
+                    child: Text(
+                      'Sign In with Google',
+                      style: TextStyle(color: Colors.black, fontSize: 20),
+                    ),
+                    color: Colors.yellow[600],
+                  ),
                   SizedBox(height: 20),
                   Text(
                     "Don't have an account? Sign up below!",

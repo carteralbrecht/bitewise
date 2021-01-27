@@ -1,10 +1,16 @@
 // Conection to Firebase and Authorization Logic Here
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: ['email', 'profile'],
+    hostedDomain: "",
+    clientId: "",);
 
   // Gets the current signed in user
+  // test comment
   Future getUser() async {
     try {
       FirebaseUser user = await _auth.currentUser();
@@ -40,9 +46,42 @@ class AuthService {
     }
   }
 
+  Future signInByGoogle() async {
+    try {
+      dynamic user = await getUser();
+      if (user != null) {
+        print(user);
+        print(
+            "already signed in to an account. Please sign out before logging into a new account.");
+        return user;
+      }
+
+      // this sign out is just to ensure the prompt will show up
+      _googleSignIn.signOut();
+
+      // prompt the user to sign into their google account
+      print("prompt for gAcc");
+      GoogleSignInAccount gAcc = await _googleSignIn.signIn();
+      print("gAcc chosen");
+
+      // create the credential for the google account
+      GoogleSignInAuthentication gAuth = await gAcc.authentication;
+      AuthCredential gCred = GoogleAuthProvider.getCredential(
+          accessToken: gAuth.accessToken, idToken: gAuth.idToken);
+
+      // Create the firebase user with the google account credential
+      user = (await _auth.signInWithCredential(gCred)).user;
+      return user;
+    } catch (e) {
+      print(e.toString());
+      return null;
+    }
+  }
+
   Future signOut() async {
     try {
-      _auth.signOut();
+        _googleSignIn.signOut();
+        _auth.signOut();
       return null;
     } catch (e) {
       print(e.toString());
