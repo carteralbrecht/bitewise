@@ -104,8 +104,15 @@ class _HomePageState extends State<HomePage> {
         markersSet.add(Marker(
           markerId: MarkerId(restaurant.name),
           position: LatLng(restaurant.geo.latitude, restaurant.geo.longitude),
-          infoWindow: InfoWindow(title: restaurant.name),
-          icon: pinImage
+          infoWindow: InfoWindow(title: restaurant.name,
+            onTap: () => {
+              Navigator.push(context, 
+                  MaterialPageRoute(builder: (context) => RestaurantPage(restaurant)
+                )
+              )
+            }  
+          ),
+          icon: pinImage,
         ));
     }
 
