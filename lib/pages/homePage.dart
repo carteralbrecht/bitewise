@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../components/restaurantListTile.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 class HomePage extends StatefulWidget {
   @override
@@ -21,17 +22,22 @@ class _HomePageState extends State<HomePage> {
   var restaurantsNearUser;
   var restaurantDistances;
   BitmapDescriptor pinImage;
+  String _mapStyle;
 
   @override
   void initState() {
     setPinImage();
     getUserLocation();
     getRestaurantsNearby();
+    rootBundle.loadString('assets/MapStyle.txt').then((string) {
+      _mapStyle = string;
+    });
     super.initState();
   }
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
+    mapController.setMapStyle(_mapStyle);
   }
 
   void setPinImage() async {
@@ -43,7 +49,6 @@ class _HomePageState extends State<HomePage> {
   void getUserLocation() async {
     Position result = await Geolocator()
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
-    print(result);
     setState(() {
       currentLocation = result;
       
@@ -94,12 +99,6 @@ class _HomePageState extends State<HomePage> {
   Set<Marker> _createMarkers() {
     final Set<Marker> markersSet = {};
 
-    markersSet.add(Marker(
-        markerId: MarkerId("Current Location"),
-        position: LatLng(currentLocation.latitude, currentLocation.longitude),
-        infoWindow: InfoWindow(title: "Current Location"),
-      ));
-
     for (Restaurant restaurant in restaurantsNearUser)
     {
         markersSet.add(Marker(
@@ -122,6 +121,8 @@ class _HomePageState extends State<HomePage> {
           zoom: 13.0,
         ),
         markers: _createMarkers(),
+        myLocationEnabled: true,
+        myLocationButtonEnabled: false,
       ),
       DraggableScrollableSheet(
         initialChildSize: 0.3,
