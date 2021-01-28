@@ -9,7 +9,7 @@
     <application
         android:name="io.flutter.app.FlutterApplication"
         android:label="bitewise"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/burger">
 
         <meta-data android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyArWh-0Qgf_oasWVJi3dGG-aj0UB-TLncQ"/>

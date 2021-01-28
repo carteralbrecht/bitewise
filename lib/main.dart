@@ -1,14 +1,16 @@
 import 'package:bitewise/pages/homePage.dart';
 import 'package:bitewise/pages/signInPage.dart';
 import 'package:bitewise/pages/registerPage.dart';
-import 'package:bitewise/pages/restaurantPage.dart';
+import 'package:bitewise/pages/profilePage.dart';
 import 'package:bitewise/pages/backendTestPage.dart';
 import 'package:flutter/material.dart';
-import 'package:dotenv/dotenv.dart' show load;
+// import 'package:dotenv/dotenv.dart' show load;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 
 Future main() async {
   // loads api key from .env
-  load();
+  await load();
 
   runApp(MyApp());
 }
@@ -18,22 +20,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      initialRoute: '/home',
+      initialRoute: '/',
       routes: {
         '/test' : (context) => Test(),
 
-        // '/' : (context) => HomePage(),
-        '/home' : (context) => HomePage(),
+        '/' : (context) => HomePage(),
+        // '/home' : (context) => HomePage(),
         '/signin' : (context) => SignIn(),
         '/register' : (context) => Register(),
-        '/restaurant' : (context) => RestaurantPage(),
-        // Ideas :
-          // Home page
-          // Restaurant Page
-          // Loading Screen
-          // User Profile
-          // sign up
-          // log in
+        '/profile' : (context) => ProfilePage(),
+        // ANON route for restaurant page
 
       },
     );
