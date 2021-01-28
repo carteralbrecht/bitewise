@@ -7,7 +7,8 @@ class AuthService {
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: ['email', 'profile'],
     hostedDomain: "",
-    clientId: "",);
+    clientId: "",
+  );
 
   // Gets the current signed in user
   // test comment
@@ -80,8 +81,8 @@ class AuthService {
 
   Future signOut() async {
     try {
-        _googleSignIn.signOut();
-        _auth.signOut();
+      _googleSignIn.signOut();
+      _auth.signOut();
       return null;
     } catch (e) {
       print(e.toString());
@@ -98,6 +99,17 @@ class AuthService {
       print("err in deleteAccount()");
       print(e.toString());
       return null;
+    }
+  }
+
+  Future resetPassword(String email) async {
+    try {
+      _auth.sendPasswordResetEmail(email: email);
+      return null;
+    } catch (e) {
+      print("err in resetPassword()");
+      print(e.toString());
+      return e.toString();
     }
   }
 
