@@ -32,6 +32,7 @@ class Restaurant {
   final String priceRange;
   final List<String> cuisines;
   final Position geo;
+  final String address;
 
   Restaurant({
     this.id,
@@ -41,7 +42,8 @@ class Restaurant {
     this.hours,
     this.priceRange,
     this.cuisines,
-    this.geo
+    this.geo,
+    this.address
   });
 
   factory Restaurant.fromJson(Map<String, dynamic> json) {
@@ -51,6 +53,8 @@ class Restaurant {
     var geoFromJson = json["geo"];
     Position position = geoFromJson == null ? null : new Position(latitude: geoFromJson["lat"], longitude: geoFromJson["lon"]);
 
+    var addressFromJson = json["address"];
+    String formattedAddress = addressFromJson == null ? null : addressFromJson["formatted"];
 
     return new Restaurant(
         id: json["restaurant_id"].toString(),
@@ -60,7 +64,8 @@ class Restaurant {
         hours: json["hours"].toString(),
         priceRange: json["price_range"].toString(),
         cuisines: cuisinesList,
-        geo: position
+        geo: position,
+        address: formattedAddress
     );
   }
 }

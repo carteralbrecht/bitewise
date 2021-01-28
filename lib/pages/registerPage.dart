@@ -76,6 +76,7 @@ class _RegisterState extends State<Register> {
                       } else {
                         print('registered');
                         print(result);
+                        Navigator.pushNamed(context, '/');
                       }
                     },
                     child: Text(

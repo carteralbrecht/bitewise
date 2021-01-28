@@ -1,8 +1,16 @@
 import 'dart:ui';
 import 'package:bitewise/services/auth.dart';
 import 'package:flutter/material.dart';
+import 'package:bitewise/models/restaurant.dart';
+import 'package:bitewise/pages/profilePage.dart';
+import 'package:bitewise/models/menuItem.dart';
 
 class RestaurantPage extends StatefulWidget {
+
+  final Restaurant restaurant;
+  const RestaurantPage(this.restaurant);
+
+
   @override
   _RestaurantPageState createState() => _RestaurantPageState();
 }
@@ -60,9 +68,42 @@ class _RestaurantPageState extends State<RestaurantPage> {
           icon: Icon(Icons.fastfood),
           color: Colors.black,
           onPressed: () {
-            Navigator.pushNamed(context, '/test');
+            Navigator.pop(context);
           },
         ),
+        actions: <Widget>[
+              Container(
+                height:35,
+                width: 35,
+                decoration: new BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                margin: EdgeInsets.only(right: 10.0),
+                child: GestureDetector(
+                  onTap: () async {
+                    var user = await _auth.getUser();
+                    if (user == null)
+                    {
+                      Navigator.pushNamed(context, '/signin');
+                      
+                    }
+                    else
+                    {
+                      Navigator.push(context, 
+                        MaterialPageRoute(builder: (context) => ProfilePage()
+                        )
+                      );
+                    }
+                    
+                  },
+                  child: Icon(
+                    Icons.person,
+                    color: Colors.grey,
+                  ),
+                )
+              ),
+            ],
         centerTitle: true,
       ),
       body: _dishList(),

@@ -1,9 +1,13 @@
 import 'dart:ui';
+import 'package:bitewise/pages/restaurantPage.dart';
 import 'package:bitewise/services/auth.dart';
+import 'package:bitewise/services/documenu.dart';
+import 'package:bitewise/models/restaurant.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../components/restaurantListTile.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 class HomePage extends StatefulWidget {
   @override
@@ -13,37 +17,106 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final AuthService _auth = AuthService();
   GoogleMapController mapController;
-  Position currentLocation;
+  Position currentLocation; 
   Stack _homePage;
+  var restaurantsNearUser;
+  var restaurantDistances;
+  BitmapDescriptor pinImage;
+  String _mapStyle;
 
   @override
   void initState() {
+    setPinImage();
     getUserLocation();
+    getRestaurantsNearby();
+    rootBundle.loadString('assets/MapStyle.txt').then((string) {
+      _mapStyle = string;
+    });
     super.initState();
   }
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
+    mapController.setMapStyle(_mapStyle);
+  }
+
+  void setPinImage() async {
+    pinImage = await BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(devicePixelRatio: 2.5, size: Size(25, 35)),
+        'assets/pin.png');
   }
 
   void getUserLocation() async {
     Position result = await Geolocator()
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
-    print(result);
     setState(() {
       currentLocation = result;
+      
+    });
+  }
+
+  // calculates the distance to a restaurant from the current location (in miles)
+  Future<double> distanceToRestaurant(Restaurant restaurant) async {
+    var distanceMeters = await Geolocator().distanceBetween(
+        restaurant.geo.latitude,
+        restaurant.geo.longitude,
+        currentLocation.latitude,
+        currentLocation.longitude);
+
+    // meters to miles
+    return distanceMeters * 0.000621371192;
+  }
+
+  void getRestaurantsNearby() async {
+
+    // Don't fetch restaurants until we have a current location for the user
+    while (currentLocation == null) {
+      await Future.delayed(Duration(milliseconds: 500));
+    }
+
+    var restaurants = await searchRestaurantsGeo(
+        currentLocation,
+        2);
+    
+
+    List<Restaurant> resultsNear = new List<Restaurant>();
+    List<double> restDistances = new List<double>();
+    
+    
+    for (Restaurant restaurant in restaurants) {
+      resultsNear.add(restaurant);
+      restDistances.add(await distanceToRestaurant(restaurant));
+    }
+
+    setState(() {
+      restaurantsNearUser = resultsNear;
+      restaurantDistances = restDistances;
+      // create the map when restaurants are finished being fetched
       _homePage = createMap();
     });
   }
 
-  Set<Marker> _createUserMarker() {
-    return <Marker>[
-      Marker(
-        markerId: MarkerId("Current Location"),
-        position: LatLng(currentLocation.latitude, currentLocation.longitude),
-        infoWindow: InfoWindow(title: "Current Location"),
-      )
-    ].toSet();
+  Set<Marker> _createMarkers() {
+    final Set<Marker> markersSet = {};
+
+    for (Restaurant restaurant in restaurantsNearUser)
+    {
+        markersSet.add(Marker(
+          markerId: MarkerId(restaurant.name),
+          position: LatLng(restaurant.geo.latitude, restaurant.geo.longitude),
+          infoWindow: InfoWindow(title: restaurant.name,
+            onTap: () => {
+              Navigator.push(context, 
+                  MaterialPageRoute(builder: (context) => RestaurantPage(restaurant)
+                )
+              )
+            }  
+          ),
+          icon: pinImage,
+        ));
+    }
+
+    return markersSet;
   }
 
   Stack createMap() {
@@ -52,9 +125,11 @@ class _HomePageState extends State<HomePage> {
         onMapCreated: _onMapCreated,
         initialCameraPosition: CameraPosition(
           target: LatLng(currentLocation.latitude, currentLocation.longitude),
-          zoom: 11.0,
+          zoom: 13.0,
         ),
-        markers: _createUserMarker(),
+        markers: _createMarkers(),
+        myLocationEnabled: true,
+        myLocationButtonEnabled: false,
       ),
       DraggableScrollableSheet(
         initialChildSize: 0.3,
@@ -72,7 +147,7 @@ class _HomePageState extends State<HomePage> {
             ),
             child: ListView.builder(
               controller: myScrollController,
-              itemCount: restaurantList.length + 1,
+              itemCount: restaurantsNearUser.length + 1,
               itemBuilder: (BuildContext context, int index) {
                 if (index == 0) {
                   return Container(
@@ -88,7 +163,15 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ));
                 }
-                return restaurantList[index - 1];
+                return new FlatButton(
+                  onPressed: () => {
+                    Navigator.push(context, 
+                      MaterialPageRoute(builder: (context) => RestaurantPage(restaurantsNearUser[index-1])
+                      )
+                    )
+                  },
+                  child: RestaurantListTile(restaurantsNearUser[index-1], restaurantDistances[index-1])
+                );
               },
             ),
           );
@@ -131,46 +214,37 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: <Widget>[
           Container(
-              height: 35,
-              width: 35,
-              decoration: new BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
-              margin: EdgeInsets.only(right: 10.0),
-              child: GestureDetector(
-                onTap: () {
-                  print("going to sign in!");
+            height:35,
+            width: 35,
+            decoration: new BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            margin: EdgeInsets.only(right: 10.0),
+            child: GestureDetector(
+              onTap: () async {
+                var user = await _auth.getUser();
+                if (user == null)
+                {
                   Navigator.pushNamed(context, '/signin');
-                },
-                child: Icon(
-                  Icons.person,
-                  color: Colors.grey,
-                ),
-              )),
+                }
+                else
+                {
+                  Navigator.pushNamed(context, '/profile');
+                }
+                
+              },
+              child: Icon(
+                Icons.person,
+                color: Colors.grey,
+              ),
+            )
+          ),
         ],
+        
       ),
       body: _homePage,
     ));
   }
 }
 
-// Temporary until RestaurantQuery is hooked up
-var restaurantList = [
-  RestaurantListTile("Chili's",
-      "this is the chilis address, hooray! gotta make it really long"),
-  RestaurantListTile("Chic Fil A",
-      "this is the Chic Fil A address, hooray! gotta make it really long"),
-  RestaurantListTile("Dominoes",
-      "this is the Dominoes address, hooray! gotta make it really long"),
-  RestaurantListTile("Waffle House",
-      "this is the Waffle House address, hooray! gotta make it really long"),
-  RestaurantListTile("Chili's",
-      "this is the chilis address, hooray! gotta make it really long"),
-  RestaurantListTile("Chic Fil A",
-      "this is the Chic Fil A address, hooray! gotta make it really long"),
-  RestaurantListTile("Dominoes",
-      "this is the Dominoes address, hooray! gotta make it really long"),
-  RestaurantListTile("Waffle House",
-      "this is the Waffle House address, hooray!, gotta make it really long")
-];
