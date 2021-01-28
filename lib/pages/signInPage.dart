@@ -141,6 +141,24 @@ class _SignInState extends State<SignIn> {
                     ),
                     color: Colors.yellow[600],
                   ),
+                  SizedBox(height: 20),
+                  RaisedButton(
+                    onPressed: () async {
+                      print(email);
+                      dynamic result = await _auth.resetPassword(email);
+                      if (result == null) {
+                        print('password reset email sent!');
+                      } else {
+                        print(result);
+                      }
+                    },
+                    child: Text(
+                      'Forgot your password? Click here!',
+                      style: TextStyle(color: Colors.black, fontSize: 20),
+                      textAlign: TextAlign.center,
+                    ),
+                    color: Colors.yellow[600],
+                  ),
                 ],
               ),
             )));
