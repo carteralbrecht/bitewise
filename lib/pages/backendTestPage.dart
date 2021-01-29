@@ -1,5 +1,6 @@
 import 'package:bitewise/services/geoquery.dart';
 import 'package:bitewise/services/ratings.dart';
+import 'package:bitewise/services/fsmanager.dart';
 import 'package:flutter/material.dart';
 
 class Test extends StatefulWidget {
@@ -14,6 +15,7 @@ class _TestState extends State<Test> {
 
   final RatingManager _rateMan = RatingManager();
   final GeoQueryManager _geoQueryManager = GeoQueryManager();
+  final FirestoreManager _fsm = FirestoreManager();
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +94,7 @@ class _TestState extends State<Test> {
                   SizedBox(height: 20),
                   RaisedButton(
                     onPressed: () async {
-                      // put function here
+                      _fsm.createUserInfo(field1);
                     },
                     child: Text(
                       'Test 3',

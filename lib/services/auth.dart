@@ -1,9 +1,11 @@
 // Conection to Firebase and Authorization Logic Here
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:bitewise/services/fsmanager.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirestoreManager _fsm = FirestoreManager();
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: ['email', 'profile'],
     hostedDomain: "",
@@ -28,6 +30,7 @@ class AuthService {
       AuthResult res = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
       FirebaseUser user = res.user;
+      _fsm.createUserInfo(user.uid);
       return user;
     } catch (e) {
       print(e.toString());
@@ -72,6 +75,11 @@ class AuthService {
 
       // Create the firebase user with the google account credential
       user = (await _auth.signInWithCredential(gCred)).user;
+      bool alreadyExists =
+          await _fsm.findDocById(_fsm.userCollectionName, user.uid);
+      if (alreadyExists == false) {
+        _fsm.createUserInfo(user.uid);
+      }
       return user;
     } catch (e) {
       print(e.toString());
@@ -93,6 +101,7 @@ class AuthService {
   Future deleteAccount() async {
     try {
       FirebaseUser user = await getUser();
+      if (user != null) _fsm.deleteDocById(_fsm.userCollectionName, user.uid);
       user.delete();
       return 0;
     } catch (e) {
