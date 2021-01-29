@@ -183,68 +183,69 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        home: Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: Color.fromRGBO(228, 236, 238, 1),
-        elevation: 0,
-        title: Container(
-          margin: EdgeInsets.only(left: 20, right: 20),
-          padding: EdgeInsets.only(left: 10, right: 10),
-          height: 40,
-          decoration: new BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.rectangle,
-            borderRadius: BorderRadius.all(Radius.circular(20.0)),
-          ),
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Icon(Icons.search, size: 26.0, color: Colors.grey),
-                Text('Search',
-                    style: TextStyle(fontSize: 20, color: Colors.grey)),
-              ]),
-        ),
-        leading: IconButton(
-          icon: Icon(Icons.fastfood),
-          color: Colors.grey,
-          onPressed: () {
-            // Navigator.pushNamed(context, '/test');
-          },
-        ),
-        actions: <Widget>[
-          Container(
-            height:35,
-            width: 35,
+      home: Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          backgroundColor: Color.fromRGBO(228, 236, 238, 1),
+          elevation: 0,
+          title: Container(
+            margin: EdgeInsets.only(left: 20, right: 20),
+            padding: EdgeInsets.only(left: 10, right: 10),
+            height: 40,
             decoration: new BoxDecoration(
               color: Colors.white,
-              shape: BoxShape.circle,
+              shape: BoxShape.rectangle,
+              borderRadius: BorderRadius.all(Radius.circular(20.0)),
             ),
-            margin: EdgeInsets.only(right: 10.0),
-            child: GestureDetector(
-              onTap: () async {
-                var user = await _auth.getUser();
-                if (user == null)
-                {
-                  Navigator.pushNamed(context, '/signin');
-                }
-                else
-                {
-                  Navigator.pushNamed(context, '/profile');
-                }
-                
-              },
-              child: Icon(
-                Icons.person,
-                color: Colors.grey,
-              ),
-            )
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Icon(Icons.search, size: 26.0, color: Colors.grey),
+                  Text('Search',
+                      style: TextStyle(fontSize: 20, color: Colors.grey)),
+                ]),
           ),
-        ],
-        
-      ),
-      body: _homePage,
-    ));
+          leading: IconButton(
+            icon: Icon(Icons.fastfood),
+            color: Colors.grey,
+            onPressed: () {
+              // Navigator.pushNamed(context, '/test');
+            },
+          ),
+          actions: <Widget>[
+            Container(
+              height:35,
+              width: 35,
+              decoration: new BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              margin: EdgeInsets.only(right: 10.0),
+              child: GestureDetector(
+                onTap: () async {
+                  var user = await _auth.getUser();
+                  if (user == null)
+                  {
+                    Navigator.pushNamed(context, '/signin');
+                  }
+                  else
+                  {
+                    Navigator.pushNamed(context, '/profile');
+                  }
+                  
+                },
+                child: Icon(
+                  Icons.person,
+                  color: Colors.grey,
+                ),
+              )
+            ),
+          ],
+          
+        ),
+        body: _homePage,
+      )
+    );
   }
 }
 

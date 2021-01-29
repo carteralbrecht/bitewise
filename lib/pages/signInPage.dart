@@ -1,3 +1,4 @@
+
 import 'package:bitewise/services/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
@@ -11,11 +12,71 @@ class _SignInState extends State<SignIn> {
   //Text Field State
   String email = '';
   String password = '';
+  String forgotPassEmail = '';
 
   final AuthService _auth = AuthService();
 
+  
+
   @override
   Widget build(BuildContext context) {
+
+    AlertDialog forgotPassModal = AlertDialog(
+      title: Container(alignment: Alignment.center, child:Text("Reset Password"), margin: EdgeInsets.only(bottom: 10)),
+      titleTextStyle: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.black),
+      titlePadding: EdgeInsets.only(left: 20, top: 15, bottom: 0, right: 20),
+      backgroundColor: Colors.yellow[600],
+      elevation: 20,
+      contentPadding: EdgeInsets.symmetric(horizontal: 10),
+      content: Container(
+        margin: EdgeInsets.all(5),
+        padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.white, width: 5.0),
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
+        child: TextFormField(
+          style: TextStyle(fontSize: 20),
+          onChanged: (val) {
+            setState(() {
+              forgotPassEmail = val;
+            });
+          },
+          decoration: InputDecoration(
+            hintText: 'email',
+            hintStyle: TextStyle(fontSize: 20),
+            border: InputBorder.none,
+          ),
+        ),
+      ),
+      // buttonPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 5),
+      actions: [
+        FlatButton(
+          color: Colors.yellow[300],
+          child: Text("Cancel", style: TextStyle(color: Colors.black, fontSize: 15)),
+          onPressed: () {
+            Navigator.pop(context);
+            print("Close dialog??");
+          },
+        ),
+        FlatButton(
+          color: Colors.yellow[300],
+          child: Text("Submit", style: TextStyle(color: Colors.black, fontSize: 15)),
+          onPressed: () async {
+            print(forgotPassEmail);
+            dynamic result = await _auth.resetPassword(forgotPassEmail);
+            if (result == null) {
+              print('password reset email sent!');
+              Navigator.pop(context);
+            } else {
+              print(result);
+            }
+          },
+        ),
+      ],
+    );
+
+
     return Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.white,
@@ -174,13 +235,10 @@ class _SignInState extends State<SignIn> {
                             style: TextStyle(color: Colors.blue, fontSize: 15, decoration: TextDecoration.underline),
                             recognizer: TapGestureRecognizer()
                               ..onTap = () async {
-                                print(email);
-                                dynamic result = await _auth.resetPassword(email);
-                                if (result == null) {
-                                  print('password reset email sent!');
-                                } else {
-                                  print(result);
-                                }
+                                showDialog(
+                                  context: context,
+                                  builder: (_) => forgotPassModal,
+                                  barrierDismissible: true);
                               }
                           ),
                         ],
