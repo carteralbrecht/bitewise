@@ -10,6 +10,8 @@ exports.aggregateRatings = functions.firestore
     .document('ratings/{ratinguid}')
     .onCreate(async (snapshot, context) => {
 
+
+        // -------------------------------------------------
         // Get the value of the newly added rating
         const ratingVal =  snapshot.data().rating;
 
@@ -33,4 +35,5 @@ exports.aggregateRatings = functions.firestore
                 numRating: newNumRating
             });
       });
+     // -------------------------------------------------
     });

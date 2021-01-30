@@ -76,7 +76,7 @@ class AuthService {
       // Create the firebase user with the google account credential
       user = (await _auth.signInWithCredential(gCred)).user;
       bool alreadyExists =
-          await _fsm.findDocById(_fsm.userCollectionName, user.uid);
+          await _fsm.findDocById(_fsm.userCollection, user.uid);
       if (alreadyExists == false) {
         _fsm.createUserInfo(user.uid);
       }
@@ -101,7 +101,7 @@ class AuthService {
   Future deleteAccount() async {
     try {
       FirebaseUser user = await getUser();
-      if (user != null) _fsm.deleteDocById(_fsm.userCollectionName, user.uid);
+      if (user != null) _fsm.deleteDocById(_fsm.userCollection, user.uid);
       user.delete();
       return 0;
     } catch (e) {

@@ -7,7 +7,7 @@ class RatingManager {
   final AuthService _auth = AuthService();
   final Firestore _firestore = Firestore.instance;
 
-  // Future that creates a rating document for menuItem
+  // Function that creates a rating document for menuItem
   // and adds it to the ratings collection
   Future writeRating(String itemId, num rating, String uid) async {
     try {
@@ -38,7 +38,7 @@ class RatingManager {
   }
 
   // User tried to rate without being logged in,
-  // prompt them to sign up for (or create) an account
+  // prompt them to sign into (or create) an account
   Future promptToSignUp() async {
     // either takes them to a new page or pops up a modal for them to sign up
     print(
