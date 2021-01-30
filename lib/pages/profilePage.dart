@@ -17,7 +17,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
     global.user = user;
 
-    Navigator.pushNamed(context, '/signin');
+    // pop current profile page off of nav stack and push sign in page on 
+    Navigator.popAndPushNamed(context, '/signin');
 
   }
 

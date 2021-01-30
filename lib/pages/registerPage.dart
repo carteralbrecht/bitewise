@@ -78,7 +78,7 @@ class _RegisterState extends State<Register> {
                         global.user = result;
                         print('registered');
                         print(result);
-                        Navigator.pushNamed(context, '/');
+                        Navigator.popUntil(context, ModalRoute.withName('/'));
                       }
                     },
                     child: Text(

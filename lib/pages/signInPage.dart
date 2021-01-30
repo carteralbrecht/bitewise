@@ -171,7 +171,7 @@ class _SignInState extends State<SignIn> {
                             global.user = result;
                             print('signed in');
                             print(result);
-                            Navigator.pushNamed(context, '/');
+                            Navigator.popUntil(context, ModalRoute.withName('/'));
                           }
                         },
                         child: Text(
@@ -193,6 +193,7 @@ class _SignInState extends State<SignIn> {
                             global.user = result;
                             print('signed in');
                             print(result);
+                            Navigator.popUntil(context, ModalRoute.withName('/'));
                           }
                         },
                         child: Text(
