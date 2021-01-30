@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:bitewise/services/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:bitewise/global.dart' as global;
 
 class ProfilePage extends StatefulWidget {
   
@@ -10,33 +11,16 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final AuthService _auth = AuthService();
-  FirebaseUser currentUser;
-
-  @override
-  void initState()  {
-    getCurrentUser();
-    super.initState();
-  }
-
+ 
   void doSignOut() async {
     var user = await _auth.signOut();
 
-    setState(() {
-      currentUser = user;
-    });
+    global.user = user;
 
     Navigator.pushNamed(context, '/signin');
 
   }
 
-  Future getCurrentUser() async {
-    FirebaseUser user = await _auth.getUser();
-    print("setting state: ");
-    print(user.toString());
-    setState(() {
-      currentUser = user;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +68,7 @@ class _ProfilePageState extends State<ProfilePage> {
         alignment: Alignment.center,
         child: Column(
           children: <Widget>[
-            Text(currentUser == null ? "loading.." : currentUser.toString(), style: TextStyle(color: Colors.black, fontSize: 20)),
+            // Text(global.user.toString(), style: TextStyle(color: Colors.black, fontSize: 20)),
             FlatButton(
               onPressed:  () async => {
                 doSignOut()

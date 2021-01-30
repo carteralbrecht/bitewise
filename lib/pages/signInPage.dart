@@ -2,6 +2,7 @@
 import 'package:bitewise/services/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:bitewise/global.dart' as global;
 
 class SignIn extends StatefulWidget {
   @override
@@ -167,6 +168,7 @@ class _SignInState extends State<SignIn> {
                           if (result == null) {
                             print('error signing in');
                           } else {
+                            global.user = result;
                             print('signed in');
                             print(result);
                             Navigator.pushNamed(context, '/');
@@ -188,6 +190,7 @@ class _SignInState extends State<SignIn> {
                           if (result == null) {
                             print('error signing in by google!');
                           } else {
+                            global.user = result;
                             print('signed in');
                             print(result);
                           }

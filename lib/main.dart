@@ -6,12 +6,16 @@ import 'package:bitewise/pages/backendTestPage.dart';
 import 'package:flutter/material.dart';
 // import 'package:dotenv/dotenv.dart' show load;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:bitewise/global.dart' as global;
+import 'package:bitewise/services/auth.dart';
 
 
 Future main() async {
   // loads api key from .env
   await load();
 
+  final AuthService _auth = AuthService();
+  global.user = await _auth.getUser();
   runApp(MyApp());
 }
 
