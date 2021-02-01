@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:bitewise/models/restaurant.dart';
 import 'package:bitewise/pages/profilePage.dart';
 import 'package:bitewise/models/menuItem.dart';
+import 'package:bitewise/components/ratingModal.dart';
 
 class RestaurantPage extends StatefulWidget {
 
@@ -47,7 +48,12 @@ class _RestaurantPageState extends State<RestaurantPage> {
                   children: <Widget> [
                     TextButton(
                         child: Text("Rate", style: TextStyle(color: Colors.black)),
-                        onPressed: ( /*rate modal*/ ) {},
+                        onPressed: () {
+                          showDialog(
+                                  context: context,
+                                  builder: (_) => RatingModal("test", "test"),
+                                  barrierDismissible: true);
+                        },
                         style: TextButton.styleFrom(backgroundColor: Colors.yellow[600])
                     )
                 ])
