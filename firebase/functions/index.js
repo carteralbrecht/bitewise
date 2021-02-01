@@ -4,7 +4,7 @@ const admin = require('firebase-admin');
 admin.initializeApp();
 const db = admin.firestore();
 
-// Update a menuitems avgRating and numRating when a new rating is created
+// Update a menuitems avgRating and numRatings when a new rating is created
 // https://cloud.google.com/firestore/docs/solutions/aggregation
 exports.aggregateRatings = functions.firestore
     .document('ratings/{ratinguid}')
@@ -14,23 +14,33 @@ exports.aggregateRatings = functions.firestore
         const ratingVal =  snapshot.data().rating;
 
         // Get a reference to the menu item
-        const menuItemRef = db.collection('menuitems').doc(snapshot.data().menuitemuid);
+        const menuItemRef = db.collection('menuitems').doc(snapshot.data().menuItemId);
 
-        // Update aggregations in a transaction
-        await db.runTransaction(async (transaction) => {
+        // Create document if not exists
+        await menuItemRef.get().then(doc => {
+            if (!doc.exists) {
+                menuItemRef.set({
+                    avgRating: 0,
+                    numRatings: 0
+                });
+            }
+        });
 
-            const menuItemDoc = await transaction.get(menuItemRef);
+        // Get document snapshot
+        const menuItemDoc = await menuItemRef.get();
 
-            // Compute The new number of ratings (+= 1)
-            const newNumRating = menuItemDoc.data().numRating + 1;
+        // Compute the new number of ratings (+=1)
+        const newNumRatings = menuItemDoc.data().numRatings + 1;
 
-            // Compute The new average rating
-            const oldRatingTotal = menuItemDoc.data().avgRating * menuItemDoc.data().numRating;
-            const newAvgRating = (oldRatingTotal + ratingVal) / newNumRating;
+        // Compute The new average rating
+        const oldRatingTotal = menuItemDoc.data().avgRating * menuItemDoc.data().numRatings;
+        const newAvgRating = (oldRatingTotal + ratingVal) / newNumRatings;
 
-            transaction.update(menuItemRef, {
-                avgRating: newAvgRating,
-                numRating: newNumRating
-            });
-      });
+        // Update the menu item document
+        await menuItemRef.set({
+            avgRating: newAvgRating,
+            numRatings: newNumRatings
+        });
     });
+
+
