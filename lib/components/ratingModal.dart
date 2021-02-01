@@ -15,19 +15,38 @@ class _RatingModalState extends State<RatingModal> {
   Widget build(BuildContext context) {
     return AlertDialog(
       elevation: 20,
-      content: Container(
-        color: Colors.white,
-        alignment: Alignment.center,
-        child: Column(
+      content: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            Text("Dish Name"),
-            Text("Restaurant Name"),
+            Container(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text("Dish Name", style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),),
+                  Text("Restaurant", style: TextStyle(color: Colors.black45, fontSize: 12, fontStyle: FontStyle.italic),),
+              ],
+              )
+            ),
             Text("Rating Widget"),
-            Text("Submit Button"),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget> [
+                TextButton(
+                  onPressed: () {
+
+                  },
+                  child: Text("cancel"),
+                ),
+                TextButton(
+                  onPressed: () {
+
+                  },
+                  child: Text("submit"),
+                ),
+              ]
+            ),
           ]
         ),
-      ),
-    );
+      );
   }
 }
