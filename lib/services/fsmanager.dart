@@ -4,12 +4,13 @@ import 'package:bitewise/services/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class FirestoreManager {
-  final AuthService _auth = AuthService();
+  final AuthService _authServ = AuthService();
   final Firestore _firestore = Firestore.instance;
 
   // variables for our collection names in firestore
   final String userCollection = "userInfo";
   final String ratingsCollection = "ratings";
+  final String menuItemCollection = "menuitems";
 
   Future findDocById(String collection, String id) async {
     try {
@@ -36,6 +37,23 @@ class FirestoreManager {
     }
   }
 
+  Future getDocData(String collection, String id, String data) async {
+    try {
+      DocumentSnapshot document =
+          await _firestore.collection(collection).document(id).get();
+      if (document == null) {
+        // doc DNE
+        return null;
+      }
+      return (document[data]);
+    } catch (e) {
+      print("error in getDocData() : " + e.toString());
+      return null;
+    }
+  }
+
+  // NOTE: THIS IS BEING CHANGED TO BE A GCF. TO BE REMOVED SOON.
+  // DO NOT CALL THIS METHOD.
   Future createUserInfo(String uid) async {
     try {
       List<String> ratedItems = [];
@@ -52,12 +70,18 @@ class FirestoreManager {
 
   Future leaveRating(String itemId, num rating) async {
     try {
-      FirebaseUser user = await _auth.getUser();
+      FirebaseUser user = await _authServ.getUser();
       if (user != null) {
         // If there is a current user, writeRating to the ratings collection
         // GCF in firebase/functions/index.js will update the average
         String uid = user.uid;
-        await writeRating(itemId, rating, uid);
+        dynamic rateId = await getUserRating(uid, itemId);
+        // updateExisting will return false if there was not a rating to update
+        if (rateId == null) {
+          await writeRating(uid, itemId, rating);
+        } else {
+          await updateExistingRating(rateId, rating);
+        }
       } else {
         // prompt user to sign up if they are not in an authorized account
         promptToSignUp();
@@ -68,9 +92,50 @@ class FirestoreManager {
     }
   }
 
+  // Function to return a rating for an item left by the given user
+  // returns null if that item does not exist
+  Future getUserRating(String uid, String itemid) async {
+    try {
+      // search for doc in ratings where userUid = uid and menuItemId = itemId
+      List<DocumentSnapshot> ratingDoc;
+      ratingDoc = (await Firestore.instance
+              .collection(ratingsCollection)
+              .where("userUid", isEqualTo: uid)
+              .where("menuItemId", isEqualTo: itemid)
+              .getDocuments())
+          .documents;
+
+      // if it does not exist, return null
+      if (ratingDoc.isEmpty) {
+        print("no rating for " + itemid + " left by " + uid);
+        return null;
+      } else {
+        return ratingDoc[0].documentID;
+      }
+    } catch (e) {
+      print("Error in updateExistingRating(): " + e.toString());
+      return null;
+    }
+  }
+
+  // Function to update a rating for a specific item from a specific user,
+  // if that rating already exists
+  Future updateExistingRating(String rateId, num rating) async {
+    try {
+      await _firestore
+          .collection(ratingsCollection)
+          .document(rateId)
+          .updateData({"rating": rating, "timestamp": Timestamp.now()});
+      return true;
+    } catch (e) {
+      print("Error in updateExistingRating(): " + e.toString());
+      return null;
+    }
+  }
+
   // Function that creates a rating document for menuItem
   // and adds it to the ratings collection
-  Future writeRating(String itemId, num rating, String uid) async {
+  Future writeRating(String uid, String itemId, num rating) async {
     try {
       _firestore.collection("ratings").add({
         "menuItemId": itemId,
