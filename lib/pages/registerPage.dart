@@ -1,6 +1,7 @@
 import 'package:bitewise/services/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:bitewise/global.dart' as global;
 
 class Register extends StatefulWidget {
   @override
@@ -74,9 +75,10 @@ class _RegisterState extends State<Register> {
                       if (result == null) {
                         print('error registering');
                       } else {
+                        global.user = result;
                         print('registered');
                         print(result);
-                        Navigator.pushNamed(context, '/');
+                        Navigator.popUntil(context, ModalRoute.withName('/'));
                       }
                     },
                     child: Text(

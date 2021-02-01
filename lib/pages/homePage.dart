@@ -8,6 +8,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../components/restaurantListTile.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:bitewise/global.dart' as global;
 
 class HomePage extends StatefulWidget {
   @override
@@ -203,7 +204,7 @@ class _HomePageState extends State<HomePage> {
           icon: Icon(Icons.fastfood),
           color: Colors.grey,
           onPressed: () {
-            Navigator.pushNamed(context, '/test');
+            // Navigator.pushNamed(context, '/test');
           },
         ),
         actions: <Widget>[
@@ -216,9 +217,8 @@ class _HomePageState extends State<HomePage> {
               ),
               margin: EdgeInsets.only(right: 10.0),
               child: GestureDetector(
-                onTap: () async {
-                  var user = await _auth.getUser();
-                  if (user == null) {
+                onTap: () {
+                  if (global.user == null) {
                     Navigator.pushNamed(context, '/signin');
                   } else {
                     Navigator.pushNamed(context, '/profile');
