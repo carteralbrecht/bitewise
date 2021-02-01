@@ -10,6 +10,12 @@ exports.aggregateRatings = functions.firestore
     .document('ratings/{ratinguid}')
     .onCreate(async (snapshot, context) => {
 
+        // Update user's ratedItems array in userInfo
+        const userInfoRef = db.collection('userInfo').doc(snapshot.data().userUid);
+        await userInfoRef.update({
+            ratedItems: admin.firestore.FieldValue.arrayUnion(snapshot.id)
+        });
+
         // Get the value of the newly added rating
         const ratingVal =  snapshot.data().rating;
 
@@ -65,6 +71,18 @@ exports.handleRatingChange = functions.firestore
         // Update the menu item document
         await menuItemRef.update({
             avgRating: newAvgRating,
+        });
+    });
+
+// creates a userInfo document when a new user is created
+exports.handleNewUser = functions.auth
+    .user()
+    .onCreate(async (user) => {
+
+        const userInfoRef = db.collection('userInfo').doc(user.uid);
+
+        await userInfoRef.set({
+            ratedItems: []
         });
     });
 
