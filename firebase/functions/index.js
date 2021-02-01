@@ -43,4 +43,28 @@ exports.aggregateRatings = functions.firestore
         });
     });
 
+// update menuitems avgRating when a rating is changed
+exports.handleRatingChange = functions.firestore
+    .document('ratings/{ratinguid}')
+    .onUpdate(async (snapshot, context) => {
+
+        const ratingBefore = snapshot.before.data().rating;
+        const ratingAfter = snapshot.after.data().rating;
+
+        // Get a reference to the menu item
+        const menuItemRef = db.collection('menuitems').doc(snapshot.after.data().menuItemId);
+
+        // Get document snapshot
+        const menuItemDoc = await menuItemRef.get();
+
+        // Compute the new average rating
+        const oldRatingTotal = menuItemDoc.data().avgRating * menuItemDoc.data().numRatings;
+
+        const newAvgRating = (oldRatingTotal - ratingBefore + ratingAfter) / menuItemDoc.data().numRatings;
+
+        // Update the menu item document
+        await menuItemRef.update({
+            avgRating: newAvgRating,
+        });
+    });
 
