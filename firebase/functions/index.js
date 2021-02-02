@@ -6,14 +6,14 @@ const db = admin.firestore();
 
 // Update a menuitems avgRating and numRatings when a new rating is created
 // https://cloud.google.com/firestore/docs/solutions/aggregation
-exports.aggregateRatings = functions.firestore
+exports.handleRatingsCreate = functions.firestore
     .document('ratings/{ratinguid}')
     .onCreate(async (snapshot, context) => {
 
         // Update user's ratedItems array in userInfo
         const userInfoRef = db.collection('userInfo').doc(snapshot.data().userUid);
         await userInfoRef.update({
-            ratedItems: admin.firestore.FieldValue.arrayUnion(snapshot.id)
+            ratedItems: admin.firestore.FieldValue.arrayUnion(snapshot.data().menuItemId)
         });
 
         // Get the value of the newly added rating
@@ -50,7 +50,7 @@ exports.aggregateRatings = functions.firestore
     });
 
 // update menuitems avgRating when a rating is changed
-exports.handleRatingChange = functions.firestore
+exports.handleRatingsUpdate = functions.firestore
     .document('ratings/{ratinguid}')
     .onUpdate(async (snapshot, context) => {
 
@@ -74,8 +74,32 @@ exports.handleRatingChange = functions.firestore
         });
     });
 
+exports.handleRatingsDelete = functions.firestore
+    .document('ratings/{ratinguid}')
+    .onDelete(async (snapshot, context) => {
+
+        const rating = snapshot.data().rating;
+
+        // Get a reference to the menu item
+        const menuItemRef = db.collection('menuitems').doc(snapshot.data().menuItemId);
+
+        // Get document snapshot
+        const menuItemDoc = await menuItemRef.get();
+
+        // Compute the new average rating
+        const ratingTotal = menuItemDoc.data().avgRating * menuItemDoc.data().numRatings;
+
+        const newAvgRating = (ratingTotal - rating) / (menuItemDoc.data().numRatings - 1);
+
+        // Update the menu item document
+        await menuItemRef.update({
+            avgRating: newAvgRating,
+            numRatings: menuItemDoc.data().numRatings - 1
+        });
+    })
+
 // creates a userInfo document when a new user is created
-exports.handleNewUser = functions.auth
+exports.handleUserCreate = functions.auth
     .user()
     .onCreate(async (user) => {
 
@@ -86,3 +110,35 @@ exports.handleNewUser = functions.auth
         });
     });
 
+exports.handleUserDelete = functions.auth
+    .user()
+    .onDelete(async (user) => {
+
+        const userInfoRef = db.collection('userInfo').doc(user.uid);
+
+        await userInfoRef.delete();
+    });
+
+exports.handleUserInfoDelete = functions.firestore
+    .document('userInfo/{userinfouid}')
+    .onDelete((snapshot, context) => {
+
+        // get ratedItems array
+        // for each menuItemId
+        // --> find rating document with userUid and menuItemId
+        //     delete each rating
+        //     --> triggers handleRatingDelete
+
+        const ratingsRef = db.collection('ratings');
+
+        snapshot.data().ratedItems.forEach((menuItemId) => {
+            const querySnapshot = ratingsRef
+                .where('userUid', '==', snapshot.data().id)
+                .where('menuItemId', '==', menuItemId)
+                .get();
+
+            querySnapshot.forEach((doc) => {
+                doc.delete();
+            });
+        });
+    })
