@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:bitewise/services/fsmanager.dart';
 
 class RatingModal extends StatefulWidget {
 
@@ -37,6 +38,7 @@ class _RatingModalState extends State<RatingModal> {
                 itemCount: 5,
                 ratingWidget: RatingWidget(
                   full: Icon(Icons.circle, color: Colors.amber),
+                  half: null,
                   empty: Icon(Icons.radio_button_off, color: Colors.amber),
                 ),
                 itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
@@ -50,13 +52,14 @@ class _RatingModalState extends State<RatingModal> {
               children: <Widget> [
                 TextButton(
                   onPressed: () {
-
+                    Navigator.of(context).pop();
                   },
                   child: Text("cancel"),
                 ),
                 TextButton(
                   onPressed: () {
-
+                    FirestoreManager().leaveRating("somereallygoodmenuitem", ratingValue);
+                    Navigator.of(context).pop();
                   },
                   child: Text("submit"),
                 ),
