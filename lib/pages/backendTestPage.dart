@@ -1,5 +1,6 @@
-import 'package:bitewise/services/geoquery.dart';
-import 'package:bitewise/services/ratings.dart';
+import 'package:bitewise/services/auth.dart';
+import 'package:bitewise/services/fsmanager.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Test extends StatefulWidget {
@@ -12,8 +13,8 @@ class _TestState extends State<Test> {
   String field1 = '';
   num field2 = 0;
 
-  final RatingManager _rateMan = RatingManager();
-  final GeoQueryManager _geoQueryManager = GeoQueryManager();
+  final AuthService _authServ = AuthService();
+  final FirestoreManager _fsm = FirestoreManager();
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +71,7 @@ class _TestState extends State<Test> {
                   SizedBox(height: 20),
                   RaisedButton(
                     onPressed: () async {
-                      _rateMan.leaveRating(field1, field2);
+                      _fsm.leaveRating(field1, field2);
                     },
                     child: Text(
                       'Test 1',
@@ -92,10 +93,31 @@ class _TestState extends State<Test> {
                   SizedBox(height: 20),
                   RaisedButton(
                     onPressed: () async {
-                      // put function here
+                      dynamic res = await _fsm.getDocData(
+                          _fsm.menuItemCollection, field1, "avgRating");
+                      print("Avg rating for " + field1 + " is:");
+                      print(res);
                     },
                     child: Text(
-                      'Test 3',
+                      'Get Avg Rating',
+                      style: TextStyle(color: Colors.black, fontSize: 20),
+                    ),
+                    color: Colors.yellow[600],
+                  ),
+                  SizedBox(height: 20),
+                  RaisedButton(
+                    onPressed: () async {
+                      FirebaseUser user = await _authServ.getUser();
+                      _fsm.getUserRating(user.uid, field1);
+                      dynamic res = await _fsm.getDocData(
+                          _fsm.menuItemCollection, field1, "avgRating");
+                      print("Users rating for ");
+                      print(user.uid);
+                      print("is ");
+                      print(res);
+                    },
+                    child: Text(
+                      'Get Users Rating',
                       style: TextStyle(color: Colors.black, fontSize: 20),
                     ),
                     color: Colors.yellow[600],
