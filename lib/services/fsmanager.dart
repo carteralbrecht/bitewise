@@ -17,13 +17,13 @@ class FirestoreManager {
       DocumentSnapshot doc =
           await _firestore.collection(collection).document(id).get();
       if (doc == null || doc.exists == false) {
-        return false;
+        return null;
       } else {
-        return true;
+        return doc;
       }
     } catch (e) {
       print("error in findDocById() : " + e.toString());
-      return false;
+      return null;
     }
   }
 
@@ -32,20 +32,19 @@ class FirestoreManager {
       await _firestore.collection(collection).document(id).delete();
       return "deleted";
     } catch (e) {
-      print("error in findDocById() : " + e.toString());
+      print("error in deleteDocById() : " + e.toString());
       return e.toString();
     }
   }
 
   Future getDocData(String collection, String id, String data) async {
     try {
-      DocumentSnapshot document =
-          await _firestore.collection(collection).document(id).get();
-      if (document == null) {
+      DocumentSnapshot doc = await findDocById(collection, id);
+      if (doc == null || doc.exists == false) {
         // doc DNE
         return null;
       }
-      return (document[data]);
+      return (doc[data]);
     } catch (e) {
       print("error in getDocData() : " + e.toString());
       return null;

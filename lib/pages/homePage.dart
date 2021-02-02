@@ -204,7 +204,7 @@ class _HomePageState extends State<HomePage> {
           icon: Icon(Icons.fastfood),
           color: Colors.grey,
           onPressed: () {
-            // Navigator.pushNamed(context, '/test');
+            Navigator.pushNamed(context, '/test');
           },
         ),
         actions: <Widget>[
