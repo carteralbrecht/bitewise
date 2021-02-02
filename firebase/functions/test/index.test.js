@@ -13,28 +13,24 @@ describe('Unit Tests', () => {
 
     beforeEach(async () => {
         await firebase.clearFirestoreData({ projectId });
+        console.log("Cleared Firestore Data");
     });
 
-    async function snooz(time = 3000) {
-        return new Promise(resolve => {
-            setTimeout(e => {
-                resolve();
-            }, time);
-        });
-    }
-
     it("Tests handleRatingsCreate", async () => {
-        const FAKE_USER_ID = "user123";
-        const FAKE_MENU_ITEM_ID = "item123";
+        const TIMESTAMP = new Date().toISOString();
+        const FAKE_USER_ID = "uid-" + TIMESTAMP;
+        const FAKE_MENU_ITEM_ID = "item-" + TIMESTAMP;
         const FAKE_RATING_VAL = 5;
 
         // add a fake userInfo to the db
+        console.log(`Adding userInfo doc for user ${FAKE_USER_ID}`);
         const fakeUserInfoRef = db.collection("userInfo").doc(FAKE_USER_ID);
         await fakeUserInfoRef.set({
             ratedItems: []
         })
 
         // add a rating doc to the db
+        console.log(`Adding a rating doc for item ${FAKE_MENU_ITEM_ID}`);
         await db.collection("ratings").add({
             rating: FAKE_RATING_VAL,
             menuItemId: FAKE_MENU_ITEM_ID,
@@ -42,18 +38,16 @@ describe('Unit Tests', () => {
         });
 
         // wait for CF to execute
+        console.log("Sleeping for cloud functions to execute...");
         await sleep(5000);
 
-
-        await fakeUserInfoRef.get().then(snapshot => {
-            assert.deepStrictEqual(snapshot.data().ratedItems.includes(FAKE_MENU_ITEM_ID), true, "Added to userInfo ratedItems");
-        });
+        const userInfoSnapshot = await fakeUserInfoRef.get();
+        assert.deepStrictEqual(userInfoSnapshot.data().ratedItems.includes(FAKE_MENU_ITEM_ID), true, "Added to userInfo ratedItems");
 
         const menuItemRef = db.collection('menuitems').doc(FAKE_MENU_ITEM_ID);
-        await menuItemRef.get().then(snapshot => {
-            assert.deepStrictEqual(snapshot.data().numRatings, 1, "Correct Num Ratings");
-            assert.deepStrictEqual(snapshot.data().avgRating, FAKE_RATING_VAL, "Correct Avg Rating");
-        });
+        const menuItemSnapshot = await menuItemRef.get();
+        assert.deepStrictEqual(menuItemSnapshot.data().numRatings, 1, "Correct Num Ratings");
+        assert.deepStrictEqual(menuItemSnapshot.data().avgRating, FAKE_RATING_VAL, "Correct Avg Rating");
 
     }).timeout(10000);
 })

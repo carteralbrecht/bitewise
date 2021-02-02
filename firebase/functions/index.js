@@ -22,18 +22,17 @@ exports.handleRatingsCreate = functions.firestore
         // Get a reference to the menu item
         const menuItemRef = db.collection('menuitems').doc(snapshot.data().menuItemId);
 
-        // Create document if not exists
-        await menuItemRef.get().then(doc => {
-            if (!doc.exists) {
-                menuItemRef.set({
-                    avgRating: 0,
-                    numRatings: 0
-                });
-            }
-        });
-
         // Get document snapshot
-        const menuItemDoc = await menuItemRef.get();
+        let menuItemDoc = await menuItemRef.get();
+
+        // Create document if not exists
+        if (!menuItemDoc.exists) {
+            await menuItemRef.set({
+                avgRating: 0,
+                numRatings: 0
+            });
+            menuItemDoc = await menuItemRef.get();
+        }
 
         // Compute the new number of ratings (+=1)
         const newNumRatings = menuItemDoc.data().numRatings + 1;
@@ -131,14 +130,14 @@ exports.handleUserInfoDelete = functions.firestore
 
         const ratingsRef = db.collection('ratings');
 
-        snapshot.data().ratedItems.forEach((menuItemId) => {
-            const querySnapshot = ratingsRef
+        snapshot.data().ratedItems.forEach(async (menuItemId) => {
+            const querySnapshot = await ratingsRef
                 .where('userUid', '==', snapshot.data().id)
                 .where('menuItemId', '==', menuItemId)
                 .get();
 
-            querySnapshot.forEach((doc) => {
-                doc.delete();
-            });
+            for (const doc of querySnapshot) {
+                await doc.delete();
+            }
         });
     })
