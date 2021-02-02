@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class RatingModal extends StatefulWidget {
 
@@ -11,6 +12,7 @@ class RatingModal extends StatefulWidget {
 }
 
 class _RatingModalState extends State<RatingModal> {
+  double ratingValue = 0;
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -27,7 +29,22 @@ class _RatingModalState extends State<RatingModal> {
               ],
               )
             ),
-            Text("Rating Widget"),
+            Container(
+              child: RatingBar(
+                initialRating: 3,
+                direction: Axis.horizontal,
+                allowHalfRating: false,
+                itemCount: 5,
+                ratingWidget: RatingWidget(
+                  full: Icon(Icons.circle, color: Colors.amber),
+                  empty: Icon(Icons.radio_button_off, color: Colors.amber),
+                ),
+                itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                onRatingUpdate: (rating) {
+                  ratingValue = rating;
+                },
+              ),
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget> [
