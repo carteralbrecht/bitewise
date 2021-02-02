@@ -17,20 +17,24 @@ class _RatingModalState extends State<RatingModal> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      contentPadding: EdgeInsets.fromLTRB(15, 15, 15, 10),
       elevation: 20,
       content: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Container(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text("Dish Name", style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),),
+                  SizedBox(height: 5),
                   Text("Restaurant", style: TextStyle(color: Colors.black45, fontSize: 12, fontStyle: FontStyle.italic),),
               ],
               )
             ),
             Container(
+              padding: EdgeInsets.symmetric(vertical: 10),
               child: RatingBar(
                 initialRating: 3,
                 direction: Axis.horizontal,
@@ -50,18 +54,19 @@ class _RatingModalState extends State<RatingModal> {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget> [
-                TextButton(
+                FlatButton(
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    Navigator.pop(context);
                   },
-                  child: Text("cancel"),
+                  child: Text("cancel", style: TextStyle(color: Colors.black54, fontSize: 15, fontStyle: FontStyle.italic, )),
                 ),
-                TextButton(
+                FlatButton(
                   onPressed: () {
                     FirestoreManager().leaveRating("somereallygoodmenuitem", ratingValue);
-                    Navigator.of(context).pop();
+                    Navigator.pop(context);
                   },
-                  child: Text("submit"),
+                  color: Colors.yellow[700],
+                  child: Text("submit", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 15)),
                 ),
               ]
             ),
