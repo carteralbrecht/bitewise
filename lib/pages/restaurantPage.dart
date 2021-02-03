@@ -6,6 +6,7 @@ import 'package:bitewise/pages/profilePage.dart';
 import 'package:bitewise/models/menuItem.dart';
 import 'package:bitewise/services/documenu.dart';
 import 'package:bitewise/components/menuItemListTile.dart';
+import 'package:bitewise/global.dart' as global;
 
 
 class RestaurantPage extends StatefulWidget {
@@ -93,7 +94,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
         child: new ListView.builder(
           padding: EdgeInsets.all(16.0),
           itemBuilder: (context, i) {
-            return new MenuItemListTile(menuItems[i]);
+            return new MenuItemListTile(menuItems[i], widget.restaurant.name);
         })
       )
     );
@@ -116,46 +117,36 @@ class _RestaurantPageState extends State<RestaurantPage> {
         elevation: 0,
         // title: Text('bitewise',
         //   style: TextStyle(color: Colors.black, fontSize: 25)),
-        // leading: IconButton(
-        //   icon: Icon(Icons.fastfood),
-        //   color: Colors.black,
-        //   onPressed: () {
-        //     Navigator.pop(context);
-        //   },
-        // ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          color: Colors.black,
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         actions: <Widget>[
-              Container(
-                height: 35,
-                width: 35,
-                decoration: new BoxDecoration(
-                  color: Colors.grey,
-                  shape: BoxShape.circle,
-                ),
-                margin: EdgeInsets.only(right: 10.0),
-                child: GestureDetector(
-                  onTap: () async {
-                    var user = await _auth.getUser();
-                    if (user == null)
-                    {
-                      Navigator.pushNamed(context, '/signin');
-                      
-                    }
-                    else
-                    {
-                      Navigator.push(context, 
-                        MaterialPageRoute(builder: (context) => ProfilePage()
-                        )
-                      );
-                    }
-                    
-                  },
-                  child: Icon(
-                    Icons.person,
-                    color: Colors.white,
-                  ),
-                )
+          Container(
+              height: 35,
+              width: 35,
+              decoration: new BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
               ),
-            ],
+              margin: EdgeInsets.only(right: 10.0),
+              child: GestureDetector(
+                onTap: () {
+                  if (global.user == null) {
+                    Navigator.pushNamed(context, '/signin');
+                  } else {
+                    Navigator.pushNamed(context, '/profile');
+                  }
+                },
+                child: Icon(
+                  Icons.person,
+                  color: Colors.grey,
+                ),
+              )),
+        ],
         centerTitle: true,
       ),
       body: _body(),

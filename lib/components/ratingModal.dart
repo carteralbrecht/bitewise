@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:bitewise/services/fsmanager.dart';
+import 'package:bitewise/models/menuItem.dart';
 
 class RatingModal extends StatefulWidget {
 
-  final String dishName;
+  // final String dishName;
   final String restaurantName;
-  const RatingModal(this.dishName, this.restaurantName);
+  final MenuItem menuItem;
+  const RatingModal(this.menuItem, this.restaurantName);
 
   @override
   _RatingModalState createState() => _RatingModalState();
@@ -27,9 +29,9 @@ class _RatingModalState extends State<RatingModal> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text("Dish Name", style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),),
+                  Text(widget.menuItem.name, style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),),
                   SizedBox(height: 5),
-                  Text("Restaurant", style: TextStyle(color: Colors.black45, fontSize: 12, fontStyle: FontStyle.italic),),
+                  Text(widget.restaurantName, style: TextStyle(color: Colors.black45, fontSize: 12, fontStyle: FontStyle.italic),),
               ],
               )
             ),
@@ -62,7 +64,7 @@ class _RatingModalState extends State<RatingModal> {
                 ),
                 FlatButton(
                   onPressed: () {
-                    FirestoreManager().leaveRating("somereallygoodmenuitem", ratingValue);
+                    FirestoreManager().leaveRating(widget.menuItem.id, ratingValue);
                     Navigator.pop(context);
                   },
                   color: Colors.yellow[700],
