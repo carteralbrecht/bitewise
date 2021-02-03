@@ -4,7 +4,7 @@ const assert = require("assert");
 const firebase = require("@firebase/testing");
 
 const projectId = "bitewwisemaybelol";
-const admin = firebase.initializeAdminApp({ projectId });
+const admin = firebase.initializeAdminApp({projectId});
 const db = admin.firestore();
 
 const sleep = (milli) => new Promise((res) => setTimeout(res, milli));
@@ -12,7 +12,7 @@ const sleep = (milli) => new Promise((res) => setTimeout(res, milli));
 describe('Unit Tests', () => {
 
     beforeEach(async () => {
-        await firebase.clearFirestoreData({ projectId });
+        await firebase.clearFirestoreData({projectId});
         console.log("Cleared Firestore Data");
     });
 

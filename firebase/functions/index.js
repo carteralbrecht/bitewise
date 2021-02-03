@@ -4,7 +4,11 @@ const admin = require('firebase-admin');
 admin.initializeApp();
 const db = admin.firestore();
 
-// put the menuItemId in the users userInfo doc
+// Firebase cloud functions
+// TODO: How to handle transaction failures and other edge cases
+
+// On rating create:
+// Put the rated item into the user's userInfo ratedItems array
 exports.addRatedItemtoUserInfo = functions.firestore
     .document('ratings/{ratinguid}')
     .onCreate(async (snapshot, context) => {
@@ -12,13 +16,14 @@ exports.addRatedItemtoUserInfo = functions.firestore
         // Create reference to the userInfoDoc
         const userInfoRef = db.collection('userInfo').doc(snapshot.data().userUid);
 
-        // Update
         await db.runTransaction(async transaction => {
+            // get the doc
             await transaction.get(userInfoRef).then((doc) => {
                     if (!doc.exists) {
                         throw "Document does not exist"
                     }
 
+                    // update the doc
                     transaction.update(userInfoRef, {
                         ratedItems: admin.firestore.FieldValue.arrayUnion(snapshot.data().menuItemId)
                     })
@@ -27,13 +32,14 @@ exports.addRatedItemtoUserInfo = functions.firestore
         });
     });
 
-// Update a menuitems avgRating and numRatings when a new rating is created
+// On rating create:
+// update a menuitem's avgRating and numRatings
 exports.aggregateRatings = functions.firestore
     .document('ratings/{ratinguid}')
     .onCreate(async (snapshot, context) => {
 
         // Get the value of the newly added rating
-        const ratingVal =  snapshot.data().rating;
+        const ratingVal = snapshot.data().rating;
 
         // Get a reference to the menu item
         const menuItemRef = db.collection('menuitems').doc(snapshot.data().menuItemId);
@@ -43,6 +49,7 @@ exports.aggregateRatings = functions.firestore
                 let oldAvgRating = 0;
                 let oldNumRatings = 0;
 
+                // if the menu item doc already exists then use current vals
                 await transaction.get(menuItemRef).then(doc => {
                     if (doc.exists) {
                         oldAvgRating = doc.data().avgRating;
@@ -66,7 +73,8 @@ exports.aggregateRatings = functions.firestore
         );
     });
 
-// update menuitems avgRating when a rating is changed
+// on rating update:
+// update menuitem's avgRating when a rating is changed
 exports.handleRatingsUpdate = functions.firestore
     .document('ratings/{ratinguid}')
     .onUpdate(async (snapshot, context) => {
@@ -83,7 +91,6 @@ exports.handleRatingsUpdate = functions.firestore
 
             // Compute the new average rating
             const oldRatingTotal = menuItemDoc.data().avgRating * menuItemDoc.data().numRatings;
-
             const newAvgRating = (oldRatingTotal - ratingBefore + ratingAfter) / menuItemDoc.data().numRatings;
 
             // Update the menu item document
@@ -93,15 +100,17 @@ exports.handleRatingsUpdate = functions.firestore
         })
     });
 
+// On rating delete:
+// recalculate the menuitem's avgRating and numRatings
 exports.handleRatingsDelete = functions.firestore
     .document('ratings/{ratinguid}')
     .onDelete(async (snapshot, context) => {
 
+        // the numeric rating being deleted
         const rating = snapshot.data().rating;
 
-        // Get a reference to the menu item
+        // Get a reference to the menu item that was rated
         const menuItemRef = db.collection('menuitems').doc(snapshot.data().menuItemId);
-
 
         try {
             await db.runTransaction(async (transaction) => {
@@ -128,13 +137,16 @@ exports.handleRatingsDelete = functions.firestore
         }
     });
 
-// creates a userInfo document when a new user is created
+// On user create:
+// creates a userInfo document
 exports.handleUserCreate = functions.auth
     .user()
     .onCreate(async (user) => {
 
+        // get ref to userInfo doc with id as uid
         const userInfoRef = db.collection('userInfo').doc(user.uid);
 
+        // create the doc and set ratedItems field
         await db.runTransaction(async (transaction) => {
             transaction.set(userInfoRef, {
                 ratedItems: []
@@ -142,38 +154,40 @@ exports.handleUserCreate = functions.auth
         });
     });
 
+// On user delete:
+// deletes their userInfo doc
 exports.handleUserDelete = functions.auth
     .user()
     .onDelete(async (user) => {
 
+        // get reference to doc
         const userInfoRef = db.collection('userInfo').doc(user.uid);
 
+        // delete the doc
         await db.runTransaction(async (transaction) => {
             transaction.delete(userInfoRef);
         });
     });
 
+// On userInfo delete:
+// deletes all of their ratings
 exports.handleUserInfoDelete = functions.firestore
     .document('userInfo/{userinfouid}')
     .onDelete(async (snapshot, context) => {
 
-        // get ratedItems array
-        // for each menuItemId
-        // --> find rating document with userUid and menuItemId
-        //     delete each rating
-        //     --> triggers handleRatingDelete
-
         const ratingsRef = db.collection('ratings');
-
         const ratedItems = snapshot.data().ratedItems;
 
+        // for each item they rated
         for (const menuItemId of ratedItems) {
             await db.runTransaction(async (transaction) => {
+                // get their rating docs for that item (Should only be 1)
                 const ratingQuerySnapshot = await ratingsRef
                     .where('userUid', '==', snapshot.id)
                     .where('menuItemId', '==', menuItemId)
                     .get();
 
+                // delete those ratings (Should only be 1)
                 for (const doc of ratingQuerySnapshot.docs) {
                     transaction.delete(doc.ref);
                 }
