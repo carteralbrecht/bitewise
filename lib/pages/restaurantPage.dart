@@ -26,6 +26,51 @@ class _RestaurantPageState extends State<RestaurantPage> {
   //   super.initState();
   // }
 
+  Color c1 = const Color(0xE4ECEE);
+  Widget restInfo() {
+    return Container (
+        margin: const EdgeInsets.all(20.0),
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        // height: 70,
+        // width: 70,
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(widget.restaurant.name, style: TextStyle(color: Colors.black, fontSize: 20)),
+              Row(
+                children: <Widget>[
+                  FlatButton(
+                    color: Colors.yellow[600],
+                    textColor: Colors.black,
+                    onPressed: () {
+                      /*...*/
+                    },
+                    child: Text(
+                      "Sort",
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(16.0),
+                  ),
+                  FlatButton(
+                    color: Colors.yellow[600],
+                    textColor: Colors.black,
+                    onPressed: () {
+                      /*...*/
+                    },
+                    child: Text(
+                      "Filter",
+                    ),
+                  )
+                ],
+              )
+            ]
+        )
+    );
+  }
+
   Widget _dishList() {
     return ListView.builder(
       padding: EdgeInsets.all(16.0),
@@ -56,27 +101,32 @@ class _RestaurantPageState extends State<RestaurantPage> {
     });
   }
 
+  Widget _body() {
+    return Stack(
+      children: <Widget>[restInfo()]);
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.yellow[600],
+        backgroundColor: Colors.white,
         elevation: 0,
-        title: Text('bitewise',
-          style: TextStyle(color: Colors.black, fontSize: 25)),
-        leading: IconButton(
-          icon: Icon(Icons.fastfood),
-          color: Colors.black,
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+        // title: Text('bitewise',
+        //   style: TextStyle(color: Colors.black, fontSize: 25)),
+        // leading: IconButton(
+        //   icon: Icon(Icons.fastfood),
+        //   color: Colors.black,
+        //   onPressed: () {
+        //     Navigator.pop(context);
+        //   },
+        // ),
         actions: <Widget>[
               Container(
-                height:35,
+                height: 35,
                 width: 35,
                 decoration: new BoxDecoration(
-                  color: Colors.white,
+                  color: Colors.grey,
                   shape: BoxShape.circle,
                 ),
                 margin: EdgeInsets.only(right: 10.0),
@@ -99,14 +149,14 @@ class _RestaurantPageState extends State<RestaurantPage> {
                   },
                   child: Icon(
                     Icons.person,
-                    color: Colors.grey,
+                    color: Colors.white,
                   ),
                 )
               ),
             ],
         centerTitle: true,
       ),
-      body: _dishList(),
+      body: _body(),
     );
   }
 }
