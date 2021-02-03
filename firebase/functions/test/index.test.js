@@ -16,11 +16,11 @@ describe('Unit Tests', () => {
         console.log("Cleared Firestore Data");
     });
 
-    it("Tests handleRatingsCreate", async () => {
+    it("Tests adding a rating", async () => {
         const TIMESTAMP = new Date().toISOString();
-        const FAKE_USER_ID = "uid-" + TIMESTAMP;
         const FAKE_MENU_ITEM_ID = "item-" + TIMESTAMP;
         const FAKE_RATING_VAL = 5;
+        const FAKE_USER_ID = "uid-" + TIMESTAMP;
 
         // add a fake userInfo to the db
         console.log(`Adding userInfo doc for user ${FAKE_USER_ID}`);
@@ -39,7 +39,7 @@ describe('Unit Tests', () => {
 
         // wait for CF to execute
         console.log("Sleeping for cloud functions to execute...");
-        await sleep(5000);
+        await sleep(10000);
 
         const userInfoSnapshot = await fakeUserInfoRef.get();
         assert.deepStrictEqual(userInfoSnapshot.data().ratedItems.includes(FAKE_MENU_ITEM_ID), true, "Added to userInfo ratedItems");
@@ -49,5 +49,5 @@ describe('Unit Tests', () => {
         assert.deepStrictEqual(menuItemSnapshot.data().numRatings, 1, "Correct Num Ratings");
         assert.deepStrictEqual(menuItemSnapshot.data().avgRating, FAKE_RATING_VAL, "Correct Avg Rating");
 
-    }).timeout(10000);
+    }).timeout(20000);
 })
