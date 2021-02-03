@@ -4,12 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:bitewise/models/restaurant.dart';
 import 'package:bitewise/pages/profilePage.dart';
 import 'package:bitewise/models/menuItem.dart';
+import 'package:bitewise/services/documenu.dart';
+import '../components/menuItemListTile.dart';
 
 class RestaurantPage extends StatefulWidget {
 
   final Restaurant restaurant;
   const RestaurantPage(this.restaurant);
-
 
   @override
   _RestaurantPageState createState() => _RestaurantPageState();
@@ -17,28 +18,41 @@ class RestaurantPage extends StatefulWidget {
 
 class _RestaurantPageState extends State<RestaurantPage> {
 
+  List<MenuItem> menuItems = new List<MenuItem>();
   ButtonStyle rateButton = new ButtonStyle();
   final AuthService _auth = AuthService();
 
-  // @override
-  // void initState() {
-  //   getUserLocation();
-  //   super.initState();
-  // }
+  @override
+  void initState() {
+    getMenuItems();
+    super.initState();
+  }
 
-  Color c1 = const Color(0xE4ECEE);
+  void getMenuItems() async {
+      List<MenuItem> menuItemsTemp = new List<MenuItem>();
+      var mi = await getMenuItemsForRestaurant(widget.restaurant.id);
+      for (MenuItem menuItem in mi)
+        menuItemsTemp.add(menuItem);
+
+      setState(() {
+        menuItems = menuItemsTemp;
+      });
+  }
+
+  // Color c1 = const Color(0xE4ECEE);
   Widget restInfo() {
     return Container (
-        margin: const EdgeInsets.all(20.0),
+        margin: const EdgeInsets.all(16.0),
         width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        // height: 70,
-        // width: 70,
+        height: 85,
         child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(widget.restaurant.name, style: TextStyle(color: Colors.black, fontSize: 20)),
+              Padding (
+                padding: EdgeInsets.all(5.0),
+              ),
               Row(
                 children: <Widget>[
                   FlatButton(
@@ -72,38 +86,25 @@ class _RestaurantPageState extends State<RestaurantPage> {
   }
 
   Widget _dishList() {
-    return ListView.builder(
-      padding: EdgeInsets.all(16.0),
-      itemBuilder: (context, i) {
-        // if (i.isOdd) return Divider();
-
-        return Card(
-          child: Container(
-            padding: EdgeInsets.all(20.0),
-            child: Stack(
-              children: <Widget> [
-              Text('Dish $i', style: TextStyle(color: Colors.black, fontSize: 20)),
-              Row(
-              children: <Widget>[
-                Column(
-                  children: <Widget> [Text('  Dish $i description', style: TextStyle(color: Colors.black38, fontSize: 15))]),
-                Padding(padding: EdgeInsets.all(32.0)),
-                Column(
-                  children: <Widget> [
-                    TextButton(
-                        child: Text("Rate", style: TextStyle(color: Colors.black)),
-                        onPressed: ( /*rate modal*/ ) {},
-                        style: TextButton.styleFrom(backgroundColor: Colors.yellow[600])
-                    )
-                ])
-              ],
-        )])));
-    });
+    return Expanded(
+      child: SizedBox(
+        height: 200.0,
+        child: new ListView.builder(
+          padding: EdgeInsets.all(16.0),
+          itemBuilder: (context, i) {
+            return new MenuItemListTile(menuItems[i]);
+        })
+      )
+    );
   }
 
   Widget _body() {
-    return Stack(
-      children: <Widget>[restInfo()]);
+    return Column(
+      children: <Widget>[
+        restInfo(),
+        menuItems.isEmpty? Text('loading') : _dishList()
+      ]
+    );
   }
 
   @override
