@@ -18,7 +18,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final AuthService _auth = AuthService();
   GoogleMapController mapController;
-  Position currentLocation; 
+  Position currentLocation;
   Stack _homePage;
   var restaurantsNearUser;
   var restaurantDistances;
@@ -52,7 +52,6 @@ class _HomePageState extends State<HomePage> {
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
     setState(() {
       currentLocation = result;
-      
     });
   }
 
@@ -69,21 +68,16 @@ class _HomePageState extends State<HomePage> {
   }
 
   void getRestaurantsNearby() async {
-
     // Don't fetch restaurants until we have a current location for the user
     while (currentLocation == null) {
       await Future.delayed(Duration(milliseconds: 500));
     }
 
-    var restaurants = await searchRestaurantsGeo(
-        currentLocation,
-        2);
-    
+    var restaurants = await searchRestaurantsGeo(currentLocation, 2);
 
     List<Restaurant> resultsNear = new List<Restaurant>();
     List<double> restDistances = new List<double>();
-    
-    
+
     for (Restaurant restaurant in restaurants) {
       resultsNear.add(restaurant);
       restDistances.add(await distanceToRestaurant(restaurant));
@@ -100,21 +94,20 @@ class _HomePageState extends State<HomePage> {
   Set<Marker> _createMarkers() {
     final Set<Marker> markersSet = {};
 
-    for (Restaurant restaurant in restaurantsNearUser)
-    {
-        markersSet.add(Marker(
-          markerId: MarkerId(restaurant.name),
-          position: LatLng(restaurant.geo.latitude, restaurant.geo.longitude),
-          infoWindow: InfoWindow(title: restaurant.name,
+    for (Restaurant restaurant in restaurantsNearUser) {
+      markersSet.add(Marker(
+        markerId: MarkerId(restaurant.name),
+        position: LatLng(restaurant.geo.latitude, restaurant.geo.longitude),
+        infoWindow: InfoWindow(
+            title: restaurant.name,
             onTap: () => {
-              Navigator.push(context, 
-                  MaterialPageRoute(builder: (context) => RestaurantPage(restaurant)
-                )
-              )
-            }  
-          ),
-          icon: pinImage,
-        ));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => RestaurantPage(restaurant)))
+                }),
+        icon: pinImage,
+      ));
     }
 
     return markersSet;
@@ -165,14 +158,15 @@ class _HomePageState extends State<HomePage> {
                       ));
                 }
                 return new FlatButton(
-                  onPressed: () => {
-                    Navigator.push(context, 
-                      MaterialPageRoute(builder: (context) => RestaurantPage(restaurantsNearUser[index-1])
-                      )
-                    )
-                  },
-                  child: RestaurantListTile(restaurantsNearUser[index-1], restaurantDistances[index-1])
-                );
+                    onPressed: () => {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => RestaurantPage(
+                                      restaurantsNearUser[index - 1])))
+                        },
+                    child: RestaurantListTile(restaurantsNearUser[index - 1],
+                        restaurantDistances[index - 1]));
               },
             ),
           );
@@ -184,38 +178,38 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          backgroundColor: Color.fromRGBO(228, 236, 238, 1),
-          elevation: 0,
-          title: Container(
-            margin: EdgeInsets.only(left: 20, right: 20),
-            padding: EdgeInsets.only(left: 10, right: 10),
-            height: 40,
-            decoration: new BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.rectangle,
-              borderRadius: BorderRadius.all(Radius.circular(20.0)),
-            ),
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  Icon(Icons.search, size: 26.0, color: Colors.grey),
-                  Text('Search',
-                      style: TextStyle(fontSize: 20, color: Colors.grey)),
-                ]),
+        home: Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        backgroundColor: Color.fromRGBO(228, 236, 238, 1),
+        elevation: 0,
+        title: Container(
+          margin: EdgeInsets.only(left: 20, right: 20),
+          padding: EdgeInsets.only(left: 10, right: 10),
+          height: 40,
+          decoration: new BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.all(Radius.circular(20.0)),
           ),
-          leading: IconButton(
-            icon: Icon(Icons.fastfood),
-            color: Colors.grey,
-            onPressed: () {
-              // Navigator.pushNamed(context, '/test');
-            },
-          ),
-          actions: <Widget>[
-            Container(
-              height:35,
+          child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Icon(Icons.search, size: 26.0, color: Colors.grey),
+                Text('Search',
+                    style: TextStyle(fontSize: 20, color: Colors.grey)),
+              ]),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.fastfood),
+          color: Colors.grey,
+          onPressed: () {
+            Navigator.pushNamed(context, '/test');
+          },
+        ),
+        actions: <Widget>[
+          Container(
+              height: 35,
               width: 35,
               decoration: new BoxDecoration(
                 color: Colors.white,
@@ -224,29 +218,20 @@ class _HomePageState extends State<HomePage> {
               margin: EdgeInsets.only(right: 10.0),
               child: GestureDetector(
                 onTap: () {
-                  
-                  if (global.user == null)
-                  {
+                  if (global.user == null) {
                     Navigator.pushNamed(context, '/signin');
-                  }
-                  else
-                  {
+                  } else {
                     Navigator.pushNamed(context, '/profile');
                   }
-                  
                 },
                 child: Icon(
                   Icons.person,
                   color: Colors.grey,
                 ),
-              )
-            ),
-          ],
-          
-        ),
-        body: _homePage,
-      )
-    );
+              )),
+        ],
+      ),
+      body: _homePage,
+    ));
   }
 }
-
