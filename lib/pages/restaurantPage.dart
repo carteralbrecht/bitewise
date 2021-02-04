@@ -7,6 +7,7 @@ import 'package:bitewise/models/menuItem.dart';
 import 'package:bitewise/services/documenu.dart';
 import 'package:bitewise/components/menuItemListTile.dart';
 import 'package:bitewise/global.dart' as global;
+import 'package:flutter/gestures.dart';
 
 
 class RestaurantPage extends StatefulWidget {
