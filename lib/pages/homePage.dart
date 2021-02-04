@@ -177,8 +177,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        home: Scaffold(
+    return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Color.fromRGBO(228, 236, 238, 1),
@@ -232,6 +231,6 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: _homePage,
-    ));
+    );
   }
 }
