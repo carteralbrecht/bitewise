@@ -82,7 +82,3 @@ class Restaurant {
     );
   }
 }
-
-// Ben needs A list of subsections where each subsection has a list of MenuItems
-// The names of the subsections are known when the Restaurant object is created
-// The items in those subsections are populated later
