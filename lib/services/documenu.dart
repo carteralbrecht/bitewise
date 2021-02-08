@@ -1,4 +1,4 @@
-// import 'package:dotenv/dotenv.dart';
+//import 'package:dotenv/dotenv.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:geolocator/geolocator.dart';
@@ -37,7 +37,8 @@ Future<List<Restaurant>> searchRestaurantsGeo(Position geo, int radius) async {
   var queryParameters = {
     'lat': geo.latitude.toString(),
     'lon': geo.longitude.toString(),
-    'distance': radius.toString()
+    'distance': radius.toString(),
+    'fullmenu': 'true'
   };
 
   var uri = Uri.https(authority, "/v2/restaurants/search/geo", queryParameters);
