@@ -25,7 +25,7 @@ void main() async {
   test('Build Menu', () async {
     var restaurant = await getRestaurant("2859723381214996");
     Menu menu = await buildMenuForRestaurant(restaurant);
-    expect(menu.subsections.keys.contains("Mobile Hot Coffee"), true);
+    expect(menu.getSubsectionNames().contains("Mobile Hot Coffee"), true);
   });
 
   // Does a GET on a menu item ID and checks that it returns the correct item name
