@@ -6,9 +6,7 @@ import 'package:test/test.dart';
 import 'package:bitewise/services/documenu.dart';
 import 'package:dotenv/dotenv.dart' show load;
 
-
 void main() async {
-
   setUp(() {
     // load api key from .env
     // this won't work unless you use dotenv/dotenv
@@ -38,8 +36,7 @@ void main() async {
   // Checks one of the results
   test('SearchRestaurantsGeo', () async {
     var restaurants = await searchRestaurantsGeo(
-        Position(longitude: -77.17103, latitude: 39.114805),
-        2);
+        Position(longitude: -77.17103, latitude: 39.114805), 2);
 
     var shouldContain = "Baja Fresh";
     var doesContain = false;
