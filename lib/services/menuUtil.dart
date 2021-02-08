@@ -26,6 +26,18 @@ class Menu {
     return this.subsectionMap.keys;
   }
 
+  // returns a list of all items in the menu
+  // not ordered by subsection
+  List<MenuItem> getAllItems() {
+    var allItems = new List<MenuItem>();
+
+    for (var subsectionList in subsectionMap.values) {
+      allItems.addAll(subsectionList);
+    }
+
+    return allItems;
+  }
+
   // adds an item to the right list of documents using its subsection name
   addItem(MenuItem item) {
     if (item == null || item.subsection == null) {
