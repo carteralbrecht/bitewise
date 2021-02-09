@@ -1,25 +1,29 @@
 import 'package:bitewise/models/menuItem.dart';
 import 'package:bitewise/models/restaurant.dart';
+import 'package:bitewise/services/menuUtil.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:test/test.dart';
 import 'package:bitewise/services/documenu.dart';
-// import 'package:dotenv/dotenv.dart' show load;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-
+import 'package:dotenv/dotenv.dart' show load;
 
 void main() async {
-
-  // load api key from .env
-  await load();
-
   setUp(() {
-    // setup goes here
+    // load api key from .env
+    // this won't work unless you use dotenv/dotenv
+    // whenever env values are read in the app
+    load();
   });
 
   // Does a GET on a Restaurant ID and checks that it returns the correct restaurant name
   test('GetRestaurant', () async {
     var restaurant = await getRestaurant("2859720081221600");
     expect(restaurant.name, "Panera Bread");
+  });
+
+  test('Build Menu', () async {
+    var restaurant = await getRestaurant("2859723381214996");
+    Menu menu = await buildMenuForRestaurant(restaurant);
+    expect(menu.getSubsectionNames().contains("Mobile Hot Coffee"), true);
   });
 
   // Does a GET on a menu item ID and checks that it returns the correct item name
@@ -32,8 +36,7 @@ void main() async {
   // Checks one of the results
   test('SearchRestaurantsGeo', () async {
     var restaurants = await searchRestaurantsGeo(
-        Position(longitude: -77.17103, latitude: 39.114805),
-        2);
+        Position(longitude: -77.17103, latitude: 39.114805), 2);
 
     var shouldContain = "Baja Fresh";
     var doesContain = false;

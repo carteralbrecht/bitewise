@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:bitewise/models/menuItem.dart';
 import 'package:geolocator/geolocator.dart';
 
 // Restaurant data model from Documenu API
@@ -33,6 +34,7 @@ class Restaurant {
   final List<String> cuisines;
   final Position geo;
   final String address;
+  final List<String> subsectionNames;
 
   Restaurant({
     this.id,
@@ -43,7 +45,8 @@ class Restaurant {
     this.priceRange,
     this.cuisines,
     this.geo,
-    this.address
+    this.address,
+    this.subsectionNames
   });
 
   factory Restaurant.fromJson(Map<String, dynamic> json) {
@@ -56,6 +59,15 @@ class Restaurant {
     var addressFromJson = json["address"];
     String formattedAddress = addressFromJson == null ? null : addressFromJson["formatted"];
 
+    List<String> subsections = new List();
+    var menus = json["menus"];
+
+    for (var menu in menus) {
+      for (var section in menu["menu_sections"]) {
+        subsections.add(section["section_name"]);
+      }
+    }
+
     return new Restaurant(
         id: json["restaurant_id"].toString(),
         name: json["restaurant_name"].toString(),
@@ -65,7 +77,8 @@ class Restaurant {
         priceRange: json["price_range"].toString(),
         cuisines: cuisinesList,
         geo: position,
-        address: formattedAddress
+        address: formattedAddress,
+        subsectionNames: subsections
     );
   }
 }
