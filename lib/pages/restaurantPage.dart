@@ -8,6 +8,7 @@ import 'package:bitewise/models/menuItem.dart';
 import 'package:bitewise/services/documenu.dart';
 import 'package:bitewise/components/menuItemListTile.dart';
 import 'package:bitewise/global.dart' as global;
+import 'package:indexed_list_view/indexed_list_view.dart';
 import 'package:flutter/gestures.dart';
 
 
@@ -23,7 +24,8 @@ class RestaurantPage extends StatefulWidget {
 class _RestaurantPageState extends State<RestaurantPage> {
 
   List<MenuItem> menuItems = new List<MenuItem>();
-  ButtonStyle rateButton = new ButtonStyle();
+  final IndexedScrollController menuController = IndexedScrollController();
+  final IndexedScrollController sectionController = IndexedScrollController();
   final AuthService _auth = AuthService();
 
   @override
@@ -44,51 +46,6 @@ class _RestaurantPageState extends State<RestaurantPage> {
       });
   }
 
-  // Color c1 = const Color(0xE4ECEE);
-  Widget restInfo() {
-    return Container (
-        margin: const EdgeInsets.all(16.0),
-        width: MediaQuery.of(context).size.width,
-        height: 85,
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(widget.restaurant.name, style: TextStyle(color: Colors.black, fontSize: 20)),
-              Padding (
-                padding: EdgeInsets.all(5.0),
-              ),
-              Row(
-                children: <Widget>[
-                  FlatButton(
-                    color: Colors.yellow[600],
-                    textColor: Colors.black,
-                    onPressed: () {
-                      /*...*/
-                    },
-                    child: Text(
-                      "Sort",
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(16.0),
-                  ),
-                  FlatButton(
-                    color: Colors.yellow[600],
-                    textColor: Colors.black,
-                    onPressed: () {
-                      /*...*/
-                    },
-                    child: Text(
-                      "Filter",
-                    ),
-                  )
-                ],
-              )
-            ]
-        )
-    );
-  }
 
   Widget _dishList() {
     return Expanded(
@@ -106,53 +63,70 @@ class _RestaurantPageState extends State<RestaurantPage> {
   Widget _body() {
     return Column(
       children: <Widget>[
-        restInfo(),
         menuItems.isEmpty? Text('loading') : _dishList()
       ]
     );
   }
 
+  CustomScrollView menu() {
+
+
+    return CustomScrollView(
+
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        // title: Text('bitewise',
-        //   style: TextStyle(color: Colors.black, fontSize: 25)),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          color: Colors.black,
-          onPressed: () {
-            Navigator.pop(context);
-          },
+    return new CustomScrollView(
+      slivers: <Widget>[
+        SliverAppBar(
+          pinned: true,
+          expandedHeight: 150.0,
+          flexibleSpace: const FlexibleSpaceBar(
+            title: Text('Available seats'),
+          ),
+          actions: <Widget>[
+            IconButton(
+              icon: const Icon(Icons.add_circle),
+              tooltip: 'Add new entry',
+              onPressed: () { /* ... */ },
+            ),
+            IconButton(
+              icon: const Icon(Icons.add_circle),
+              tooltip: 'Add new entry',
+              onPressed: () { /* ... */ },
+            ),
+            IconButton(
+              icon: const Icon(Icons.add_circle),
+              tooltip: 'Add new entry',
+              onPressed: () { /* ... */ },
+            ),
+            IconButton(
+              icon: const Icon(Icons.add_circle),
+              tooltip: 'Add new entry',
+              onPressed: () { /* ... */ },
+            ),
+            IconButton(
+              icon: const Icon(Icons.add_circle),
+              tooltip: 'Add new entry',
+              onPressed: () { /* ... */ },
+            ),
+          ]
         ),
-        actions: <Widget>[
-          Container(
-              height: 35,
-              width: 35,
-              decoration: new BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
-              margin: EdgeInsets.only(right: 10.0),
-              child: GestureDetector(
-                onTap: () {
-                  if (global.user == null) {
-                    Navigator.pushNamed(context, '/signin');
-                  } else {
-                    Navigator.pushNamed(context, '/profile');
-                  }
-                },
-                child: Icon(
-                  Icons.person,
-                  color: Colors.grey,
-                ),
-              )),
-        ],
-        centerTitle: true,
-      ),
-      body: _body(),
+        SliverFixedExtentList(
+          itemExtent: 50.0,
+          delegate: SliverChildBuilderDelegate(
+            (BuildContext context, int index) {
+              return Container(
+                alignment: Alignment.center,
+                color: Colors.lightBlue[100 * (index % 9)],
+                child: Text('List Item $index'),
+              );
+            },
+          ),
+        ),
+      ]
     );
   }
 }
