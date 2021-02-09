@@ -1,6 +1,7 @@
 import 'package:bitewise/models/restaurant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:bitewise/icons/my_flutter_app_icons.dart';
 
 class RestaurantListTile extends StatefulWidget {
 
@@ -31,7 +32,7 @@ class _RestaurantListTileState extends State<RestaurantListTile> {
           tileColor: Color.fromRGBO(250,202,51,1),
           trailing: Container(
             margin: EdgeInsets.only(left: 20),
-            child: Icon(Icons.circle, color:Colors.white, size:50),
+            child: Icon(MyFlutterApp.big_cheeseburger, color:Colors.grey, size:50),
           ),
           title: Text(widget.restaurant.name, style: TextStyle(color: Colors.black, fontSize:25, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis),
           subtitle: Container(

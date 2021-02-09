@@ -80,6 +80,7 @@ class _HomePageState extends State<HomePage> {
 
     for (Restaurant restaurant in restaurants) {
       resultsNear.add(restaurant);
+      print(restaurant.cuisines);
       restDistances.add(await distanceToRestaurant(restaurant));
     }
 
