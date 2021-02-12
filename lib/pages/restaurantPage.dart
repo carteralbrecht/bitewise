@@ -92,9 +92,10 @@ class RestaurantPage extends StatefulWidget {
 class _RestaurantPageState extends State<RestaurantPage> {
 
   List<MenuItem> menuItems = new List<MenuItem>();
-  List<String> subSectionNames = <String>[
-    "Section 1", "Section 2", "Section 3", "Section 4", "Section 5", "Section 6", "Section 7", "Section 8"
-  ];
+  List<String> subSectionNames = <String>["Section 0","Section 1","Section 2","Section 3","Section 4"];
+  List<int> sectionScrollPositions = new List<int>();
+
+  Map subSectionToIndexMap = new Map();
 
 
   ItemScrollController menuController = ItemScrollController();
@@ -135,9 +136,14 @@ class _RestaurantPageState extends State<RestaurantPage> {
   List<Widget> generateMenu() {
 
     List listylist = List<Widget>();
+    List<int> positions = new List<int>();
+    List<String> subsections = new List<String>();
 
     String subsection = menuItems.elementAt(0).subsection;
     listylist.add(new SubSectionHeader(subsection, 0));
+    positions.add(listylist.length - 1);
+    subsections.add(subsection);
+    subSectionToIndexMap.putIfAbsent(subsection, () => 0);
 
     int sectionNum = 0;
 
@@ -146,9 +152,34 @@ class _RestaurantPageState extends State<RestaurantPage> {
         subsection = i.subsection;
         sectionNum++;
         listylist.add( new SubSectionHeader(subsection, sectionNum));
+        positions.add(listylist.length - 1);
+        subsections.add(subsection);
+        subSectionToIndexMap.putIfAbsent(subsection, () => sectionNum);
       }
       listylist.add(new MenuItemListTile(i, widget.restaurant.name));
     }
+
+    setState(() {
+      sectionScrollPositions = positions;
+      subSectionNames = subsections;
+      SubSectionWidget = ScrollablePositionedList.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemScrollController: sectionController,
+                      itemCount: subSectionNames.length,
+                      itemBuilder:(BuildContext context, int index) {
+                        if (index >= 0 && index < subSectionNames.length) {
+                          return FlatButton(
+                            onPressed: () {
+                              print(subSectionNames[index] + " was pressed!");
+                              menuController.scrollTo(index: sectionScrollPositions[index], duration: Duration(seconds:2));
+                            }, 
+                            child: Text(subSectionNames[index], style: TextStyle(fontSize: 15, color: Colors.black))
+                          );
+                        }
+                        return null;
+                      }
+                    );
+    });
 
     return listylist;
   }
@@ -181,6 +212,8 @@ class _RestaurantPageState extends State<RestaurantPage> {
   //   );
   // }
 
+  Widget SubSectionWidget;
+
   @override
   Widget build(BuildContext context) {
     
@@ -206,7 +239,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
                     onPressed: () { /* ... */ },
                   ),
                   
-                ]
+                ],
               ),
               SliverPersistentHeader(
                 pinned: true,
@@ -214,23 +247,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
                 delegate: PersistentHeader(
                   widget: Container(
                     height: 150,
-                    child: ScrollablePositionedList.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemScrollController: sectionController,
-                      itemCount: subSectionNames.length,
-                      itemBuilder:(BuildContext context, int index) {
-                        if (index >= 0 && index < subSectionNames.length) {
-                          return FlatButton(
-                            onPressed: () {
-                              print(subSectionNames[index] + " was pressed!");
-                              menuController.scrollTo(index: index, duration: Duration(seconds:2));
-                            }, 
-                            child: Text(subSectionNames[index], style: TextStyle(fontSize: 15, color: Colors.black))
-                          );
-                        }
-                        return null;
-                      }
-                    ),
+                    child: SubSectionWidget,
                   ),
                 ),
               ),
@@ -242,7 +259,6 @@ class _RestaurantPageState extends State<RestaurantPage> {
             itemCount: _menu.length,
             itemPositionsListener: itemPositionsListener,
             itemBuilder: (BuildContext context, int index) {
-              positionsView;
               if (index >= 0 && index < _menu.length)
               {
                 return _menu[index];
@@ -263,19 +279,24 @@ class _RestaurantPageState extends State<RestaurantPage> {
         // Determine the first visible item by finding the item with the
         // smallest trailing edge that is greater than 0.  i.e. the first
         // item whose trailing edge in visible in the viewport.
-        min = positions
-            .where((ItemPosition position) => position.itemTrailingEdge > 0)
-            .reduce((ItemPosition min, ItemPosition position) =>
-                position.itemTrailingEdge < min.itemTrailingEdge
-                    ? position
-                    : min)
-            .index;
+        // min = positions
+        //     .where((ItemPosition position) => position.itemTrailingEdge > 0)
+        //     .reduce((ItemPosition min, ItemPosition position) =>
+        //         position.itemTrailingEdge < min.itemTrailingEdge
+        //             ? position
+        //             : min)
+        //     .index;
         
-      }
-      print("Position Update Index: " + min.toString());
+        min = positions.last.index;
 
-      // Use min to scroll to sub section
-      updateSubSection(min);
+      }
+      if (min != null) {
+        print("Position Update Index: " + min.toString());
+
+        // Use min to scroll to sub section
+        updateSubSection(min);
+      }
+      
 
       // return null;
       return Container(width: 0.0, height: 0.0);
@@ -285,13 +306,39 @@ class _RestaurantPageState extends State<RestaurantPage> {
 
   void updateSubSection(int index) {
 
-    if (_menu[index] is SubSectionHeader) {
+    if (subSectionNames == null)
+      return;
+
+    if (_menu[index] is SubSectionHeader && sectionController.isAttached) {
       SubSectionHeader h = _menu[index];
       int scrollTo = h.keyIndex;
-      sectionController.scrollTo(
-        index: scrollTo,
-        duration: Duration(seconds:2)
-      );
+      try {
+        sectionController.scrollTo(
+          index: scrollTo,
+          duration: Duration(milliseconds:500)
+        );
+      }
+      catch (e) {
+        print(e.toString());
+      }
+    }
+
+    else {
+      for (int i = 0; i < sectionScrollPositions.length; i++)
+      {
+        if (index <= sectionScrollPositions[i] && sectionController.isAttached) {
+          try {
+            sectionController.scrollTo(
+              index: i,
+              duration: Duration(milliseconds:500)
+            );
+          }
+          catch (e) {
+            print(e.toString());
+          }
+          break;
+        }
+      }
     }
   }
 
