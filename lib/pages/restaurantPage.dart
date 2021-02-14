@@ -80,6 +80,81 @@ class PersistentHeader extends SliverPersistentHeaderDelegate {
   }
 }
 
+class menuSubSectionScrollbar extends StatefulWidget {
+
+  List<String> subsections;
+  ScrollController _controller;
+
+  menuSubSectionScrollbar(this.subsections, this._controller);
+
+  @override
+  _menuSubSectionScrollbarState createState() => _menuSubSectionScrollbarState();
+}
+
+class _menuSubSectionScrollbarState extends State<menuSubSectionScrollbar> {
+
+  int selectedIndex;
+
+  void updateSelectedIndex(int newIndex) {
+    setState(() {
+      selectedIndex = newIndex;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    selectedIndex = 0;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.all(5),
+      height: 50,
+      child: ListView.builder(
+        controller: widget._controller,
+        scrollDirection: Axis.horizontal,
+        itemCount: widget.subsections.length,
+        itemBuilder: (BuildContext context, int index) {
+          if (index == selectedIndex) {
+            return Container(
+              decoration: new BoxDecoration(
+                color: Colors.black,
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.all(Radius.circular(8)),
+              ),
+              margin: EdgeInsets.symmetric(horizontal: 5),
+              child: FlatButton(
+                onPressed: () {
+                  print("Selected Index : " + index.toString() + " was pressed");
+                },
+                child: Text(widget.subsections[index], style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold))
+              )
+            );
+          }
+          else {
+            return Container(
+              margin: EdgeInsets.symmetric(horizontal: 5),
+              child: FlatButton(
+                color: Colors.transparent,
+                onPressed: () {
+                  print("Unselected index : " + index.toString() + " was pressed");
+                  setState(() {
+                    selectedIndex = index;
+                  });
+                },
+                child: Text(widget.subsections[index], style: TextStyle(color: Colors.black, fontSize: 15))
+              )
+            );
+          }
+        },
+      )
+    );
+  }
+}
+
+
 class RestaurantPage extends StatefulWidget {
 
   final Restaurant restaurant;
@@ -95,14 +170,48 @@ class _RestaurantPageState extends State<RestaurantPage> {
   List<String> subSectionNames = <String>["Section 0","Section 1","Section 2","Section 3","Section 4"];
   List<int> sectionScrollPositions = new List<int>();
 
+  menuSubSectionScrollbar subSectionWidget;
+  ScrollController sectionController = new ScrollController();
+
   Map subSectionToIndexMap = new Map();
 
+  final itemSize = 100.0;
+  ScrollController _controller;
+  int firstIndex = 0;
+  String message = "";
 
-  ItemScrollController menuController = ItemScrollController();
-  ItemScrollController sectionController = ItemScrollController();
-  final ItemPositionsListener itemPositionsListener = ItemPositionsListener.create();
+  List<Widget> subSectionsWidgetList;
 
-  double alignment = 0;
+
+  _moveUp() {
+     //Add logic here
+  }
+
+  _moveDown() {
+   //Add logic here
+  }
+
+  _scrollListener() {
+    if (_controller.offset >= _controller.position.maxScrollExtent &&
+        !_controller.position.outOfRange) {
+      setState(() {
+        message = "reach the bottom";
+      });
+    }
+    if (_controller.offset <= _controller.position.minScrollExtent &&
+        !_controller.position.outOfRange) {
+      setState(() {
+        message = "reach the top";
+      });
+    }
+    else {
+      setState(() {
+        firstIndex = _controller.position.extentBefore ~/ itemSize;
+      });
+      print(firstIndex.toString());
+      // _controller.animateTo(offset, duration: null, curve: null)
+    }
+  }
 
 
   List<Widget> _menu;
@@ -110,6 +219,8 @@ class _RestaurantPageState extends State<RestaurantPage> {
 
   @override
   void initState() {
+    _controller = ScrollController();
+    _controller.addListener(_scrollListener);
     getMenuItems();
     super.initState();
   }
@@ -122,6 +233,12 @@ class _RestaurantPageState extends State<RestaurantPage> {
 
       for (MenuItem menuItem in allItems)
         menuItemsTemp.add(menuItem);
+
+      if (menuItemsTemp.length == 0) {
+        print("No menu items");
+        // TODO: Handle error
+        return; 
+      }
 
       setState(() {
         menuItems = menuItemsTemp;
@@ -138,6 +255,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
     List listylist = List<Widget>();
     List<int> positions = new List<int>();
     List<String> subsections = new List<String>();
+    List<Widget> subSectionWidgetListTemp = new List<Widget>();
 
     String subsection = menuItems.elementAt(0).subsection;
     listylist.add(new SubSectionHeader(subsection, 0));
@@ -147,6 +265,8 @@ class _RestaurantPageState extends State<RestaurantPage> {
 
     int sectionNum = 0;
 
+
+
     for (MenuItem i in menuItems) {
       if (i.subsection != subsection) {
         subsection = i.subsection;
@@ -155,33 +275,37 @@ class _RestaurantPageState extends State<RestaurantPage> {
         positions.add(listylist.length - 1);
         subsections.add(subsection);
         subSectionToIndexMap.putIfAbsent(subsection, () => sectionNum);
+        
       }
       listylist.add(new MenuItemListTile(i, widget.restaurant.name));
     }
 
+
     setState(() {
       sectionScrollPositions = positions;
       subSectionNames = subsections;
-      SubSectionWidget = ScrollablePositionedList.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemScrollController: sectionController,
-                      itemCount: subSectionNames.length,
-                      itemBuilder:(BuildContext context, int index) {
-                        if (index >= 0 && index < subSectionNames.length) {
-                          return FlatButton(
-                            onPressed: () {
-                              print(subSectionNames[index] + " was pressed!");
-                              menuController.scrollTo(index: sectionScrollPositions[index], duration: Duration(seconds:2));
-                            }, 
-                            child: Text(subSectionNames[index], style: TextStyle(fontSize: 15, color: Colors.black))
-                          );
-                        }
-                        return null;
-                      }
-                    );
+      subSectionWidget = new menuSubSectionScrollbar(subSectionNames, sectionController);
+      // subSectionsWidgetList = subSectionWidgetListTemp;
     });
 
+    
+
     return listylist;
+  }
+
+  void SelectSubSection(int newIndex) {
+    setState(() {
+      subSectionsWidgetList[newIndex] = FlatButton(
+        color: Colors.black,
+        textColor: Colors.white,
+        shape: CircleBorder(),
+        onPressed: () {
+          print(newIndex.toString() + " was pressed");
+          SelectSubSection(newIndex);
+        },
+        child: Text(subSectionNames[newIndex]),
+      );
+    });
   }
 
   // Widget subSections() {
@@ -212,7 +336,6 @@ class _RestaurantPageState extends State<RestaurantPage> {
   //   );
   // }
 
-  Widget SubSectionWidget;
 
   @override
   Widget build(BuildContext context) {
@@ -220,241 +343,39 @@ class _RestaurantPageState extends State<RestaurantPage> {
     return Material(
       child: Container(
         color: Colors.white,
-        child: NestedScrollView(
-          floatHeaderSlivers: true,
-          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-            return <Widget>[
-              SliverAppBar(
-                pinned: true,
-                floating: true,
-                expandedHeight: 200.0,
-                forceElevated: innerBoxIsScrolled,
-                flexibleSpace: FlexibleSpaceBar(
-                  title: Text("Restaurant")
-                ),
-                actions: <Widget>[
-                  IconButton(
-                    icon: const Icon(Icons.add_circle),
-                    tooltip: 'Add new entry',
-                    onPressed: () { /* ... */ },
-                  ),
-                  
-                ],
+        child: CustomScrollView(
+        controller: _controller,
+        slivers: <Widget>[
+          SliverAppBar(
+            pinned: true,
+            expandedHeight: 150,
+            title: Text("Restaurant"),
+            centerTitle: true,
+            backgroundColor: Colors.green,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                color: Colors.red,
+                alignment: Alignment.center,
+                child: Text("The details..."),
               ),
-              SliverPersistentHeader(
-                pinned: true,
-                floating: true,
-                delegate: PersistentHeader(
-                  widget: Container(
-                    height: 150,
-                    child: SubSectionWidget,
-                  ),
-                ),
-              ),
-              SliverToBoxAdapter(child: (_menu == null ? Container(height: 0, width: 0) : positionsView)),
-            ];
-          },
-          body: _menu == null ? Text("Loading...") : ScrollablePositionedList.builder(
-            itemScrollController: menuController, 
-            itemCount: _menu.length,
-            itemPositionsListener: itemPositionsListener,
-            itemBuilder: (BuildContext context, int index) {
-              if (index >= 0 && index < _menu.length)
-              {
-                return _menu[index];
-              }
-              return null;
-            },
-          )
-        )
+            ),
+            bottom: PreferredSize(
+              preferredSize: firstIndex == 0 ? Size(0,0) : Size.fromHeight(50),
+              child: firstIndex == 0 ? Container(height:0, width: 0) : (subSectionWidget == null ? Text("Loading") : subSectionWidget),
+            ),
+          ),
+          SliverList(
+            delegate: SliverChildListDelegate(
+              _menu == null ? [Text("Loading")] : _menu,
+            ),
+          ),
+          
+        ]
+      ),
       ),
     );
   }
 
-  Widget get positionsView => ValueListenableBuilder<Iterable<ItemPosition>>(
-    valueListenable: itemPositionsListener.itemPositions,
-    builder: (context, positions, child) {
-      int min;
-      if (positions.isNotEmpty) {
-        // Determine the first visible item by finding the item with the
-        // smallest trailing edge that is greater than 0.  i.e. the first
-        // item whose trailing edge in visible in the viewport.
-        // min = positions
-        //     .where((ItemPosition position) => position.itemTrailingEdge > 0)
-        //     .reduce((ItemPosition min, ItemPosition position) =>
-        //         position.itemTrailingEdge < min.itemTrailingEdge
-        //             ? position
-        //             : min)
-        //     .index;
-        
-        min = positions.last.index;
-
-      }
-      if (min != null) {
-        print("Position Update Index: " + min.toString());
-
-        // Use min to scroll to sub section
-        updateSubSection(min);
-      }
-      
-
-      // return null;
-      return Container(width: 0.0, height: 0.0);
-    },
-    
-  );
-
-  void updateSubSection(int index) {
-
-    if (subSectionNames == null)
-      return;
-
-    if (_menu[index] is SubSectionHeader && sectionController.isAttached) {
-      SubSectionHeader h = _menu[index];
-      int scrollTo = h.keyIndex;
-      try {
-        sectionController.scrollTo(
-          index: scrollTo,
-          duration: Duration(milliseconds:500)
-        );
-      }
-      catch (e) {
-        print(e.toString());
-      }
-    }
-
-    else {
-      for (int i = 0; i < sectionScrollPositions.length; i++)
-      {
-        if (index <= sectionScrollPositions[i] && sectionController.isAttached) {
-          try {
-            sectionController.scrollTo(
-              index: i,
-              duration: Duration(milliseconds:500)
-            );
-          }
-          catch (e) {
-            print(e.toString());
-          }
-          break;
-        }
-      }
-    }
-  }
+  
 
 }
-//   @override
-//   Widget build(BuildContext context) {
-//     return Material(
-//       child: Container(
-//         color: Colors.white,
-//         child: IndexedListView.builder(
-//           controller: menuController,
-//           itemBuilder: (BuildContext context, int index) {
-//             if (index == 0) 
-//             {
-//               return SliverAppBar(
-//                 pinned: true,
-//                 expandedHeight: 150.0,
-//                 flexibleSpace: FlexibleSpaceBar(
-//                   title: Text("Restaurant")
-//                 ),
-//                 actions: <Widget>[
-//                   IconButton(
-//                     icon: const Icon(Icons.add_circle),
-//                     tooltip: 'Add new entry',
-//                     onPressed: () { /* ... */ },
-//                   ),
-//                   IconButton(
-//                     icon: const Icon(Icons.add_circle),
-//                     tooltip: 'Add new entry',
-//                     onPressed: () { /* ... */ },
-//                   ),
-                  
-//                 ]
-//               );
-//             }
-//             else if (index == 1) 
-//             {
-//               return SliverPersistentHeader(
-//                 pinned: true,
-//                 delegate: PersistentHeader(
-//                   widget: Container(
-//                     height: 150,
-//                     child: ListView.builder(
-//                       scrollDirection: Axis.horizontal,
-//                       controller: sectionController,
-//                       itemCount: subSectionNames.length,
-//                       itemBuilder:(BuildContext context, int index) {
-//                         return FlatButton(
-//                           onPressed: () {
-//                             print(subSectionNames[index] + " was pressed!");
-//                           }, 
-//                           child: Text(subSectionNames[index], style: TextStyle(fontSize: 15, color: Colors.black))
-//                         );
-//                       }
-//                     ),
-//                   ),
-//                 ),
-//               );
-//             }
-//             else 
-//             {
-//               return _menu == null ? Text("Loading") : _menu[index-2];
-//             }
-//           },
-//         )
-            
-            
-//             // SliverToBoxAdapter(
-//             //   child: Container(
-//             //     height: 150,
-//             //     child: ListView(
-//             //       scrollDirection: Axis.horizontal,
-//             //       controller: sectionController,
-//             //       children: <Widget>[
-//             //         Container(
-//             //           width: 150,
-//             //           alignment: Alignment.center,
-//             //           child: Text("Section 1", style: TextStyle(fontSize: 20)),
-//             //         ),
-//             //         Container(
-//             //           width: 150,
-//             //           alignment: Alignment.center,
-//             //           child: Text("Section 2", style: TextStyle(fontSize: 20)),
-//             //         ),
-//             //         Container(
-//             //           width: 150,
-//             //           alignment: Alignment.center,
-//             //           child: Text("Section 3", style: TextStyle(fontSize: 20)),
-//             //         ),
-//             //         Container(
-//             //           width: 150,
-//             //           alignment: Alignment.center,
-//             //           child: Text("Section 4", style: TextStyle(fontSize: 20)),
-//             //         ),
-//             //         Container(
-//             //           width: 150,
-//             //           alignment: Alignment.center,
-//             //           child: Text("Section 5", style: TextStyle(fontSize: 20)),
-//             //         ),
-//             //       ],
-//             //     ),
-//             //   ),
-//             // ),
-//             // SliverFixedExtentList(
-//             //   itemExtent: 50.0,
-//             //   delegate: SliverChildBuilderDelegate(
-//             //     (BuildContext context, int index) {
-//             //       return Container(
-//             //         alignment: Alignment.center,
-//             //         color: Colors.lightBlue[100 * (index % 9)],
-//             //         child: Text('List Item $index'),
-//             //       );
-//             //     },
-//             //   ),
-//             // ),
-//         )
-//       );
-//   }
-// }
