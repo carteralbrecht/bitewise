@@ -8,9 +8,7 @@ import 'package:bitewise/models/menuItem.dart';
 import 'package:bitewise/services/documenu.dart';
 import 'package:bitewise/components/menuItemListTile.dart';
 import 'package:bitewise/global.dart' as global;
-import 'package:indexed_list_view/indexed_list_view.dart';
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-import 'package:flutter/gestures.dart';
+
 
 class SubSectionHeader extends StatefulWidget {
 
@@ -48,63 +46,52 @@ class _SubSectionHeaderState extends State<SubSectionHeader> {
   }
 }
 
-class PersistentHeader extends SliverPersistentHeaderDelegate {
-  final Widget widget;
 
-  PersistentHeader({this.widget});
+class MenuSubSectionScrollbar extends StatefulWidget {
 
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      width: double.infinity,
-      height: 56.0,
-      child: Card(
-        margin: EdgeInsets.all(0),
-        color: Colors.white,
-        elevation: 5.0,
-        child: Center(child: widget),
-      ),
-    );
-  }
+  List<SubSection> subsections;
+  ScrollController _sectionController;
+  ScrollController _menuController;
+
+  MenuSubSectionScrollbar(this.subsections, this._sectionController, this._menuController);
 
   @override
-  double get maxExtent => 56.0;
-
-  @override
-  double get minExtent => 56.0;
-
-  @override
-  bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) {
-    return true;
-  }
+  _MenuSubSectionScrollbarState createState() => _MenuSubSectionScrollbarState();
 }
 
-class menuSubSectionScrollbar extends StatefulWidget {
-
-  List<String> subsections;
-  ScrollController _controller;
-
-  menuSubSectionScrollbar(this.subsections, this._controller);
-
-  @override
-  _menuSubSectionScrollbarState createState() => _menuSubSectionScrollbarState();
-}
-
-class _menuSubSectionScrollbarState extends State<menuSubSectionScrollbar> {
+class _MenuSubSectionScrollbarState extends State<MenuSubSectionScrollbar> {
 
   int selectedIndex;
+  double itemWidth = 150;
+
+  double menuItemHeight = 100;
+  double menuSubsectionHeight = 100;
 
   void updateSelectedIndex(int newIndex) {
     setState(() {
       selectedIndex = newIndex;
+      widget._sectionController.animateTo(newIndex * itemWidth, duration: Duration(milliseconds: 500), curve: Curves.linear);
+      scrollMenu();
     });
+  }
+
+  void scrollMenu() {
+    double scrollDistance = 0;
+    if (selectedIndex == 0) {
+      scrollDistance += menuSubsectionHeight;
+    }
+    for (int i = 0 ; i < selectedIndex; i++) {
+      scrollDistance += menuSubsectionHeight;
+      scrollDistance += widget.subsections[i].numItems * menuItemHeight;
+    }
+    widget._menuController.animateTo(scrollDistance, duration: Duration(seconds: 2), curve: Curves.linear);
   }
 
   @override
   void initState() {
     super.initState();
     selectedIndex = 0;
+    
   }
 
   @override
@@ -113,9 +100,10 @@ class _menuSubSectionScrollbarState extends State<menuSubSectionScrollbar> {
       margin: EdgeInsets.all(5),
       height: 50,
       child: ListView.builder(
-        controller: widget._controller,
+        controller: widget._sectionController,
         scrollDirection: Axis.horizontal,
         itemCount: widget.subsections.length,
+        itemExtent: itemWidth,
         itemBuilder: (BuildContext context, int index) {
           if (index == selectedIndex) {
             return Container(
@@ -129,7 +117,7 @@ class _menuSubSectionScrollbarState extends State<menuSubSectionScrollbar> {
                 onPressed: () {
                   print("Selected Index : " + index.toString() + " was pressed");
                 },
-                child: Text(widget.subsections[index], style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold))
+                child: Text(widget.subsections[index].name, style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold))
               )
             );
           }
@@ -140,17 +128,35 @@ class _menuSubSectionScrollbarState extends State<menuSubSectionScrollbar> {
                 color: Colors.transparent,
                 onPressed: () {
                   print("Unselected index : " + index.toString() + " was pressed");
-                  setState(() {
-                    selectedIndex = index;
-                  });
+                  updateSelectedIndex(index);
                 },
-                child: Text(widget.subsections[index], style: TextStyle(color: Colors.black, fontSize: 15))
+                child: Text(widget.subsections[index].name, style: TextStyle(color: Colors.black, fontSize: 15))
               )
             );
           }
         },
       )
     );
+  }
+}
+
+class SubSection {
+
+  String name;
+  int numItems;
+
+  // Costructor
+  SubSection(String s, int n) {
+    name = s;
+    numItems = n;
+  }
+
+  String get section_name {
+    return name;
+  }
+
+  int get num_items {
+    return numItems;
   }
 }
 
@@ -167,20 +173,20 @@ class RestaurantPage extends StatefulWidget {
 class _RestaurantPageState extends State<RestaurantPage> {
 
   List<MenuItem> menuItems = new List<MenuItem>();
-  List<String> subSectionNames = <String>["Section 0","Section 1","Section 2","Section 3","Section 4"];
-  List<int> sectionScrollPositions = new List<int>();
+  // List<String> subSectionNames = <String>["Section 0","Section 1","Section 2","Section 3","Section 4"];
+  // List<int> sectionScrollPositions = new List<int>();
 
-  menuSubSectionScrollbar subSectionWidget;
+  MenuSubSectionScrollbar subSectionWidget;
   ScrollController sectionController = new ScrollController();
 
-  Map subSectionToIndexMap = new Map();
+  // Map subSectionToIndexMap = new Map();
 
   final itemSize = 100.0;
-  ScrollController _controller;
+  ScrollController _menuController;
   int firstIndex = 0;
   String message = "";
 
-  List<Widget> subSectionsWidgetList;
+  // List<Widget> subSectionsWidgetList;
 
 
   _moveUp() {
@@ -192,21 +198,21 @@ class _RestaurantPageState extends State<RestaurantPage> {
   }
 
   _scrollListener() {
-    if (_controller.offset >= _controller.position.maxScrollExtent &&
-        !_controller.position.outOfRange) {
+    if (_menuController.offset >= _menuController.position.maxScrollExtent &&
+        !_menuController.position.outOfRange) {
       setState(() {
         message = "reach the bottom";
       });
     }
-    if (_controller.offset <= _controller.position.minScrollExtent &&
-        !_controller.position.outOfRange) {
+    if (_menuController.offset <= _menuController.position.minScrollExtent &&
+        !_menuController.position.outOfRange) {
       setState(() {
         message = "reach the top";
       });
     }
     else {
       setState(() {
-        firstIndex = _controller.position.extentBefore ~/ itemSize;
+        firstIndex = _menuController.position.extentBefore ~/ itemSize;
       });
       print(firstIndex.toString());
       // _controller.animateTo(offset, duration: null, curve: null)
@@ -219,8 +225,8 @@ class _RestaurantPageState extends State<RestaurantPage> {
 
   @override
   void initState() {
-    _controller = ScrollController();
-    _controller.addListener(_scrollListener);
+    _menuController = ScrollController();
+    _menuController.addListener(_scrollListener);
     getMenuItems();
     super.initState();
   }
@@ -253,88 +259,35 @@ class _RestaurantPageState extends State<RestaurantPage> {
   List<Widget> generateMenu() {
 
     List listylist = List<Widget>();
-    List<int> positions = new List<int>();
-    List<String> subsections = new List<String>();
-    List<Widget> subSectionWidgetListTemp = new List<Widget>();
 
-    String subsection = menuItems.elementAt(0).subsection;
-    listylist.add(new SubSectionHeader(subsection, 0));
-    positions.add(listylist.length - 1);
-    subsections.add(subsection);
-    subSectionToIndexMap.putIfAbsent(subsection, () => 0);
+    List<SubSection> sectionList = List<SubSection>();
 
     int sectionNum = 0;
+    int prevIndex = 0;
+    
 
+    String subsection = menuItems.elementAt(sectionNum).subsection;
+    listylist.add(new SubSectionHeader(subsection, sectionNum));
+   
 
-
-    for (MenuItem i in menuItems) {
-      if (i.subsection != subsection) {
-        subsection = i.subsection;
-        sectionNum++;
+    for (int i = 0; i < menuItems.length; i++) {
+      if (menuItems[i].subsection != subsection) {
+        sectionList.add(new SubSection(subsection, i - prevIndex));
+        subsection = menuItems[i].subsection;
+        prevIndex = i;
         listylist.add( new SubSectionHeader(subsection, sectionNum));
-        positions.add(listylist.length - 1);
-        subsections.add(subsection);
-        subSectionToIndexMap.putIfAbsent(subsection, () => sectionNum);
-        
       }
-      listylist.add(new MenuItemListTile(i, widget.restaurant.name));
+      listylist.add(new MenuItemListTile(menuItems[i], widget.restaurant.name));
     }
+    sectionList.add(new SubSection(subsection, menuItems.length - prevIndex));
 
 
     setState(() {
-      sectionScrollPositions = positions;
-      subSectionNames = subsections;
-      subSectionWidget = new menuSubSectionScrollbar(subSectionNames, sectionController);
-      // subSectionsWidgetList = subSectionWidgetListTemp;
+      subSectionWidget = new MenuSubSectionScrollbar(sectionList, sectionController, _menuController);
     });
-
-    
 
     return listylist;
   }
-
-  void SelectSubSection(int newIndex) {
-    setState(() {
-      subSectionsWidgetList[newIndex] = FlatButton(
-        color: Colors.black,
-        textColor: Colors.white,
-        shape: CircleBorder(),
-        onPressed: () {
-          print(newIndex.toString() + " was pressed");
-          SelectSubSection(newIndex);
-        },
-        child: Text(subSectionNames[newIndex]),
-      );
-    });
-  }
-
-  // Widget subSections() {
-
-  //   List listylist = List<Widget>();
-
-  //   Color c = Colors.white;
-
-  //   for (String s in subSectionNames) {
-  //     listylist.add(
-  //       FlatButton(
-  //         color: c,
-  //         onPressed: () {
-  //           c = Colors.blue;
-  //           print(s + " was pressed!");
-  //         }, 
-  //         child: Text(s, style: TextStyle(fontSize: 15, color: Colors.black))
-  //       )
-  //     );
-  //   }
-
-  //   return IndexedListView.builder(
-  //     // controller: sectionController, 
-  //     itemBuilder: (BuildContext context, int index) {
-  //       return listylist[index];
-  //     },
-  //     maxItemCount: listylist.length,
-  //   );
-  // }
 
 
   @override
@@ -344,7 +297,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
       child: Container(
         color: Colors.white,
         child: CustomScrollView(
-        controller: _controller,
+        controller: _menuController,
         slivers: <Widget>[
           SliverAppBar(
             pinned: true,
