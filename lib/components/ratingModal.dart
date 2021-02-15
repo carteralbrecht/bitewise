@@ -1,3 +1,4 @@
+import 'package:bitewise/models/restaurant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:bitewise/services/fsmanager.dart';
@@ -6,9 +7,9 @@ import 'package:bitewise/models/menuItem.dart';
 class RatingModal extends StatefulWidget {
 
   // final String dishName;
-  final String restaurantName;
+  final Restaurant restaurant;
   final MenuItem menuItem;
-  const RatingModal(this.menuItem, this.restaurantName);
+  const RatingModal(this.menuItem, this.restaurant);
 
   @override
   _RatingModalState createState() => _RatingModalState();
@@ -31,7 +32,7 @@ class _RatingModalState extends State<RatingModal> {
                 children: [
                   Text(widget.menuItem.name, style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),),
                   SizedBox(height: 5),
-                  Text(widget.restaurantName, style: TextStyle(color: Colors.black45, fontSize: 12, fontStyle: FontStyle.italic),),
+                  Text(widget.restaurant.name, style: TextStyle(color: Colors.black45, fontSize: 12, fontStyle: FontStyle.italic),),
               ],
               )
             ),
