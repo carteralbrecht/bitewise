@@ -82,10 +82,13 @@ class _TestState extends State<Test> {
                   SizedBox(height: 20),
                   RaisedButton(
                     onPressed: () async {
-                      // put function here
+                      print("---- calling getTopFive -------");
+                      dynamic res = await _fsm.getTopFive(field1);
+                      print("TOP 5 FOR " + field1 + ": ");
+                      print(res);
                     },
                     child: Text(
-                      'Test 2',
+                      'getRestList',
                       style: TextStyle(color: Colors.black, fontSize: 20),
                     ),
                     color: Colors.yellow[600],
