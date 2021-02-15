@@ -9,6 +9,7 @@ import 'package:bitewise/models/menuItem.dart';
 import 'package:bitewise/services/documenu.dart';
 import 'package:bitewise/components/menuItemListTile.dart';
 import 'package:bitewise/global.dart' as global;
+import 'package:bitewise/services/restaurantUtil.dart';
 
 
 class SubSectionHeader extends StatefulWidget {
@@ -54,10 +55,10 @@ class _SubSectionHeaderState extends State<SubSectionHeader> {
 
 class MenuSubSectionScrollbar extends StatefulWidget {
 
-  Key _key;
-  List<SubSection> subsections;
-  ScrollController _sectionController;
-  ScrollController _menuController;
+  final Key _key;
+  final List<SubSection> subsections;
+  final ScrollController _sectionController;
+  final ScrollController _menuController;
 
   MenuSubSectionScrollbar(this._key, this.subsections, this._sectionController, this._menuController) : super(key: _key);
 
@@ -223,14 +224,10 @@ class _RestaurantPageState extends State<RestaurantPage> {
   final GlobalKey<_MenuSubSectionScrollbarState> _key = GlobalKey();
 
   List<MenuItem> menuItems = new List<MenuItem>();
-  // List<String> subSectionNames = <String>["Section 0","Section 1","Section 2","Section 3","Section 4"];
-  // List<int> sectionScrollPositions = new List<int>();
 
   MenuSubSectionScrollbar subSectionWidget;
-  // _MenuSubSectionScrollbarState sectionScrollState;
   ScrollController sectionController = new ScrollController();
 
-  // Map subSectionToIndexMap = new Map();
 
   final itemSize = 100.0;
   ScrollController _menuController;
@@ -239,16 +236,8 @@ class _RestaurantPageState extends State<RestaurantPage> {
 
   String currentSubSection = "";
 
-  // List<Widget> subSectionsWidgetList;
+  Icon restaurantIcon;
 
-
-  _moveUp() {
-     //Add logic here
-  }
-
-  _moveDown() {
-   //Add logic here
-  }
 
   _scrollListener() {
     if (_menuController.offset >= _menuController.position.maxScrollExtent &&
@@ -279,7 +268,6 @@ class _RestaurantPageState extends State<RestaurantPage> {
         }
       } 
       print(firstIndex.toString());
-      // _controller.animateTo(offset, duration: null, curve: null)
     }
   }
 
@@ -291,6 +279,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
   void initState() {
     _menuController = ScrollController();
     _menuController.addListener(_scrollListener);
+    restaurantIcon = RestaurantUtil.assignIcon(widget.restaurant);
     getMenuItems();
     super.initState();
   }
@@ -299,7 +288,6 @@ class _RestaurantPageState extends State<RestaurantPage> {
       List<MenuItem> menuItemsTemp = new List<MenuItem>();
       var menu = await buildMenuForRestaurant(widget.restaurant);
       var allItems = menu.getAllItems();
-      // List<String> subsections = menu.getSubsectionNames();
 
       for (MenuItem menuItem in allItems)
         menuItemsTemp.add(menuItem);
@@ -313,7 +301,6 @@ class _RestaurantPageState extends State<RestaurantPage> {
       setState(() {
         menuItems = menuItemsTemp;
         _menu = generateMenu();
-        // subSectionNames = subsections;
       });
   }
 
@@ -374,7 +361,23 @@ class _RestaurantPageState extends State<RestaurantPage> {
               background: Container(
                 color: Colors.red,
                 alignment: Alignment.center,
-                child: Text("The details..."),
+                child: Row(
+                  children: [
+                    Container(
+                      child: Column(
+                        children: [
+                          Text(widget.restaurant.cuisines[0] + ", " + widget.restaurant.cuisines[1] + ", " + widget.restaurant.cuisines[2]),
+                          Text("7 items rated"),
+                          Text(widget.restaurant.address),
+                          Text(widget.restaurant.hours),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      child: restaurantIcon,
+                    ),
+                  ],
+                ),
               ),
             ),
             bottom: PreferredSize(
