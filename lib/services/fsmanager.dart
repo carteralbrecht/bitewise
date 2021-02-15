@@ -67,6 +67,7 @@ class FirestoreManager {
     }
   }
 
+  // TODO: pass restaurantId to rating and menu item docs
   Future leaveRating(String itemId, num rating) async {
     try {
       FirebaseUser user = await _authServ.getUser();
