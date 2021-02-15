@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:bitewise/services/auth.dart';
 import 'package:bitewise/services/menuUtil.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:bitewise/models/restaurant.dart';
 import 'package:bitewise/pages/profilePage.dart';
@@ -17,6 +18,10 @@ class SubSectionHeader extends StatefulWidget {
 
   int get keyIndex {
     return this.index;
+  }
+
+  String get subSectionName {
+    return this.subsection;
   }
 
   SubSectionHeader(this.subsection, this.index);
@@ -49,11 +54,12 @@ class _SubSectionHeaderState extends State<SubSectionHeader> {
 
 class MenuSubSectionScrollbar extends StatefulWidget {
 
+  Key _key;
   List<SubSection> subsections;
   ScrollController _sectionController;
   ScrollController _menuController;
 
-  MenuSubSectionScrollbar(this.subsections, this._sectionController, this._menuController);
+  MenuSubSectionScrollbar(this._key, this.subsections, this._sectionController, this._menuController) : super(key: _key);
 
   @override
   _MenuSubSectionScrollbarState createState() => _MenuSubSectionScrollbarState();
@@ -61,8 +67,45 @@ class MenuSubSectionScrollbar extends StatefulWidget {
 
 class _MenuSubSectionScrollbarState extends State<MenuSubSectionScrollbar> {
 
+  Stopwatch scrollStart = new Stopwatch();
   int selectedIndex;
   double itemWidth = 150;
+
+  void tryUpdateSubSection(String s) {
+    int newIndex = 0;
+
+    if (widget == null) {
+      print("Widget is null");
+      return;
+    }
+    
+    if (scrollStart.elapsedMilliseconds < 500 && scrollStart.elapsedMilliseconds != 0) {
+      print("Didn't update because elapsed time = " + scrollStart.elapsedMilliseconds.toString());
+      return; 
+    }
+    else {
+      for (int i = 0; i < widget.subsections.length; i++) {
+        if (widget.subsections[i].name == s) {
+          newIndex = i;
+          break;
+        }
+      }
+      scrollStart.stop();
+      scrollStart.reset();
+      try {
+        widget._sectionController.animateTo(newIndex * itemWidth, duration: Duration(milliseconds: 500), curve: Curves.linear);
+        scrollStart.start();
+        setState(() {
+          selectedIndex = newIndex;
+        });
+      }
+      catch(e) {
+        print(e.toString());
+      }
+      return;
+    }
+  
+  }
 
   double menuItemHeight = 100;
   double menuSubsectionHeight = 100;
@@ -84,14 +127,19 @@ class _MenuSubSectionScrollbarState extends State<MenuSubSectionScrollbar> {
       scrollDistance += menuSubsectionHeight;
       scrollDistance += widget.subsections[i].numItems * menuItemHeight;
     }
-    widget._menuController.animateTo(scrollDistance, duration: Duration(seconds: 2), curve: Curves.linear);
+    widget._menuController.animateTo(scrollDistance, duration: Duration(milliseconds: 500), curve: Curves.linear);
+    setState(() {
+      scrollStart.start();
+    });
   }
+
+  
 
   @override
   void initState() {
     super.initState();
     selectedIndex = 0;
-    
+    scrollStart.start();
   }
 
   @override
@@ -172,11 +220,14 @@ class RestaurantPage extends StatefulWidget {
 
 class _RestaurantPageState extends State<RestaurantPage> {
 
+  final GlobalKey<_MenuSubSectionScrollbarState> _key = GlobalKey();
+
   List<MenuItem> menuItems = new List<MenuItem>();
   // List<String> subSectionNames = <String>["Section 0","Section 1","Section 2","Section 3","Section 4"];
   // List<int> sectionScrollPositions = new List<int>();
 
   MenuSubSectionScrollbar subSectionWidget;
+  // _MenuSubSectionScrollbarState sectionScrollState;
   ScrollController sectionController = new ScrollController();
 
   // Map subSectionToIndexMap = new Map();
@@ -185,6 +236,8 @@ class _RestaurantPageState extends State<RestaurantPage> {
   ScrollController _menuController;
   int firstIndex = 0;
   String message = "";
+
+  String currentSubSection = "";
 
   // List<Widget> subSectionsWidgetList;
 
@@ -213,7 +266,18 @@ class _RestaurantPageState extends State<RestaurantPage> {
     else {
       setState(() {
         firstIndex = _menuController.position.extentBefore ~/ itemSize;
+        
       });
+      if (_menu[firstIndex] is SubSectionHeader) {
+        SubSectionHeader h = _menu[firstIndex];
+        if (_key.currentState != null) {
+          _key.currentState.tryUpdateSubSection(h.subsection);
+          print("Trying to scroll the header!");
+        }
+        else {
+          print("Current key state = null :(");
+        }
+      } 
       print(firstIndex.toString());
       // _controller.animateTo(offset, duration: null, curve: null)
     }
@@ -281,10 +345,11 @@ class _RestaurantPageState extends State<RestaurantPage> {
     }
     sectionList.add(new SubSection(subsection, menuItems.length - prevIndex));
 
-
     setState(() {
-      subSectionWidget = new MenuSubSectionScrollbar(sectionList, sectionController, _menuController);
+      subSectionWidget = new MenuSubSectionScrollbar(_key, sectionList, sectionController, _menuController);
+      // sectionScrollState = subSectionWidget.createState();
     });
+
 
     return listylist;
   }
