@@ -5,7 +5,6 @@ import 'package:bitewise/services/fsmanager.dart';
 import 'package:bitewise/models/menuItem.dart';
 
 class RatingModal extends StatefulWidget {
-
   // final String dishName;
   final Restaurant restaurant;
   final MenuItem menuItem;
@@ -27,15 +26,26 @@ class _RatingModalState extends State<RatingModal> {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Container(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(widget.menuItem.name, style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),),
-                  SizedBox(height: 5),
-                  Text(widget.restaurant.name, style: TextStyle(color: Colors.black45, fontSize: 12, fontStyle: FontStyle.italic),),
+                child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  widget.menuItem.name,
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 5),
+                Text(
+                  widget.restaurant.name,
+                  style: TextStyle(
+                      color: Colors.black45,
+                      fontSize: 12,
+                      fontStyle: FontStyle.italic),
+                ),
               ],
-              )
-            ),
+            )),
             Container(
               padding: EdgeInsets.symmetric(vertical: 10),
               child: RatingBar(
@@ -54,27 +64,33 @@ class _RatingModalState extends State<RatingModal> {
                 },
               ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget> [
-                FlatButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text("cancel", style: TextStyle(color: Colors.black54, fontSize: 15, fontStyle: FontStyle.italic, )),
-                ),
-                FlatButton(
-                  onPressed: () {
-                    FirestoreManager().leaveRating(widget.menuItem.id, ratingValue);
-                    Navigator.pop(context);
-                  },
-                  color: Colors.yellow[700],
-                  child: Text("submit", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 15)),
-                ),
-              ]
-            ),
-          ]
-        ),
-      );
+            Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
+              FlatButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text("cancel",
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontSize: 15,
+                      fontStyle: FontStyle.italic,
+                    )),
+              ),
+              FlatButton(
+                onPressed: () {
+                  FirestoreManager().leaveRating(
+                      widget.restaurant.id, widget.menuItem.id, ratingValue);
+                  Navigator.pop(context);
+                },
+                color: Colors.yellow[700],
+                child: Text("submit",
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15)),
+              ),
+            ]),
+          ]),
+    );
   }
 }

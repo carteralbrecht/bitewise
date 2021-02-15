@@ -67,8 +67,7 @@ class FirestoreManager {
     }
   }
 
-  // TODO: pass restaurantId to rating and menu item docs
-  Future leaveRating(String itemId, num rating) async {
+  Future leaveRating(String restId, String itemId, num rating) async {
     try {
       FirebaseUser user = await _authServ.getUser();
       if (user != null) {
@@ -78,7 +77,7 @@ class FirestoreManager {
         dynamic rateId = await getUserRating(uid, itemId);
         // updateExisting will return false if there was not a rating to update
         if (rateId == null) {
-          await writeRating(uid, itemId, rating);
+          await writeRating(uid, restId, itemId, rating);
         } else {
           await updateExistingRating(rateId, rating);
         }
@@ -135,9 +134,11 @@ class FirestoreManager {
 
   // Function that creates a rating document for menuItem
   // and adds it to the ratings collection
-  Future writeRating(String uid, String itemId, num rating) async {
+  Future writeRating(
+      String uid, String restId, String itemId, num rating) async {
     try {
       _firestore.collection("ratings").add({
+        "restaurantId": restId,
         "menuItemId": itemId,
         "rating": rating,
         "userUid": uid,
