@@ -9,6 +9,7 @@ import 'package:bitewise/services/documenu.dart';
 import 'package:bitewise/components/menuItemListTile.dart';
 import 'package:bitewise/global.dart' as global;
 import 'package:flutter/gestures.dart';
+import 'package:bitewise/pages/ratingPage.dart';
 
 
 class RestaurantPage extends StatefulWidget {
@@ -97,8 +98,17 @@ class _RestaurantPageState extends State<RestaurantPage> {
         child: new ListView.builder(
           padding: EdgeInsets.all(16.0),
           itemBuilder: (context, i) {
-            return new MenuItemListTile(menuItems[i], widget.restaurant);
-        })
+            // return new MenuItemListTile(menuItems[i], widget.restaurant),
+            return new FlatButton(
+              onPressed: () => {
+                Navigator.push(
+                  context,
+                    MaterialPageRoute(
+                      builder: (context) => RatingPage()))
+                  },
+              child: new MenuItemListTile(menuItems[i], widget.restaurant));
+          }
+        )
       )
     );
   }
