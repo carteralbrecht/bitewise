@@ -27,7 +27,7 @@ class _MenuItemListTile extends State<MenuItemListTile> {
                 // border: Border(bottom: BorderSide(width: 3, color: Colors.grey)),
                 // borderRadius: BorderRadius.all(Radius.circular(8.0)),
       ),
-      margin: EdgeInsets.only(left:10,right:10, ),
+      margin: EdgeInsets.only(left:0,right:0, ),
       height: widget.height,
       child: Column(
         mainAxisSize: MainAxisSize.min,
