@@ -38,16 +38,26 @@ class _SubSectionHeaderState extends State<SubSectionHeader> {
     super.initState();
   }
 
+  Color dividerColor = Color.fromRGBO(228,236,238,1);
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      alignment: Alignment.center,
-      color: Colors.grey,
-      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      child: Text(
-        widget.subsection,
-        style: TextStyle(fontSize: 25, color: Colors.black, fontWeight: FontWeight.bold)
-      ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          color: Colors.white,
+          alignment: Alignment.centerLeft,
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          margin: EdgeInsets.only(left: 10, top: 5, bottom: 5),
+          child: Text(
+            widget.subsection,
+            style: TextStyle(fontSize: 25, color: Colors.black, fontWeight: FontWeight.bold,),
+            textAlign: TextAlign.left,
+          ),
+        ),
+        Divider(color: dividerColor, thickness: 5, indent: 20, endIndent: 20,),
+      ],
     );
   }
 }
@@ -229,7 +239,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
   ScrollController sectionController = new ScrollController();
 
 
-  final itemSize = 100.0;
+  final double itemHeight = 100.0;
   ScrollController _menuController;
   int firstIndex = 0;
   String message = "";
@@ -254,7 +264,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
     }
     else {
       setState(() {
-        firstIndex = _menuController.position.extentBefore ~/ itemSize;
+        firstIndex = _menuController.position.extentBefore ~/ itemHeight;
         
       });
       if (_menu[firstIndex] is SubSectionHeader) {
@@ -328,7 +338,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
         prevIndex = i;
         listylist.add( new SubSectionHeader(subsection, sectionNum));
       }
-      listylist.add(new MenuItemListTile(menuItems[i], widget.restaurant.name));
+      listylist.add(new MenuItemListTile(menuItems[i], widget.restaurant.name, itemHeight));
     }
     sectionList.add(new SubSection(subsection, menuItems.length - prevIndex));
 
@@ -345,55 +355,70 @@ class _RestaurantPageState extends State<RestaurantPage> {
   @override
   Widget build(BuildContext context) {
     
-    return Material(
-      child: Container(
-        color: Colors.white,
-        child: CustomScrollView(
-        controller: _menuController,
-        slivers: <Widget>[
-          SliverAppBar(
-            pinned: true,
-            expandedHeight: 150,
-            title: Text("Restaurant"),
-            centerTitle: true,
-            backgroundColor: Colors.green,
-            flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                color: Colors.red,
-                alignment: Alignment.center,
-                child: Row(
-                  children: [
-                    Container(
-                      child: Column(
-                        children: [
-                          Text(widget.restaurant.cuisines[0] + ", " + widget.restaurant.cuisines[1] + ", " + widget.restaurant.cuisines[2]),
-                          Text("7 items rated"),
-                          Text(widget.restaurant.address),
-                          Text(widget.restaurant.hours),
-                        ],
-                      ),
+    return SafeArea(
+      child: Material(
+        child: Container(
+          color: Colors.white,
+          child: CustomScrollView(
+            controller: _menuController,
+            slivers: <Widget>[
+              SliverAppBar(
+                pinned: true,
+                expandedHeight: 150,
+                title: Text(widget.restaurant.name, style: TextStyle(fontSize: 25, color: Colors.black)),
+                centerTitle: true,
+                backgroundColor: Color.fromRGBO(250,202,51,1),
+                flexibleSpace: FlexibleSpaceBar(
+                  background: Container(
+                    color: Color.fromRGBO(250,202,51,0.72),
+                    alignment: Alignment.center,
+                    padding: EdgeInsets.fromLTRB(5, 20, 5, 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(height: 25),
+                              Text("American, Pizza, Italian", style: TextStyle(fontSize:15)),
+                              Text("7 items rated", style: TextStyle(fontSize:15), textAlign: TextAlign.left),
+                              Container(
+                                width: 100,
+                                alignment: Alignment.centerLeft,
+                                child: Text(widget.restaurant.address, style: TextStyle(fontSize:15)),
+                              ),
+                              Text("Hours: 1:00 - 10:00", style: TextStyle(fontSize:15), textAlign: TextAlign.left),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          // padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                          margin: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                          alignment: Alignment.center,
+                          child: restaurantIcon,
+                        ),
+                      ],
                     ),
-                    Container(
-                      child: restaurantIcon,
-                    ),
-                  ],
+                  ),
+                ),
+                bottom: PreferredSize(
+                  preferredSize: firstIndex == 0 ? Size(0,0) : Size.fromHeight(50),
+                  child: firstIndex == 0 ? Container(height:0, width: 0) : (subSectionWidget == null ? Text("Loading") : subSectionWidget),
                 ),
               ),
-            ),
-            bottom: PreferredSize(
-              preferredSize: firstIndex == 0 ? Size(0,0) : Size.fromHeight(50),
-              child: firstIndex == 0 ? Container(height:0, width: 0) : (subSectionWidget == null ? Text("Loading") : subSectionWidget),
-            ),
+              SliverList(
+                delegate: SliverChildListDelegate(
+                  _menu == null ? [Text("Loading")] : _menu,
+                ),
+              ),
+              
+            ]
           ),
-          SliverList(
-            delegate: SliverChildListDelegate(
-              _menu == null ? [Text("Loading")] : _menu,
-            ),
-          ),
-          
-        ]
-      ),
-      ),
+        ),
+      )
     );
   }
 
