@@ -41,6 +41,9 @@ exports.aggregateRatings = functions.firestore
         // Get the value of the newly added rating
         const ratingVal = snapshot.data().rating;
 
+        // Get the restaurant id of the newly added rating
+        const restId = snapshot.data().restaurantId;
+
         // Get a reference to the menu item
         const menuItemRef = db.collection('menuitems').doc(snapshot.data().menuItemId);
 
@@ -67,7 +70,8 @@ exports.aggregateRatings = functions.firestore
                 // Update the menu item document
                 transaction.set(menuItemRef, {
                     avgRating: newAvgRating,
-                    numRatings: newNumRatings
+                    numRatings: newNumRatings,
+                    restaurantId: restId
                 });
             }
         );

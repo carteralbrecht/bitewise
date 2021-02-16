@@ -71,7 +71,7 @@ class _TestState extends State<Test> {
                   SizedBox(height: 20),
                   RaisedButton(
                     onPressed: () async {
-                      _fsm.leaveRating(field1, field2);
+                      _fsm.leaveRating("BackendTestRestaurant", field1, field2);
                     },
                     child: Text(
                       'Test 1',
