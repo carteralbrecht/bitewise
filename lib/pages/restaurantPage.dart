@@ -97,7 +97,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
         child: new ListView.builder(
           padding: EdgeInsets.all(16.0),
           itemBuilder: (context, i) {
-            return new MenuItemListTile(menuItems[i], widget.restaurant.name);
+            return new MenuItemListTile(menuItems[i], widget.restaurant);
         })
       )
     );

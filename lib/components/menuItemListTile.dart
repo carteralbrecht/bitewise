@@ -1,4 +1,5 @@
 import 'package:bitewise/models/menuItem.dart';
+import 'package:bitewise/models/restaurant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:bitewise/components/ratingModal.dart';
@@ -6,8 +7,8 @@ import 'package:bitewise/components/ratingModal.dart';
 class MenuItemListTile extends StatefulWidget {
 
   final MenuItem menuItem;
-  final String restaurantName;
-  const MenuItemListTile(this.menuItem, this.restaurantName);
+  final Restaurant restaurant;
+  const MenuItemListTile(this.menuItem, this.restaurant);
 
   @override
   _MenuItemListTile createState() => _MenuItemListTile();
@@ -36,7 +37,7 @@ class _MenuItemListTile extends State<MenuItemListTile> {
                 onPressed: () {
                   showDialog(
                                 context: context,
-                                builder: (_) => RatingModal(widget.menuItem, widget.restaurantName),
+                                builder: (_) => RatingModal(widget.menuItem, widget.restaurant),
                                 barrierDismissible: true);
                 },
                 child: Text("rate"),
