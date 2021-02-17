@@ -90,12 +90,14 @@ class _MenuSubSectionScrollbarState extends State<MenuSubSectionScrollbar> {
   Stopwatch scrollStart = new Stopwatch();
   int selectedIndex;
 
-  List<double> itemWidths; 
   double menuItemHeight;
   double menuSubsectionHeight;
 
-  ListView rowWidget;
   List<GlobalKey> keyList = new List<GlobalKey>();
+
+  Map<int, double> indexToOffsetMap = new Map();
+
+  double itemWidth = 125;
 
   void tryUpdateSubSection(String s) {
     int newIndex = 0;
@@ -118,27 +120,21 @@ class _MenuSubSectionScrollbarState extends State<MenuSubSectionScrollbar> {
       }
       scrollStart.stop();
       scrollStart.reset();
-      try {
-        widget._sectionController.animateTo(calcOffsetForSS(newIndex), duration: Duration(milliseconds: 500), curve: Curves.linear);
-        scrollStart.start();
-        setState(() {
-          selectedIndex = newIndex;
-        });
-      }
-      catch(e) {
-        print(e.toString());
-      }
+
+      widget._sectionController.animateTo(itemWidth * newIndex, duration: Duration(milliseconds: 500), curve: Curves.linear);
+      scrollStart.start();
+      setState(() {
+        selectedIndex = newIndex;
+      });
       return;
     }
   
   }
 
-  
-
   void updateSelectedIndex(int newIndex) {
     setState(() {
       selectedIndex = newIndex;
-      widget._sectionController.animateTo(calcOffsetForSS(newIndex), duration: Duration(milliseconds: 500), curve: Curves.linear);
+      widget._sectionController.animateTo(itemWidth * newIndex, duration: Duration(milliseconds: 500), curve: Curves.linear);
       scrollMenu();
     });
   }
@@ -158,75 +154,6 @@ class _MenuSubSectionScrollbarState extends State<MenuSubSectionScrollbar> {
     });
   }
 
-  void getWidths() {
-    List<double> temp = new List<double>();
-    for (GlobalKey k in keyList) {
-      RenderBox rb = k.currentContext.findRenderObject();
-      temp.add(rb.size.width);
-    }
-    print("Got keys: " + keyList.length.toString());
-    setState(() {
-      itemWidths = temp;
-    });
-  }
-
-  ListView buildWidget() {
-    ListView temp = ListView.builder(
-      controller: widget._sectionController,
-      scrollDirection: Axis.horizontal,
-      itemCount: widget.subsections.length,
-      itemBuilder: (BuildContext context, int index) {
-        GlobalKey _key = new GlobalKey();
-        keyList.add(_key);
-        print("Adding Key : " + index.toString());
-        if (index == selectedIndex) {
-          return Container(
-            key: _key,
-            decoration: new BoxDecoration(
-              color: Colors.black,
-              shape: BoxShape.rectangle,
-              borderRadius: BorderRadius.all(Radius.circular(8)),
-            ),
-            margin: EdgeInsets.symmetric(horizontal: 5),
-            child: FlatButton(
-              onPressed: () {
-                print("Selected Index : " + index.toString() + " was pressed");
-              },
-              child: Text(widget.subsections[index].name, style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold))
-            )
-          );
-        }
-        else {
-          return Container(
-            key: _key,
-            margin: EdgeInsets.symmetric(horizontal: 5),
-            child: FlatButton(
-              color: Colors.transparent,
-              onPressed: () {
-                print("Unselected index : " + index.toString() + " was pressed");
-                updateSelectedIndex(index);
-              },
-              child: Text(widget.subsections[index].name, style: TextStyle(color: Colors.black, fontSize: 15))
-            )
-          );
-        }
-      },
-    );
-    // call get widths after listview is built 
-    getWidths();
-    return temp;
-  }
-
-  double calcOffsetForSS(int newIndex) {
-    double offset = 0;
-    for (double d in itemWidths) {
-      print(d.toString());
-    }
-    for (int i = 0; i < newIndex; i++) {
-      offset += itemWidths[i-1];
-    }
-    return offset;
-  }  
 
   
 
@@ -237,15 +164,53 @@ class _MenuSubSectionScrollbarState extends State<MenuSubSectionScrollbar> {
     menuSubsectionHeight = widget.menuSSHeight;
     selectedIndex = 0;
     scrollStart.start();
-    rowWidget = buildWidget();
   }
+
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.all(5),
       height: 50,
-      child: rowWidget == null ? Container(height: 0, width: 0) : rowWidget,
+      child: ListView.builder(
+        controller: widget._sectionController,
+        scrollDirection: Axis.horizontal,
+        itemCount: widget.subsections.length,
+        itemExtent: itemWidth,
+        itemBuilder: (BuildContext context, int index) {
+          if (index == selectedIndex) {
+            return Container(
+              width: itemWidth,
+              decoration: new BoxDecoration(
+                color: Colors.black,
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.all(Radius.circular(8)),
+              ),
+              margin: EdgeInsets.symmetric(horizontal: 5),
+              child: FlatButton(
+                onPressed: () {
+                  print("Selected Index : " + index.toString() + " was pressed");
+                },
+                child: Text(widget.subsections[index].name, style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold), maxLines: 2, overflow: TextOverflow.fade)
+              )
+            );
+          }
+          else {
+            return Container(
+              width: itemWidth,
+              margin: EdgeInsets.symmetric(horizontal: 5),
+              child: FlatButton(
+                color: Colors.transparent,
+                onPressed: () {
+                  print("Unselected index : " + index.toString() + " was pressed");
+                  updateSelectedIndex(index);
+                },
+                child: Text(widget.subsections[index].name, style: TextStyle(color: Colors.black, fontSize: 15), maxLines: 2, overflow: TextOverflow.fade),
+              )
+            );
+          }
+        },
+      ),
     );
   }
 }
