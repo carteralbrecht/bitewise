@@ -298,7 +298,6 @@ exports.menuItemUpdated = functions.firestore
 
                 const listLen = ratedItemList.length;
                 var index = 0;
-                var i = 0;
                 // TODO: make more efficient (?)
                 for(index = 0; index < listLen; index++)
                 {
