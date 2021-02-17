@@ -104,7 +104,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
                 Navigator.push(
                   context,
                     MaterialPageRoute(
-                      builder: (context) => RatingPage()))
+                      builder: (context) => RatingPage(menuItems[i], widget.restaurant)))
                   },
               child: new MenuItemListTile(menuItems[i], widget.restaurant));
           }
