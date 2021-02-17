@@ -2,6 +2,7 @@ import 'package:bitewise/models/menuItem.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:bitewise/components/ratingModal.dart';
+import 'package:bitewise/services/fsmanager.dart';
 
 class MenuItemListTile extends StatefulWidget {
 
@@ -17,6 +18,26 @@ class MenuItemListTile extends StatefulWidget {
 class _MenuItemListTile extends State<MenuItemListTile> {
 
   Color dividerColor = Color.fromRGBO(228,236,238,1);
+
+  final FirestoreManager _fsm = FirestoreManager(); 
+
+  num avgRating = 0;
+
+  void getAvgRating() async {
+    var res = await _fsm.getDocData(_fsm.menuItemCollection, widget.menuItem.id, "avgRating");
+    if (res == null) {
+      res = 0;
+    }
+    setState(() {
+      avgRating = res;
+    });
+  }
+
+  @override
+  initState() {
+    super.initState();
+    getAvgRating();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +66,7 @@ class _MenuItemListTile extends State<MenuItemListTile> {
                   children: [
                     Icon(Icons.star, color: Colors.yellow[700],size: 40,),
                     SizedBox(width:10),
-                    Text("4.0", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
+                    Text(avgRating.toString(), style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
                   ],
                 )
               ),

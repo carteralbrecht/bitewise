@@ -107,7 +107,7 @@ class _MenuSubSectionScrollbarState extends State<MenuSubSectionScrollbar> {
       return;
     }
     
-    if (scrollStart.elapsedMilliseconds < 500 && scrollStart.elapsedMilliseconds != 0) {
+    if (scrollStart.elapsedMilliseconds < 750 && scrollStart.elapsedMilliseconds != 0) {
       print("Didn't update because elapsed time = " + scrollStart.elapsedMilliseconds.toString());
       return; 
     }
@@ -132,6 +132,9 @@ class _MenuSubSectionScrollbarState extends State<MenuSubSectionScrollbar> {
   }
 
   void updateSelectedIndex(int newIndex) {
+    scrollStart.stop();
+    scrollStart.reset();
+    scrollStart.start();
     setState(() {
       selectedIndex = newIndex;
       widget._sectionController.animateTo(itemWidth * newIndex, duration: Duration(milliseconds: 500), curve: Curves.linear);
@@ -260,6 +263,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
   ScrollController _menuController;
   int firstIndex = 0;
   String message = "";
+  int numItemsRated = 0;
 
   String currentSubSection = "";
 
@@ -311,6 +315,10 @@ class _RestaurantPageState extends State<RestaurantPage> {
     getMenuItems();
     super.initState();
   }
+
+  // int getNumItemsRated() {
+  //   fsmanager.getDocData(fsmanager.restaurantCollection, widget.restaurant.id, "ratedItems").length;
+  // }
 
   void getMenuItems() async {
       List<MenuItem> menuItemsTemp = new List<MenuItem>();
@@ -403,11 +411,6 @@ class _RestaurantPageState extends State<RestaurantPage> {
                               SizedBox(height: 25),
                               Text("American, Pizza, Italian", style: TextStyle(fontSize:15)),
                               Text("7 items rated", style: TextStyle(fontSize:15), textAlign: TextAlign.left),
-                              // Container(
-                              //   width: 100,
-                              //   alignment: Alignment.centerLeft,
-                              //   child: Text(widget.restaurant.address, style: TextStyle(fontSize:15)),
-                              // ),
                               Text("Hours: 1:00 - 10:00", style: TextStyle(fontSize:15), textAlign: TextAlign.left),
                             ],
                           ),
