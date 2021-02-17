@@ -61,8 +61,10 @@ class _TestState extends State<Test> {
                           field2 = 3;
                         } else if (val == '4') {
                           field2 = 4;
-                        } else {
+                        } else if (val == '5') {
                           field2 = 5;
+                        } else {
+                          field2 = 0;
                         }
                       });
                     },
@@ -88,7 +90,21 @@ class _TestState extends State<Test> {
                       print(res);
                     },
                     child: Text(
-                      'getRestList',
+                      'getTop5 test',
+                      style: TextStyle(color: Colors.black, fontSize: 20),
+                    ),
+                    color: Colors.yellow[600],
+                  ),
+                  SizedBox(height: 20),
+                  RaisedButton(
+                    onPressed: () async {
+                      print("---- calling getTopN -------");
+                      dynamic res = await _fsm.getTopN(field1, field2);
+                      print("TOP N FOR " + field1 + ": ");
+                      print(res);
+                    },
+                    child: Text(
+                      'getTopN test',
                       style: TextStyle(color: Colors.black, fontSize: 20),
                     ),
                     color: Colors.yellow[600],

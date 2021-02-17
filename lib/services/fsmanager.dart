@@ -54,6 +54,9 @@ class FirestoreManager {
 
   Future getTopN(String restId, num numPopular) async {
     try {
+      if (numPopular <= 0) {
+        return null;
+      }
       // Retrieve top items for a restaurant
       dynamic topMenuItems =
           await getDocData(restaurantCollection, restId, "ratedItems");
@@ -62,8 +65,9 @@ class FirestoreManager {
         // Trim the list to hold only 'numPopular' items if necessary,
         // and return the list
         if (topMenuItems.length > numPopular) {
-          List<dynamic> topItems = new List(5);
-          for (var i = 0; i < 5; i++) {
+          print(numPopular);
+          List<dynamic> topItems = new List(numPopular);
+          for (var i = 0; i < numPopular; i++) {
             topItems[i] = topMenuItems[i];
           }
           return topItems;

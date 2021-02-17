@@ -300,7 +300,7 @@ exports.menuItemUpdated = functions.firestore
                 var index = 0;
                 var i = 0;
                 // TODO: make more efficient (?)
-                for(index = 0; i < listLen; index++)
+                for(index = 0; index < listLen; index++)
                 {
                     // console.log("searching...");
                     var currItem = ratedItemList[index];
