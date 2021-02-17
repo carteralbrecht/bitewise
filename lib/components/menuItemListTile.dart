@@ -1,4 +1,5 @@
 import 'package:bitewise/models/menuItem.dart';
+import 'package:bitewise/models/restaurant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:bitewise/components/ratingModal.dart';

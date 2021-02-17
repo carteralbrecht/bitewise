@@ -341,8 +341,6 @@ class _RestaurantPageState extends State<RestaurantPage> {
   }
 
 
-
-
   List<Widget> generateMenu() {
 
     List listylist = List<Widget>();

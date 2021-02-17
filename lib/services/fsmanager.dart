@@ -11,6 +11,7 @@ class FirestoreManager {
   final String userCollection = "userInfo";
   final String ratingsCollection = "ratings";
   final String menuItemCollection = "menuitems";
+  final String restaurantCollection = "restaurants";
 
   Future findDocById(String collection, String id) async {
     try {
@@ -51,6 +52,46 @@ class FirestoreManager {
     }
   }
 
+  Future getTopN(String restId, num numPopular) async {
+    try {
+      if (numPopular <= 0) {
+        return null;
+      }
+      // Retrieve top items for a restaurant
+      dynamic topMenuItems =
+          await getDocData(restaurantCollection, restId, "ratedItems");
+      // Make sure the proper list was returned
+      if (topMenuItems is List) {
+        // Trim the list to hold only 'numPopular' items if necessary,
+        // and return the list
+        if (topMenuItems.length > numPopular) {
+          print(numPopular);
+          List<dynamic> topItems = new List(numPopular);
+          for (var i = 0; i < numPopular; i++) {
+            topItems[i] = topMenuItems[i];
+          }
+          return topItems;
+        }
+        return topMenuItems;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print("error in getTopN() : " + e.toString());
+      return null;
+    }
+  }
+
+  // Method to call getTop5 items in a restaurant
+  Future getTopFive(String restId) async {
+    try {
+      return await getTopN(restId, 5);
+    } catch (e) {
+      print("error in getTopFive() : " + e.toString());
+      return null;
+    }
+  }
+
   // NOTE: THIS IS BEING CHANGED TO BE A GCF. TO BE REMOVED SOON.
   // DO NOT CALL THIS METHOD.
   Future createUserInfo(String uid) async {
@@ -67,7 +108,7 @@ class FirestoreManager {
     }
   }
 
-  Future leaveRating(String itemId, num rating) async {
+  Future leaveRating(String restId, String itemId, num rating) async {
     try {
       FirebaseUser user = await _authServ.getUser();
       if (user != null) {
@@ -77,7 +118,7 @@ class FirestoreManager {
         dynamic rateId = await getUserRating(uid, itemId);
         // updateExisting will return false if there was not a rating to update
         if (rateId == null) {
-          await writeRating(uid, itemId, rating);
+          await writeRating(uid, restId, itemId, rating);
         } else {
           await updateExistingRating(rateId, rating);
         }
@@ -134,9 +175,11 @@ class FirestoreManager {
 
   // Function that creates a rating document for menuItem
   // and adds it to the ratings collection
-  Future writeRating(String uid, String itemId, num rating) async {
+  Future writeRating(
+      String uid, String restId, String itemId, num rating) async {
     try {
       _firestore.collection("ratings").add({
+        "restaurantId": restId,
         "menuItemId": itemId,
         "rating": rating,
         "userUid": uid,
