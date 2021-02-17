@@ -10,6 +10,8 @@ import 'package:bitewise/services/documenu.dart';
 import 'package:bitewise/components/menuItemListTile.dart';
 import 'package:bitewise/global.dart' as global;
 import 'package:bitewise/services/restaurantUtil.dart';
+import 'package:flutter/gestures.dart';
+import 'package:bitewise/pages/ratingPage.dart';
 
 
 class SubSectionHeader extends StatefulWidget {
