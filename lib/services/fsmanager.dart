@@ -11,6 +11,7 @@ class FirestoreManager {
   final String userCollection = "userInfo";
   final String ratingsCollection = "ratings";
   final String menuItemCollection = "menuitems";
+  final String restaurantCollection = "restaurants";
 
   Future findDocById(String collection, String id) async {
     try {
@@ -47,6 +48,46 @@ class FirestoreManager {
       return (doc[data]);
     } catch (e) {
       print("error in getDocData() : " + e.toString());
+      return null;
+    }
+  }
+
+  Future getTopN(String restId, num numPopular) async {
+    try {
+      if (numPopular <= 0) {
+        return null;
+      }
+      // Retrieve top items for a restaurant
+      dynamic topMenuItems =
+          await getDocData(restaurantCollection, restId, "ratedItems");
+      // Make sure the proper list was returned
+      if (topMenuItems is List) {
+        // Trim the list to hold only 'numPopular' items if necessary,
+        // and return the list
+        if (topMenuItems.length > numPopular) {
+          print(numPopular);
+          List<dynamic> topItems = new List(numPopular);
+          for (var i = 0; i < numPopular; i++) {
+            topItems[i] = topMenuItems[i];
+          }
+          return topItems;
+        }
+        return topMenuItems;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print("error in getTopN() : " + e.toString());
+      return null;
+    }
+  }
+
+  // Method to call getTop5 items in a restaurant
+  Future getTopFive(String restId) async {
+    try {
+      return await getTopN(restId, 5);
+    } catch (e) {
+      print("error in getTopFive() : " + e.toString());
       return null;
     }
   }
