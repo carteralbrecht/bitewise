@@ -11,6 +11,7 @@ class Menu {
   final LinkedHashMap<String, List<MenuItem>> subsectionMap;
 
   static const POPULAR_ITEMS_SUBSECTION_NAME = "Most Popular";
+  final instanceMostPopName = POPULAR_ITEMS_SUBSECTION_NAME;
 
   Menu._(this.subsectionMap);
 

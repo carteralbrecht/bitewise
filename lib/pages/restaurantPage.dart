@@ -309,6 +309,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
 
 
   List<Widget> _menu;
+  Menu realMenu;
   List<SubSection> sectionList = List<SubSection>();
   final AuthService _auth = AuthService();
   final FirestoreManager _fsm = FirestoreManager();
@@ -364,6 +365,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
       }
 
       setState(() {
+        realMenu = menu;
         menuItems = menuItemsTemp;
         _menu = generateMenu();
       });
@@ -378,13 +380,26 @@ class _RestaurantPageState extends State<RestaurantPage> {
 
     int sectionNum = 0;
     int prevIndex = 0;
+
+    // TODO: FIX THIS 
+
+    int mostPopLen = realMenu.subsectionMap[realMenu.instanceMostPopName].length;
+
+    if (mostPopLen != 0) {
+      listylist.add(new SubSectionHeader("Most Popular", sectionNum, subSectionHeight));
+      sectionList.add(new SubSection("Most Popular", mostPopLen));
+      for (int i = 0; i < mostPopLen; i++) {
+        listylist.add(new MenuItemListTile(menuItems[i], widget.restaurant, itemHeight));
+      }
+    }
+    
     
 
-    String subsection = menuItems.elementAt(sectionNum).subsection;
+    String subsection = menuItems.elementAt(mostPopLen).subsection;
     listylist.add(new SubSectionHeader(subsection, sectionNum, subSectionHeight));
    
 
-    for (int i = 0; i < menuItems.length; i++) {
+    for (int i = mostPopLen; i < menuItems.length; i++) {
       if (menuItems[i].subsection != subsection) {
         sectionList.add(new SubSection(subsection, i - prevIndex));
         subsection = menuItems[i].subsection;
@@ -436,7 +451,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               SizedBox(height: 25),
-                              Text(cuisineString, style: TextStyle(fontSize:15)),
+                              Text("American, Pizza, Italian", style: TextStyle(fontSize:15)),
                               Text(numItemsRated.toString() + " items rated", style: TextStyle(fontSize:15), textAlign: TextAlign.left),
                               Text("Hours: 1:00 - 10:00", style: TextStyle(fontSize:15), textAlign: TextAlign.left),
                             ],
