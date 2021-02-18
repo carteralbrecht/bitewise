@@ -11,6 +11,7 @@ class Menu {
   final LinkedHashMap<String, List<MenuItem>> subsectionMap;
 
   static const POPULAR_ITEMS_SUBSECTION_NAME = "Most Popular";
+  final instanceMostPopName = POPULAR_ITEMS_SUBSECTION_NAME;
 
   Menu._(this.subsectionMap);
 
@@ -46,7 +47,7 @@ class Menu {
   }
 
   // adds an item to the right list of documents using its subsection name
-  addItem(MenuItem item, bool isPopular) {
+  addItem(MenuItem item, bool isPopular, int popularIndex) {
     if (item == null || item.subsection == null) {
       return;
     }
@@ -64,8 +65,9 @@ class Menu {
       if (popularSubsectionList == null) {
         return;
       }
-
-      popularSubsectionList.add(item);
+      print("inserting popular item:");
+      print(popularIndex);
+      popularSubsectionList[popularIndex] = item;
     }
 
     return;
@@ -85,7 +87,7 @@ Future<Menu> buildMenuForRestaurant(Restaurant restaurant) async {
 
   // Get the Ids for the most popular items
   num topN = 5;
-  List<dynamic> topItemsList = await _fsm.getTopFive(restaurant.id);
+  List<dynamic> topItemsList = await _fsm.getTopN(restaurant.id, topN);
   List<String> topItemIds = new List(topN);
   if (topItemsList != null) {
     if (topItemsList.length < topN) {
@@ -93,6 +95,8 @@ Future<Menu> buildMenuForRestaurant(Restaurant restaurant) async {
     }
     for (var i = 0; i < topN; i++) {
       topItemIds[i] = topItemsList[i]["itemId"];
+      menu.subsectionMap[Menu.POPULAR_ITEMS_SUBSECTION_NAME].add(null);
+      print(i);
     }
   }
 
@@ -100,7 +104,9 @@ Future<Menu> buildMenuForRestaurant(Restaurant restaurant) async {
   List<MenuItem> items = await getMenuItemsForRestaurant(restaurant.id);
   for (var item in items) {
     bool isPopular = topItemIds.contains(item.id);
-    menu.addItem(item, isPopular);
+    int popIndex = -1;
+    if (isPopular) popIndex = topItemIds.indexOf(item.id);
+    menu.addItem(item, isPopular, popIndex);
   }
 
   return menu;
