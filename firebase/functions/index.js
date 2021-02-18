@@ -5,6 +5,11 @@ const { debug } = require('firebase-functions/lib/logger');
 admin.initializeApp();
 const db = admin.firestore();
 
+const longFunction = {
+    timeoutSeconds: 300,
+    memory: '1GB'
+  }
+
 // Firebase cloud functions
 // TODO: How to handle transaction failures and other edge cases
 
@@ -204,9 +209,9 @@ exports.handleUserInfoDelete = functions.firestore
 
 // On menuItem creation:
 // create/update the restauraunt doc for the restaurant that item is from
-exports.menuItemRated = functions.firestore
-.document('menuitems/{menuitemuid}')
-.onCreate(async (snapshot, context) => {
+exports.menuItemRated = functions.runWith(longFunction).firestore
+    .document('menuitems/{menuitemuid}')
+    .onCreate(async (snapshot, context) => {
 
         // Get the avg rating from this menu item and its docId
         const aRate = snapshot.data().avgRating;
@@ -226,6 +231,7 @@ exports.menuItemRated = functions.firestore
                         ratedItemList = doc.data().ratedItems;
                     }
                 });
+                console.log("ratedList obtained, attempting insert");
 
                 // If the restaurants list is empty, just add this menu item to it
                 // Otherwise, insert into the restaurants list, but keep items in order of highest rated to lowest
@@ -252,13 +258,11 @@ exports.menuItemRated = functions.firestore
                         ratedItemList[listLen] = newItem;
                     }
                 }
-                
-                // Update the menu item document
+
+                // Update the restaurant document
                 const ratedArray = ratedItemList;
-                await db.runTransaction(async (transaction) => {
-                    transaction.set(restaurantRef, {
-                        ratedItems: ratedArray,
-                    })
+                transaction.set(restaurantRef, {
+                    ratedItems: ratedArray,
                 });
             }
         );
@@ -266,9 +270,9 @@ exports.menuItemRated = functions.firestore
 
 // On menuItem update:
 // update the restauraunt doc for the restaurant that item is from
-exports.menuItemUpdated = functions.firestore
-.document('menuitems/{menuitemuid}')
-.onUpdate(async (snapshot, context) => {
+exports.menuItemUpdated = functions.runWith(longFunction).firestore
+    .document('menuitems/{menuitemuid}')
+    .onUpdate(async (snapshot, context) => {
 
         // console.log("menuItem updated!");
         // Get the avg rating from this menu item and its docId
@@ -277,18 +281,19 @@ exports.menuItemUpdated = functions.firestore
         // Get a reference to the restaurant item
         const restaurantRef = db.collection('restaurants').doc(snapshot.after.data().restaurantId);
 
-        console.log(aRate);
         await db.runTransaction(async transaction => {
 
                 let ratedItemList = null;
                 // Make the updated menuItem map to be added to the restaurant page 
                 const updateItem = {avgRating : aRate, itemId : iId};
-                // console.log(updateItem);
 
                 // if the menu item doc already exists then use get the current list
                 await transaction.get(restaurantRef).then(doc => {
                     if (doc.exists) {
                         ratedItemList = doc.data().ratedItems;
+                    }
+                    else {
+                        throw "Menu item updated, bet restaurant doc for item dne";
                     }
                 });
 
@@ -303,8 +308,6 @@ exports.menuItemUpdated = functions.firestore
                 {
                     // console.log("searching...");
                     var currItem = ratedItemList[index];
-                    // console.log(currItem["itemId"] );
-                    // console.log(iId);
                     if(currItem["itemId"] == iId)
                     {
                         // console.log("found item in list");
@@ -332,14 +335,12 @@ exports.menuItemUpdated = functions.firestore
                     ratedItemList[index+1] = updateItem;
                     index = index+1;
                 }
-                
-                console.log("updating doc now :)");
-                // Update the menu item document
+
                 const ratedArray = ratedItemList;
-                await db.runTransaction(async (transaction) => {
-                    transaction.set(restaurantRef, {
-                        ratedItems: ratedArray,
-                    })
+                // console.log("updating doc now :)");
+                // Update the restaurant document
+                transaction.set(restaurantRef, {
+                    ratedItems: ratedArray,
                 });
             }
         );
