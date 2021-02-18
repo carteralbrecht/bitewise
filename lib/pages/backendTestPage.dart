@@ -85,9 +85,11 @@ class _TestState extends State<Test> {
                   RaisedButton(
                     onPressed: () async {
                       print("---- calling getTopFive -------");
-                      dynamic res = await _fsm.getTopFive(field1);
+                      List<dynamic> res = await _fsm.getTopFive(field1);
                       print("TOP 5 FOR " + field1 + ": ");
                       print(res);
+                      print("attempting res[i][''itemId'']");
+                      for (var i = 0; i < 5; i++) print(res[i]["itemId"]);
                     },
                     child: Text(
                       'getTop5 test',
