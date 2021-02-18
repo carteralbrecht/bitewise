@@ -26,8 +26,8 @@ class _RatingPageState extends State<RatingPage> {
   Widget _body() {
     return Container (
         margin: const EdgeInsets.all(16.0),
-        width: MediaQuery.of(context).size.width,
-        height: 250,
+        // width: MediaQuery.of(context).size.width,
+        // height: 250,
         child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -41,7 +41,7 @@ class _RatingPageState extends State<RatingPage> {
               Container(
                 padding: EdgeInsets.symmetric(vertical: 10),
                 child: RatingBar(
-                  initialRating: 3,
+                  initialRating: 0,
                   direction: Axis.horizontal,
                   allowHalfRating: false,
                   itemCount: 5,
@@ -69,9 +69,9 @@ class _RatingPageState extends State<RatingPage> {
                       )),
                 ),
                 FlatButton(
-                  onPressed: () {
-                    FirestoreManager().leaveRating(
-                        widget.restaurant.id, widget.menuItem.id, ratingValue);
+                  disabledColor: Colors.grey,
+                  onPressed: global.user == null ? null : () {
+                    FirestoreManager().leaveRating(widget.restaurant.id, widget.menuItem.id, ratingValue);
                     Navigator.pop(context);
                   },
                   color: Colors.yellow[700],
@@ -82,6 +82,7 @@ class _RatingPageState extends State<RatingPage> {
                           fontSize: 15)),
                 ),
               ]),
+              global.user == null ? Text("Sign in to rate this item!") : Container(height:0, width:0),
             ]
         )
     );

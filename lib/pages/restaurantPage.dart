@@ -12,6 +12,8 @@ import 'package:bitewise/global.dart' as global;
 import 'package:bitewise/services/restaurantUtil.dart';
 import 'package:flutter/gestures.dart';
 import 'package:bitewise/pages/ratingPage.dart';
+import 'package:bitewise/services/fsmanager.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 
 class SubSectionHeader extends StatefulWidget {
@@ -76,7 +78,7 @@ class MenuSubSectionScrollbar extends StatefulWidget {
 
   final Key _key;
   final List<SubSection> subsections;
-  final ScrollController _sectionController;
+  final ItemScrollController _sectionController;
   final ScrollController _menuController;
   final double menuItemHeight;
   final double menuSSHeight;
@@ -99,7 +101,7 @@ class _MenuSubSectionScrollbarState extends State<MenuSubSectionScrollbar> {
 
   Map<int, double> indexToOffsetMap = new Map();
 
-  double itemWidth = 125;
+  // double itemWidth = 125;
 
   void tryUpdateSubSection(String s) {
     int newIndex = 0;
@@ -123,7 +125,7 @@ class _MenuSubSectionScrollbarState extends State<MenuSubSectionScrollbar> {
       scrollStart.stop();
       scrollStart.reset();
 
-      widget._sectionController.animateTo(itemWidth * newIndex, duration: Duration(milliseconds: 500), curve: Curves.linear);
+      widget._sectionController.scrollTo(index: newIndex, duration: Duration(milliseconds: 500), curve: Curves.linear);
       scrollStart.start();
       setState(() {
         selectedIndex = newIndex;
@@ -139,7 +141,7 @@ class _MenuSubSectionScrollbarState extends State<MenuSubSectionScrollbar> {
     scrollStart.start();
     setState(() {
       selectedIndex = newIndex;
-      widget._sectionController.animateTo(itemWidth * newIndex, duration: Duration(milliseconds: 500), curve: Curves.linear);
+      widget._sectionController.scrollTo(index: newIndex, duration: Duration(milliseconds: 500), curve: Curves.linear);
       scrollMenu();
     });
   }
@@ -177,32 +179,31 @@ class _MenuSubSectionScrollbarState extends State<MenuSubSectionScrollbar> {
     return Container(
       margin: EdgeInsets.all(5),
       height: 50,
-      child: ListView.builder(
-        controller: widget._sectionController,
+      child: ScrollablePositionedList.builder(
+        itemScrollController: widget._sectionController,
         scrollDirection: Axis.horizontal,
         itemCount: widget.subsections.length,
-        itemExtent: itemWidth,
         itemBuilder: (BuildContext context, int index) {
           if (index == selectedIndex) {
             return Container(
-              width: itemWidth,
+              // width: itemWidth,
               decoration: new BoxDecoration(
                 color: Colors.black,
                 shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.all(Radius.circular(8)),
+                borderRadius: BorderRadius.all(Radius.circular(30)),
               ),
-              margin: EdgeInsets.symmetric(horizontal: 5),
+              margin: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
               child: FlatButton(
                 onPressed: () {
                   print("Selected Index : " + index.toString() + " was pressed");
                 },
-                child: Text(widget.subsections[index].name, style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold), maxLines: 2, overflow: TextOverflow.fade)
+                child: Text(widget.subsections[index].name, style: TextStyle(color: Colors.white, fontSize: 15))
               )
             );
           }
           else {
             return Container(
-              width: itemWidth,
+              // width: itemWidth,
               margin: EdgeInsets.symmetric(horizontal: 5),
               child: FlatButton(
                 color: Colors.transparent,
@@ -210,7 +211,7 @@ class _MenuSubSectionScrollbarState extends State<MenuSubSectionScrollbar> {
                   print("Unselected index : " + index.toString() + " was pressed");
                   updateSelectedIndex(index);
                 },
-                child: Text(widget.subsections[index].name, style: TextStyle(color: Colors.black, fontSize: 15), maxLines: 2, overflow: TextOverflow.fade),
+                child: Text(widget.subsections[index].name, style: TextStyle(color: Colors.black, fontSize: 15)),
               )
             );
           }
@@ -257,7 +258,8 @@ class _RestaurantPageState extends State<RestaurantPage> {
   List<MenuItem> menuItems = new List<MenuItem>();
 
   MenuSubSectionScrollbar subSectionWidget;
-  ScrollController sectionController = new ScrollController();
+  // ScrollController sectionController = new ScrollController();
+  final ItemScrollController sectionController = ItemScrollController();
 
 
   final double itemHeight = 125.0;
@@ -266,6 +268,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
   int firstIndex = 0;
   String message = "";
   int numItemsRated = 0;
+  String cuisineString = "";
 
   String currentSubSection = "";
 
@@ -308,6 +311,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
   List<Widget> _menu;
   List<SubSection> sectionList = List<SubSection>();
   final AuthService _auth = AuthService();
+  final FirestoreManager _fsm = FirestoreManager();
 
   @override
   void initState() {
@@ -315,12 +319,35 @@ class _RestaurantPageState extends State<RestaurantPage> {
     _menuController.addListener(_scrollListener);
     restaurantIcon = RestaurantUtil.assignIcon(widget.restaurant);
     getMenuItems();
+    getNumItemsRated();
+    getCuisineString();
     super.initState();
   }
 
-  // int getNumItemsRated() {
-  //   fsmanager.getDocData(fsmanager.restaurantCollection, widget.restaurant.id, "ratedItems").length;
-  // }
+  void getNumItemsRated() async {
+    var ratedList = await _fsm.getDocData(_fsm.restaurantCollection, widget.restaurant.id, "ratedItems");
+    int numRated = 0;
+    if (ratedList is List) {
+      numRated = ratedList.length;
+    }
+
+    setState(() {
+      numItemsRated = numRated;
+    });
+  }
+
+  void getCuisineString() {
+    String s = "";
+      // print(widget.restaurant.cuisines.length.toString());
+
+    for (int i = 0; i < widget.restaurant.cuisines.length && i < 3; i++) {
+      s += widget.restaurant.cuisines[i] + ", ";
+    }
+    setState(() {
+      cuisineString = s;
+    });
+  }
+
 
   void getMenuItems() async {
       List<MenuItem> menuItemsTemp = new List<MenuItem>();
@@ -364,7 +391,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
         prevIndex = i;
         listylist.add( new SubSectionHeader(subsection, sectionNum, subSectionHeight));
       }
-      listylist.add(new MenuItemListTile(menuItems[i], widget.restaurant.name, itemHeight));
+      listylist.add(new MenuItemListTile(menuItems[i], widget.restaurant, itemHeight));
     }
     sectionList.add(new SubSection(subsection, menuItems.length - prevIndex));
 
@@ -409,8 +436,8 @@ class _RestaurantPageState extends State<RestaurantPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               SizedBox(height: 25),
-                              Text("American, Pizza, Italian", style: TextStyle(fontSize:15)),
-                              Text("7 items rated", style: TextStyle(fontSize:15), textAlign: TextAlign.left),
+                              Text(cuisineString, style: TextStyle(fontSize:15)),
+                              Text(numItemsRated.toString() + " items rated", style: TextStyle(fontSize:15), textAlign: TextAlign.left),
                               Text("Hours: 1:00 - 10:00", style: TextStyle(fontSize:15), textAlign: TextAlign.left),
                             ],
                           ),
