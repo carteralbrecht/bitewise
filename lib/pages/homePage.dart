@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:bitewise/util/geoUtil.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:geolocator/geolocator.dart';
@@ -57,18 +58,6 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  // calculates the distance to a restaurant from the current location (in miles)
-  Future<double> distanceToRestaurant(Restaurant restaurant) async {
-    var distanceMeters = await Geolocator().distanceBetween(
-        restaurant.geo.latitude,
-        restaurant.geo.longitude,
-        currentLocation.latitude,
-        currentLocation.longitude);
-
-    // meters to miles
-    return distanceMeters * 0.000621371192;
-  }
-
   void getRestaurantsNearby() async {
     // Don't fetch restaurants until we have a current location for the user
     while (currentLocation == null) {
@@ -82,7 +71,7 @@ class _HomePageState extends State<HomePage> {
 
     for (Restaurant restaurant in restaurants) {
       resultsNear.add(restaurant);
-      restDistances.add(await distanceToRestaurant(restaurant));
+      restDistances.add(await GeoUtil.distanceToRestaurant(currentLocation, restaurant));
     }
 
     setState(() {
