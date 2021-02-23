@@ -50,6 +50,12 @@ void main() async {
     expect(doesContain, true);
   });
 
+  test('SearchRestaurantsZipName', () async {
+    var restaurants = await searchRestaurantsZipName("32817", "Panera");
+
+    expect(restaurants.first.name.contains("Panera"), true);
+  });
+
   // Gets the menu items for a restaurant by the restaurant id
   // Checks one of the results
   test('MenuItemsForRestaurant', () async {

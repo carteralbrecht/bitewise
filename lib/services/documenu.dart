@@ -1,7 +1,8 @@
-//import 'package:dotenv/dotenv.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:dotenv/dotenv.dart';
+//import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:geolocator/geolocator.dart';
+import 'package:geocoder/geocoder.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'package:bitewise/models/restaurant.dart';
@@ -58,5 +59,22 @@ Future<List<MenuItem>> getMenuItemsForRestaurant(String id) async {
   });
 
   return menuItemsFromJson(response.body);
+}
+
+Future<List<Restaurant>> searchRestaurantsZipName(String zip, String restaurantName) async {
+
+  var queryParameters = {
+    'restaurant_name': restaurantName,
+    'zip_code': zip,
+    'fullmenu': 'true'
+  };
+
+  var uri = Uri.https(authority, "v2/restaurants/search/fields", queryParameters);
+
+  final response = await http.get(uri, headers: {
+    "X-API-KEY": key
+  });
+
+  return restaurantsFromJson(response.body);
 }
 

@@ -21,7 +21,7 @@ class Menu {
 
   // returns a list of subsection names for this menu
   List<String> getSubsectionNames() {
-    return this.subsectionMap.keys;
+    return new List.from(this.subsectionMap.keys);
   }
 
   // returns a list of all items in the menu
