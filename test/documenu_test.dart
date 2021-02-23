@@ -36,7 +36,7 @@ void main() async {
 
   // Does a restaurant search by location
   // Checks one of the results
-  test('SearchRestaurantsGeo', () async {
+  test('searchByGeo', () async {
     var restaurants = await RestaurantSearchUtil.searchByGeo(
         Position(longitude: -77.17103, latitude: 39.114805), 2);
 
