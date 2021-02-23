@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:bitewise/services/auth.dart';
-import 'package:bitewise/services/menuUtil.dart';
+import 'package:bitewise/util/menuUtil.dart';
 import 'package:flutter/material.dart';
 import 'package:bitewise/models/restaurant.dart';
 import 'package:bitewise/pages/profilePage.dart';
@@ -34,7 +34,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
 
   void getMenuItems() async {
       List<MenuItem> menuItemsTemp = new List<MenuItem>();
-      var menu = await buildMenuForRestaurant(widget.restaurant);
+      var menu = await MenuUtil.buildMenuForRestaurant(widget.restaurant);
       var allItems = menu.getAllItems();
       for (MenuItem menuItem in allItems)
         menuItemsTemp.add(menuItem);

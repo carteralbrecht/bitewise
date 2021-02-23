@@ -1,14 +1,16 @@
 import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+import 'package:bitewise/global.dart' as global;
 import 'package:bitewise/pages/restaurantPage.dart';
 import 'package:bitewise/services/auth.dart';
 import 'package:bitewise/services/documenu.dart';
+import 'package:bitewise/util/restaurantSearchUtil.dart';
 import 'package:bitewise/models/restaurant.dart';
-import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../components/restaurantListTile.dart';
-import 'package:flutter/services.dart' show rootBundle;
-import 'package:bitewise/global.dart' as global;
 
 class HomePage extends StatefulWidget {
   @override
@@ -73,7 +75,7 @@ class _HomePageState extends State<HomePage> {
       await Future.delayed(Duration(milliseconds: 500));
     }
 
-    var restaurants = await searchRestaurantsGeo(currentLocation, 2);
+    var restaurants = await RestaurantSearchUtil.searchByGeo(currentLocation, 2);
 
     List<Restaurant> resultsNear = new List<Restaurant>();
     List<double> restDistances = new List<double>();

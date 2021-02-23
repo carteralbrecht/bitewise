@@ -1,6 +1,8 @@
+import 'package:bitewise/models/menu.dart';
 import 'package:bitewise/models/menuItem.dart';
 import 'package:bitewise/models/restaurant.dart';
-import 'package:bitewise/services/menuUtil.dart';
+import 'package:bitewise/util/menuUtil.dart';
+import 'package:bitewise/util/restaurantSearchUtil.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:test/test.dart';
 import 'package:bitewise/services/documenu.dart';
@@ -16,26 +18,26 @@ void main() async {
 
   // Does a GET on a Restaurant ID and checks that it returns the correct restaurant name
   test('GetRestaurant', () async {
-    var restaurant = await getRestaurant("2859720081221600");
+    var restaurant = await Documenu.getRestaurant("2859720081221600");
     expect(restaurant.name, "Panera Bread");
   });
 
   test('Build Menu', () async {
-    var restaurant = await getRestaurant("2859723381214996");
-    Menu menu = await buildMenuForRestaurant(restaurant);
+    var restaurant = await Documenu.getRestaurant("2859723381214996");
+    Menu menu = await MenuUtil.buildMenuForRestaurant(restaurant);
     expect(menu.getSubsectionNames().contains("Mobile Hot Coffee"), true);
   });
 
   // Does a GET on a menu item ID and checks that it returns the correct item name
   test('GetMenuItem', () async {
-    var menuItem = await getMenuItem("8840854639283264567");
+    var menuItem = await Documenu.getMenuItem("8840854639283264567");
     expect(menuItem.name, "Hook & Ladder®");
   });
 
   // Does a restaurant search by location
   // Checks one of the results
   test('SearchRestaurantsGeo', () async {
-    var restaurants = await searchRestaurantsGeo(
+    var restaurants = await RestaurantSearchUtil.searchByGeo(
         Position(longitude: -77.17103, latitude: 39.114805), 2);
 
     var shouldContain = "Baja Fresh";
@@ -51,7 +53,7 @@ void main() async {
   });
 
   test('SearchRestaurantsZipName', () async {
-    var restaurants = await searchRestaurantsZipName("32817", "Panera");
+    var restaurants = await RestaurantSearchUtil.searchByZipAndName("32817", "Panera");
 
     expect(restaurants.first.name.contains("Panera"), true);
   });
@@ -59,9 +61,9 @@ void main() async {
   // Gets the menu items for a restaurant by the restaurant id
   // Checks one of the results
   test('MenuItemsForRestaurant', () async {
-    var restaurant = await getRestaurant("2859723381214996");
+    var restaurant = await Documenu.getRestaurant("2859723381214996");
 
-    var menuItems = await getMenuItemsForRestaurant(restaurant.id);
+    var menuItems = await Documenu.getMenuItemsForRestaurant(restaurant.id);
 
     var shouldContain = "Sun Up Large Eggs";
     var doesContain = false;
