@@ -1,15 +1,20 @@
 import 'package:bitewise/models/restaurant.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+
+// Contains useful geo methods
 
 class GeoUtil {
 
   static const MILES_PER_METER = 0.000621371192;
   static final _geoLocator = Geolocator();
 
+  // converts meters to miles
   static double metersToMiles(double meters) {
     return meters * MILES_PER_METER;
   }
 
+  // returns distance in miles between two lat lng
   static Future<double> milesBetween(lat1, lng1, lat2, lng2) async {
     var distanceMeters = await _geoLocator.distanceBetween(lat1, lng1, lat2, lng2);
     return metersToMiles(distanceMeters);
@@ -20,15 +25,14 @@ class GeoUtil {
     return milesBetween(p.latitude, p.longitude, restaurant.geo.latitude, restaurant.geo.longitude);
   }
 
-  static void sortByDistance(List<Restaurant> list, Position p) async {
+  // returns the zip code string for a position
+  static Future<String> findZip(Position p) async {
+    if (p == null)
+      return "";
 
-    final computedDistances = <Restaurant, double>{};
+    var placemarks = await placemarkFromCoordinates(p.latitude, p.longitude);
+    var zip = placemarks.first.postalCode;
 
-    for (Restaurant r in list) {
-      computedDistances[r] = (await distanceToRestaurant(p, r));
-    }
-
-    list.sort((a, b) => computedDistances[a].compareTo(computedDistances[b]));
+    return zip;
   }
-
 }
