@@ -111,7 +111,7 @@ class _MenuSubSectionScrollbarState extends State<MenuSubSectionScrollbar> {
       return;
     }
     
-    if (scrollStart.elapsedMilliseconds < 750 && scrollStart.elapsedMilliseconds != 0) {
+    if (scrollStart.elapsedMilliseconds < 500 && scrollStart.elapsedMilliseconds != 0) {
       print("Didn't update because elapsed time = " + scrollStart.elapsedMilliseconds.toString());
       return; 
     }
