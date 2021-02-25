@@ -2,7 +2,7 @@ import 'package:bitewise/models/restaurant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:bitewise/icons/my_flutter_app_icons.dart';
-import 'package:bitewise/services/restaurantUtil.dart';
+import 'package:bitewise/util/restaurantUtil.dart';
 
 class RestaurantListTile extends StatefulWidget {
 

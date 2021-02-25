@@ -1,17 +1,12 @@
 import 'dart:ui';
+import 'package:bitewise/models/menu.dart';
 import 'package:bitewise/services/auth.dart';
-import 'package:bitewise/services/menuUtil.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:bitewise/util/menuUtil.dart';
 import 'package:flutter/material.dart';
 import 'package:bitewise/models/restaurant.dart';
-import 'package:bitewise/pages/profilePage.dart';
 import 'package:bitewise/models/menuItem.dart';
-import 'package:bitewise/services/documenu.dart';
 import 'package:bitewise/components/menuItemListTile.dart';
-import 'package:bitewise/global.dart' as global;
-import 'package:bitewise/services/restaurantUtil.dart';
-import 'package:flutter/gestures.dart';
-import 'package:bitewise/pages/ratingPage.dart';
+import 'package:bitewise/util/restaurantUtil.dart';
 import 'package:bitewise/services/fsmanager.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
@@ -352,7 +347,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
 
   void getMenuItems() async {
       List<MenuItem> menuItemsTemp = new List<MenuItem>();
-      var menu = await buildMenuForRestaurant(widget.restaurant);
+      var menu = await MenuUtil.buildMenuForRestaurant(widget.restaurant);
       var allItems = menu.getAllItems();
 
       for (MenuItem menuItem in allItems)
