@@ -51,8 +51,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   void getUserLocation() async {
-    Position result = await Geolocator()
-        .getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
+    Position result = await Geolocator
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     setState(() {
       currentLocation = result;
     });
