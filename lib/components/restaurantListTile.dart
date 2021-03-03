@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:bitewise/icons/my_flutter_app_icons.dart';
 import 'package:bitewise/util/restaurantUtil.dart';
+import 'package:bitewise/global.dart' as global;
 
 class RestaurantListTile extends StatefulWidget {
 
@@ -28,26 +29,26 @@ class _RestaurantListTileState extends State<RestaurantListTile> {
   Widget build(BuildContext context) {
     return Container(
       decoration: new BoxDecoration(
-                color: Color.fromRGBO(250,202,51,1),
+                // color: global.mainColor,
                 shape: BoxShape.rectangle,
                 borderRadius: BorderRadius.all(Radius.circular(8.0)),
       ),
-      margin: EdgeInsets.only(left:10,right:10, bottom:10, top:10),
-      height: 100,
+      margin: EdgeInsets.only(bottom:5, top:10),
+      height: 90,
       child: Card(
         elevation: 0,
         child: ListTile(
-          contentPadding: EdgeInsets.only(left:20, right: 20, top: 10),
-          tileColor: Color.fromRGBO(250,202,51,1),
+          // contentPadding: EdgeInsets.only(left:20, right: 20, top: 10),
+          // tileColor: global.mainColor,
           trailing: Container(
             margin: EdgeInsets.only(left: 20),
             child: cuisineIcon,
           ),
           title: Text(widget.restaurant.name, style: TextStyle(color: Colors.black, fontSize:25, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis),
           subtitle: Container(
-            padding: EdgeInsets.fromLTRB(0, 10, 20, 0),
+            padding: EdgeInsets.fromLTRB(0, 10, 10, 0),
             child: Text(
-              widget.milesAway.toStringAsFixed(2) + " Miles", style: TextStyle(fontSize:20)
+              widget.restaurant.address + " • " + widget.milesAway.toStringAsFixed(2) + " mi", style: TextStyle(fontSize:15)
             ),
           ),
           isThreeLine: true,

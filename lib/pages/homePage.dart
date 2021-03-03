@@ -27,6 +27,7 @@ class _HomePageState extends State<HomePage> {
   var restaurantDistances;
   BitmapDescriptor pinImage;
   String _mapStyle;
+  bool isSheetMax = false;
 
   @override
   void initState() {
@@ -120,44 +121,61 @@ class _HomePageState extends State<HomePage> {
         initialChildSize: 0.3,
         minChildSize: 0.05,
         maxChildSize: 1,
-        builder: (BuildContext context, myScrollController) {
+        builder: (BuildContext context, _scrollController) {
+          _scrollController.addListener(() {
+            setState(() {
+              isSheetMax = _scrollController.offset > 0;
+            });
+            print(_scrollController.offset.toString());
+          });
           return Container(
             padding: EdgeInsets.only(top: 10),
             decoration: new BoxDecoration(
               color: Colors.white,
               shape: BoxShape.rectangle,
-              borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20.0),
-                  topRight: Radius.circular(20.0)),
+              borderRadius: isSheetMax ? BorderRadius.zero : BorderRadius.only(
+                  topLeft: Radius.circular(40.0),
+                  topRight: Radius.circular(40.0)),
             ),
             child: ListView.builder(
-              controller: myScrollController,
+              controller: _scrollController,
               itemCount: restaurantsNearUser.length + 1,
               itemBuilder: (BuildContext context, int index) {
                 if (index == 0) {
                   return Container(
                       alignment: Alignment.topCenter,
                       child: Container(
-                        height: 10,
-                        width: 50,
-                        margin: EdgeInsetsDirectional.only(top: 0, bottom: 0),
+                        height: 5,
+                        width: 60,
+                        margin: EdgeInsetsDirectional.only(top: 0, bottom: 5),
                         decoration: new BoxDecoration(
-                          color: Color.fromRGBO(228, 236, 238, 1),
+                          color: global.accentGrayDark,
                           shape: BoxShape.rectangle,
                           borderRadius: BorderRadius.all(Radius.circular(8.0)),
                         ),
                       ));
                 }
-                return new FlatButton(
-                    onPressed: () => {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => RestaurantPage(
-                                      restaurantsNearUser[index - 1])))
-                        },
-                    child: RestaurantListTile(restaurantsNearUser[index - 1],
-                        restaurantDistances[index - 1]));
+                return new Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    FlatButton(
+                      onPressed: () => {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => RestaurantPage(
+                                        restaurantsNearUser[index - 1])))
+                          },
+                      child: RestaurantListTile(restaurantsNearUser[index - 1],
+                          restaurantDistances[index - 1])
+                    ),
+                    Divider(
+                      color: global.accentGrayLight,
+                      height: 5,
+                      thickness: 5,
+                    )
+                  ],
+                );
               },
             ),
           );
@@ -168,60 +186,56 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: Color.fromRGBO(228, 236, 238, 1),
-        elevation: 0,
-        title: Container(
-          margin: EdgeInsets.only(left: 20, right: 20),
-          padding: EdgeInsets.only(left: 10, right: 10),
-          height: 40,
-          decoration: new BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.rectangle,
-            borderRadius: BorderRadius.all(Radius.circular(20.0)),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          centerTitle: false,
+          backgroundColor: global.mainColor,
+          elevation: 0,
+          title: Container(
+            margin: EdgeInsets.only(left: 0, right: 20),
+            padding: EdgeInsets.only(left: 10, right: 10),
+            height: 40,
+            decoration: new BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.rectangle,
+              borderRadius: BorderRadius.all(Radius.circular(20.0)),
+            ),
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Icon(Icons.search, size: 26.0, color: Colors.grey),
+                  Text('Search',
+                      style: TextStyle(fontSize: 20, color: Colors.grey)),
+                ]),
           ),
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Icon(Icons.search, size: 26.0, color: Colors.grey),
-                Text('Search',
-                    style: TextStyle(fontSize: 20, color: Colors.grey)),
-              ]),
-        ),
-        leading: IconButton(
-          icon: Icon(Icons.fastfood),
-          color: Colors.grey,
-          onPressed: () {
-            Navigator.pushNamed(context, '/test');
-          },
-        ),
-        actions: <Widget>[
-          Container(
-              height: 35,
-              width: 35,
-              decoration: new BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
-              margin: EdgeInsets.only(right: 10.0),
-              child: GestureDetector(
-                onTap: () {
-                  if (global.user == null) {
-                    Navigator.pushNamed(context, '/signin');
-                  } else {
-                    Navigator.pushNamed(context, '/profile');
-                  }
-                },
-                child: Icon(
-                  Icons.person,
-                  color: Colors.grey,
+          actions: <Widget>[
+            Container(
+                height: 35,
+                width: 35,
+                decoration: new BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
                 ),
-              )),
-        ],
+                margin: EdgeInsets.only(right: 10.0),
+                child: GestureDetector(
+                  onTap: () {
+                    if (global.user == null) {
+                      Navigator.pushNamed(context, '/signin');
+                    } else {
+                      Navigator.pushNamed(context, '/profile');
+                    }
+                  },
+                  child: Icon(
+                    Icons.person,
+                    size: 30,
+                    color: global.mainColor,
+                  ),
+                )),
+          ],
+        ),
+        body: _homePage,
       ),
-      body: _homePage,
     );
   }
 }
