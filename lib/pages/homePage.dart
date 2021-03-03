@@ -1,10 +1,10 @@
-import 'dart:ui';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 import 'package:bitewise/util/geoUtil.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
 import 'package:bitewise/global.dart' as global;
 import 'package:bitewise/pages/restaurantPage.dart';
 import 'package:bitewise/services/auth.dart';
@@ -25,7 +25,7 @@ class _HomePageState extends State<HomePage> {
   Stack _homePage;
   var restaurantsNearUser;
   var restaurantDistances;
-  BitmapDescriptor pinImage;
+  Uint8List markerIcon;
   String _mapStyle;
 
   @override
@@ -45,9 +45,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   void setPinImage() async {
-    pinImage = await BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(devicePixelRatio: 2.5, size: Size(25, 35)),
-        'assets/pin.png');
+    ByteData data = await rootBundle.load('assets/pin.png');
+    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(), targetWidth: 120, targetHeight: 130);
+    ui.FrameInfo fi = await codec.getNextFrame();
+    markerIcon = (await fi.image.toByteData(format: ui.ImageByteFormat.png)).buffer.asUint8List();
   }
 
   void getUserLocation() async {
@@ -97,7 +98,7 @@ class _HomePageState extends State<HomePage> {
                       MaterialPageRoute(
                           builder: (context) => RestaurantPage(restaurant)))
                 }),
-        icon: pinImage,
+        icon: BitmapDescriptor.fromBytes(markerIcon),
       ));
     }
 
