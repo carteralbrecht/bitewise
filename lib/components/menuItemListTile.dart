@@ -53,7 +53,7 @@ class _MenuItemListTile extends State<MenuItemListTile> {
         //);
         showDialog(
             context: context,
-            builder: (_) => RatingModal(widget.menuItem, widget.restaurant),
+            builder: (_) => RatingModal(widget.menuItem, widget.restaurant, avgRating),
             barrierDismissible: true);
       },
       child: Container(
