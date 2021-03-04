@@ -422,7 +422,12 @@ class _RestaurantPageState extends State<RestaurantPage> {
       child: Material(
         child: Container(
           color: Colors.white,
-          child: CustomScrollView(
+          child: _menu == null ? Center(
+            // Display Progress Indicator
+              child: CircularProgressIndicator(
+                  valueColor: new AlwaysStoppedAnimation<Color>(Color.fromRGBO(250,202,51,1))
+              )) :
+          CustomScrollView(
             controller: _menuController,
             slivers: <Widget>[
               SliverAppBar(
