@@ -45,12 +45,16 @@ class _MenuItemListTile extends State<MenuItemListTile> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => RatingPage(widget.menuItem, widget.restaurant)
-          )
-        );
+        // Navigator.push(
+          // context,
+          // MaterialPageRoute(
+            // builder: (context) => RatingPage(widget.menuItem, widget.restaurant)
+          // )
+        //);
+        showDialog(
+            context: context,
+            builder: (_) => RatingModal(widget.menuItem, widget.restaurant, avgRating),
+            barrierDismissible: true);
       },
       child: Container(
         decoration: new BoxDecoration(
