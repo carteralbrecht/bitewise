@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:bitewise/services/fsmanager.dart';
 import 'package:bitewise/models/menuItem.dart';
+import 'package:bitewise/global.dart' as global;
 
 class RatingModal extends StatefulWidget {
   // final String dishName;
@@ -67,7 +68,7 @@ class _RatingModalState extends State<RatingModal> {
                       Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Icon(Icons.star_rate_rounded, size: 50, color: const Color(0xFFFBD96C)),
+                            Icon(Icons.star_rate_rounded, size: 50, color: global.mainColor),
                           ]
                       ),
                       SizedBox(width: 5),
@@ -106,17 +107,17 @@ class _RatingModalState extends State<RatingModal> {
               padding: EdgeInsets.symmetric(vertical: 5),
               child:
               RatingBar(
-                initialRating: 3,
+                initialRating: widget.avgRating.toDouble(),
                 direction: Axis.horizontal,
                 allowHalfRating: false,
                 itemCount: 5,
                 ratingWidget: RatingWidget(
-                  full: Icon(Icons.star_rate_rounded, color: const Color(0xFFFBD96C)),
+                  full: Icon(Icons.star_rate_rounded, color: global.mainColor),
                   half: null,
                   empty: Icon(Icons.star_rate_rounded, color: Colors.black26),
                 ),
                 itemPadding: EdgeInsets.symmetric(horizontal: 0.0),
-                itemSize: 60,
+                itemSize: 50,
                 onRatingUpdate: (rating) {
                   ratingValue = rating;
                 },
@@ -140,7 +141,7 @@ class _RatingModalState extends State<RatingModal> {
                       widget.restaurant.id, widget.menuItem.id, ratingValue);
                   Navigator.pop(context);
                 },
-                color: const Color(0xFFFBD96C),
+                color: global.mainColor,
                 child: Text("submit",
                     style: TextStyle(
                         color: Colors.black,

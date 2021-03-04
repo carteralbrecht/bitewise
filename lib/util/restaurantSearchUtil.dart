@@ -34,7 +34,7 @@ class RestaurantSearchUtil {
     List<Restaurant> results = await Documenu.searchRestaurantsZipName(zip, name);
 
     // filter out restaurants that only matched zip
-    results.removeWhere((restaurant) => !restaurant.name.contains(name));
+    results.removeWhere((restaurant) => !restaurant.name.toLowerCase().contains(name.toLowerCase()));
 
     // return only restaurants whose name had a partial (or full) match
     return results;
