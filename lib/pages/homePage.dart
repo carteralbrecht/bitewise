@@ -222,7 +222,12 @@ class _HomePageState extends State<HomePage> {
               )),
         ],
       ),
-      body: _homePage,
+      body: _homePage != null ? _homePage : Center(
+        // Display Progress Indicator
+        child: CircularProgressIndicator(
+          valueColor: new AlwaysStoppedAnimation<Color>(Color.fromRGBO(250,202,51,1))
+        ),
+      ),
     );
   }
 }
