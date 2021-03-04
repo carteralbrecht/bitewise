@@ -8,7 +8,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:bitewise/global.dart' as global;
 import 'package:bitewise/pages/restaurantPage.dart';
 import 'package:bitewise/services/auth.dart';
-import 'package:bitewise/services/documenu.dart';
 import 'package:bitewise/util/restaurantSearchUtil.dart';
 import 'package:bitewise/models/restaurant.dart';
 import '../components/restaurantListTile.dart';
@@ -28,6 +27,9 @@ class _HomePageState extends State<HomePage> {
   BitmapDescriptor pinImage;
   String _mapStyle;
   bool isSheetMax = false;
+  bool isSearchActive = false;
+  List<Widget> searchResults = new List<Widget>();
+  TextEditingController searchController = new TextEditingController();
 
   @override
   void initState() {
@@ -106,82 +108,117 @@ class _HomePageState extends State<HomePage> {
   }
 
   Stack createMap() {
-    return Stack(children: <Widget>[
-      GoogleMap(
-        onMapCreated: _onMapCreated,
-        initialCameraPosition: CameraPosition(
-          target: LatLng(currentLocation.latitude, currentLocation.longitude),
-          zoom: 13.0,
+    return Stack(
+      children: <Widget>[
+        GoogleMap(
+          onMapCreated: _onMapCreated,
+          initialCameraPosition: CameraPosition(
+            target: LatLng(currentLocation.latitude, currentLocation.longitude),
+            zoom: 13.0,
+          ),
+          markers: _createMarkers(),
+          myLocationEnabled: true,
+          myLocationButtonEnabled: false,
         ),
-        markers: _createMarkers(),
-        myLocationEnabled: true,
-        myLocationButtonEnabled: false,
-      ),
-      DraggableScrollableSheet(
-        initialChildSize: 0.3,
-        minChildSize: 0.05,
-        maxChildSize: 1,
-        builder: (BuildContext context, _scrollController) {
-          _scrollController.addListener(() {
-            setState(() {
-              isSheetMax = _scrollController.offset > 0;
+        DraggableScrollableSheet(
+          initialChildSize: 0.3,
+          minChildSize: 0.05,
+          maxChildSize: 1,
+          builder: (BuildContext context, _scrollController) {
+            _scrollController.addListener(() {
+              setState(() {
+                isSheetMax = _scrollController.offset > 0;
+              });
+              print(_scrollController.offset.toString());
             });
-            print(_scrollController.offset.toString());
-          });
-          return Container(
-            padding: EdgeInsets.only(top: 10),
-            decoration: new BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.rectangle,
-              borderRadius: isSheetMax ? BorderRadius.zero : BorderRadius.only(
-                  topLeft: Radius.circular(40.0),
-                  topRight: Radius.circular(40.0)),
-            ),
-            child: ListView.builder(
-              controller: _scrollController,
-              itemCount: restaurantsNearUser.length + 1,
-              itemBuilder: (BuildContext context, int index) {
-                if (index == 0) {
-                  return Container(
-                      alignment: Alignment.topCenter,
-                      child: Container(
+            return Container(
+              decoration: new BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.rectangle,
+                borderRadius: isSheetMax ? BorderRadius.zero : BorderRadius.only(
+                    topLeft: Radius.circular(40.0),
+                    topRight: Radius.circular(40.0)),
+              ),
+              child: ListView.builder(
+                controller: _scrollController,
+                itemCount: restaurantsNearUser.length + 1,
+                itemBuilder: (BuildContext context, int index) {
+                  if (index == 0) {
+                    return Container(
+                        alignment: Alignment.topCenter,
+                        child: Container(
+                          height: 5,
+                          width: 60,
+                          margin: EdgeInsetsDirectional.only(top: 10, bottom: 5),
+                          decoration: new BoxDecoration(
+                            color: global.accentGrayDark,
+                            shape: BoxShape.rectangle,
+                            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                          ),
+                        ));
+                  }
+                  return new Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      FlatButton(
+                        onPressed: () => {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => RestaurantPage(
+                                          restaurantsNearUser[index - 1])))
+                            },
+                        child: RestaurantListTile(restaurantsNearUser[index - 1],
+                            restaurantDistances[index - 1])
+                      ),
+                      Divider(
+                        color: global.accentGrayLight,
                         height: 5,
-                        width: 60,
-                        margin: EdgeInsetsDirectional.only(top: 0, bottom: 5),
-                        decoration: new BoxDecoration(
-                          color: global.accentGrayDark,
-                          shape: BoxShape.rectangle,
-                          borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                        ),
-                      ));
-                }
-                return new Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    FlatButton(
-                      onPressed: () => {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => RestaurantPage(
-                                        restaurantsNearUser[index - 1])))
-                          },
-                      child: RestaurantListTile(restaurantsNearUser[index - 1],
-                          restaurantDistances[index - 1])
-                    ),
-                    Divider(
-                      color: global.accentGrayLight,
-                      height: 5,
-                      thickness: 5,
-                    )
-                  ],
-                );
-              },
-            ),
-          );
-        },
-      ),
-    ]);
+                        thickness: 5,
+                      )
+                    ],
+                  );
+                },
+              ),
+            );
+          },
+        ),
+      ]
+    );
+  }
+
+  void getSearch(String s) async {
+    var restList = await RestaurantSearchUtil.searchByGeoAndName(currentLocation, s);
+    List<Widget> restWidgets = new List<Widget>();
+    for (Restaurant r in restList) {
+      restWidgets.add(
+        FlatButton(
+          color: Colors.white,
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => RestaurantPage(r)));
+          },
+          child: Text(r.name, style: TextStyle(fontSize: 20, color: Colors.black)),
+        )
+      );
+    }
+
+    if (restWidgets.length == 0) {
+      restWidgets.add(
+        FlatButton(
+          color: Colors.white,
+          onPressed: () {
+            
+          },
+          child: Text("No Results", style: TextStyle(fontSize: 20, color: Colors.black)),
+        )
+      );
+    }
+
+    setState(() {
+      searchResults = restWidgets;
+    });
   }
 
   @override
@@ -193,7 +230,7 @@ class _HomePageState extends State<HomePage> {
           backgroundColor: global.mainColor,
           elevation: 0,
           title: Container(
-            margin: EdgeInsets.only(left: 0, right: 20),
+            margin: EdgeInsets.only(left: 0, right: 0),
             padding: EdgeInsets.only(left: 10, right: 10),
             height: 40,
             decoration: new BoxDecoration(
@@ -204,9 +241,51 @@ class _HomePageState extends State<HomePage> {
             child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
-                  Icon(Icons.search, size: 26.0, color: Colors.grey),
-                  Text('Search',
-                      style: TextStyle(fontSize: 20, color: Colors.grey)),
+                  Icon(Icons.search, size: 26.0, color: Colors.black),
+                  Expanded(
+                    child: Container(
+                      padding: EdgeInsets.only(left: 5, top:18.5),
+                      alignment: Alignment.bottomLeft,
+                      child: TextFormField(
+                        controller: searchController,
+                        textAlignVertical: TextAlignVertical.bottom,
+                        style: TextStyle(fontSize: 20),
+                        onChanged: (val) {
+                          setState(() {
+                            print("Search for: " + val);
+                            getSearch(val);
+                          });
+                        },
+                        onTap: () {
+                          setState(() {
+                            isSearchActive = true;
+                          });
+                        },
+                        readOnly: !isSearchActive,
+                        decoration: InputDecoration(
+                          hintText: 'Search...',
+                          hintStyle: TextStyle(fontSize: 20, color: Colors.grey),
+                          border: InputBorder.none,
+                        ),
+                      ),
+                    ),
+                  ),
+                  isSearchActive ? Container(
+                    alignment: Alignment.centerRight, 
+                    child: GestureDetector(
+                      onTap: () {
+                        searchController.clear();
+                        setState(() {
+                          isSearchActive = false;
+                        });
+                      },
+                      child: Icon(
+                        Icons.cancel_outlined,
+                        size: 26,
+                        color: Colors.black,
+                      ),
+                    )
+                  ) : Container(height: 0, width: 0),
                 ]),
           ),
           actions: <Widget>[
@@ -234,7 +313,12 @@ class _HomePageState extends State<HomePage> {
                 )),
           ],
         ),
-        body: _homePage,
+        body: isSearchActive ?  Container(
+          color: Colors.white,
+          child: ListView(
+            children: searchResults,
+          ),
+        ) : _homePage,
       ),
     );
   }
