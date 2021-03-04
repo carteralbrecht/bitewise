@@ -117,6 +117,9 @@ class _HomePageState extends State<HomePage> {
           target: LatLng(currentLocation.latitude, currentLocation.longitude),
           zoom: 15.0,
         ),
+        markers: _createMarkers(),
+        myLocationEnabled: true,
+        myLocationButtonEnabled: false
       ),
       DraggableScrollableSheet(
         initialChildSize: 0.3,
