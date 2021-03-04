@@ -223,103 +223,101 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          centerTitle: false,
-          backgroundColor: global.mainColor,
-          elevation: 0,
-          title: Container(
-            margin: EdgeInsets.only(left: 0, right: 0),
-            padding: EdgeInsets.only(left: 10, right: 10),
-            height: 40,
-            decoration: new BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.rectangle,
-              borderRadius: BorderRadius.all(Radius.circular(20.0)),
-            ),
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  Icon(Icons.search, size: 26.0, color: Colors.black),
-                  Expanded(
-                    child: Container(
-                      padding: EdgeInsets.only(left: 5, top:18.5),
-                      alignment: Alignment.bottomLeft,
-                      child: TextFormField(
-                        controller: searchController,
-                        textAlignVertical: TextAlignVertical.bottom,
-                        style: TextStyle(fontSize: 20),
-                        onChanged: (val) {
-                          setState(() {
-                            print("Search for: " + val);
-                            getSearch(val);
-                          });
-                        },
-                        onTap: () {
-                          setState(() {
-                            isSearchActive = true;
-                          });
-                        },
-                        readOnly: !isSearchActive,
-                        decoration: InputDecoration(
-                          hintText: 'Search...',
-                          hintStyle: TextStyle(fontSize: 20, color: Colors.grey),
-                          border: InputBorder.none,
-                        ),
+    return Scaffold(
+      appBar: AppBar(
+        centerTitle: false,
+        backgroundColor: global.mainColor,
+        elevation: 0,
+        title: Container(
+          margin: EdgeInsets.only(left: 0, right: 0),
+          padding: EdgeInsets.only(left: 10, right: 10),
+          height: 40,
+          decoration: new BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.all(Radius.circular(20.0)),
+          ),
+          child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Icon(Icons.search, size: 26.0, color: Colors.black),
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.only(left: 5, top:18.5),
+                    alignment: Alignment.bottomLeft,
+                    child: TextFormField(
+                      controller: searchController,
+                      textAlignVertical: TextAlignVertical.bottom,
+                      style: TextStyle(fontSize: 20),
+                      onChanged: (val) {
+                        setState(() {
+                          print("Search for: " + val);
+                          getSearch(val);
+                        });
+                      },
+                      onTap: () {
+                        setState(() {
+                          isSearchActive = true;
+                        });
+                      },
+                      readOnly: !isSearchActive,
+                      decoration: InputDecoration(
+                        hintText: 'Search...',
+                        hintStyle: TextStyle(fontSize: 20, color: Colors.grey),
+                        border: InputBorder.none,
                       ),
                     ),
                   ),
-                  isSearchActive ? Container(
-                    alignment: Alignment.centerRight, 
-                    child: GestureDetector(
-                      onTap: () {
-                        searchController.clear();
-                        setState(() {
-                          isSearchActive = false;
-                        });
-                      },
-                      child: Icon(
-                        Icons.cancel_outlined,
-                        size: 26,
-                        color: Colors.black,
-                      ),
-                    )
-                  ) : Container(height: 0, width: 0),
-                ]),
-          ),
-          actions: <Widget>[
-            Container(
-                height: 35,
-                width: 35,
-                decoration: new BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
                 ),
-                margin: EdgeInsets.only(right: 10.0),
-                child: GestureDetector(
-                  onTap: () {
-                    if (global.user == null) {
-                      Navigator.pushNamed(context, '/signin');
-                    } else {
-                      Navigator.pushNamed(context, '/profile');
-                    }
-                  },
-                  child: Icon(
-                    Icons.person,
-                    size: 30,
-                    color: global.mainColor,
-                  ),
-                )),
-          ],
+                isSearchActive ? Container(
+                  alignment: Alignment.centerRight, 
+                  child: GestureDetector(
+                    onTap: () {
+                      searchController.clear();
+                      setState(() {
+                        isSearchActive = false;
+                      });
+                    },
+                    child: Icon(
+                      Icons.cancel_outlined,
+                      size: 26,
+                      color: Colors.black,
+                    ),
+                  )
+                ) : Container(height: 0, width: 0),
+              ]),
         ),
-        body: isSearchActive ?  Container(
-          color: Colors.white,
-          child: ListView(
-            children: searchResults,
-          ),
-        ) : _homePage,
+        actions: <Widget>[
+          Container(
+              height: 35,
+              width: 35,
+              decoration: new BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              margin: EdgeInsets.only(right: 10.0),
+              child: GestureDetector(
+                onTap: () {
+                  if (global.user == null) {
+                    Navigator.pushNamed(context, '/signin');
+                  } else {
+                    Navigator.pushNamed(context, '/profile');
+                  }
+                },
+                child: Icon(
+                  Icons.person,
+                  size: 30,
+                  color: global.mainColor,
+                ),
+              )),
+        ],
       ),
+      body: isSearchActive ?  Container(
+        color: Colors.white,
+        child: ListView(
+          children: searchResults,
+        ),
+      ) : _homePage,
     );
   }
 }
