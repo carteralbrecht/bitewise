@@ -7,7 +7,6 @@ import 'package:geolocator/geolocator.dart';
 class GeoUtil {
 
   static const MILES_PER_METER = 0.000621371192;
-  static final _geoLocator = Geolocator();
 
   // converts meters to miles
   static double metersToMiles(double meters) {
@@ -16,7 +15,7 @@ class GeoUtil {
 
   // returns distance in miles between two lat lng
   static Future<double> milesBetween(lat1, lng1, lat2, lng2) async {
-    var distanceMeters = await _geoLocator.distanceBetween(lat1, lng1, lat2, lng2);
+    var distanceMeters = Geolocator.distanceBetween(lat1, lng1, lat2, lng2);
     return metersToMiles(distanceMeters);
   }
 

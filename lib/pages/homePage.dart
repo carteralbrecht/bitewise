@@ -42,6 +42,7 @@ class _HomePageState extends State<HomePage> {
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
     mapController.setMapStyle(_mapStyle);
+
   }
 
   void setPinImage() async {
@@ -52,8 +53,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   void getUserLocation() async {
-    Position result = await Geolocator()
-        .getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
+    Position result = await Geolocator
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     setState(() {
       currentLocation = result;
     });
@@ -111,7 +112,7 @@ class _HomePageState extends State<HomePage> {
         onMapCreated: _onMapCreated,
         initialCameraPosition: CameraPosition(
           target: LatLng(currentLocation.latitude, currentLocation.longitude),
-          zoom: 13.0,
+          zoom: 15.0,
         ),
         markers: _createMarkers(),
         myLocationEnabled: true,
@@ -222,7 +223,12 @@ class _HomePageState extends State<HomePage> {
               )),
         ],
       ),
-      body: _homePage,
+      body: _homePage != null ? _homePage : Center(
+        // Display Progress Indicator
+        child: CircularProgressIndicator(
+          valueColor: new AlwaysStoppedAnimation<Color>(Color.fromRGBO(250,202,51,1))
+        ),
+      ),
     );
   }
 }
