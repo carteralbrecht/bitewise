@@ -8,7 +8,8 @@ class RatingModal extends StatefulWidget {
   // final String dishName;
   final Restaurant restaurant;
   final MenuItem menuItem;
-  const RatingModal(this.menuItem, this.restaurant);
+  final num avgRating;
+  const RatingModal(this.menuItem, this.restaurant, this.avgRating);
 
   @override
   _RatingModalState createState() => _RatingModalState();
@@ -23,42 +24,99 @@ class _RatingModalState extends State<RatingModal> {
       elevation: 20,
       content: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Container(
-                child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  widget.menuItem.name,
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 5),
-                Text(
-                  widget.restaurant.name,
-                  style: TextStyle(
-                      color: Colors.black45,
-                      fontSize: 12,
-                      fontStyle: FontStyle.italic),
-                ),
-              ],
-            )),
+                child:
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          widget.menuItem.name,
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 20),
+                        ),
+                        SizedBox(height: 10),
+                      ],
+                    )
+            ),
             Container(
-              padding: EdgeInsets.symmetric(vertical: 10),
-              child: RatingBar(
+              child:
+                Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Container(
+                        constraints: BoxConstraints(maxWidth: 200),
+                        child:
+                        Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                widget.menuItem.description,
+                                style: TextStyle(
+                                    color: Colors.black38,
+                                    fontSize: 12),
+                              ),
+                            ]
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                      Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Icon(Icons.star_rate_rounded, size: 50, color: const Color(0xFFFBD96C)),
+                          ]
+                      ),
+                      SizedBox(width: 5),
+                      Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(height: 5),
+                            Text(
+                              widget.avgRating.toString(),
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 25),
+                            ),
+                          ]
+                      ),
+                    ]
+                ),
+            ),
+            Container(
+                child:
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(height: 10),
+                        Text(
+                          "Rate this item:",
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16),
+                        ),
+                      ],
+                    )
+            ),
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 5),
+              child:
+              RatingBar(
                 initialRating: 3,
                 direction: Axis.horizontal,
                 allowHalfRating: false,
                 itemCount: 5,
                 ratingWidget: RatingWidget(
-                  full: Icon(Icons.circle, color: Colors.amber),
+                  full: Icon(Icons.star_rate_rounded, color: const Color(0xFFFBD96C)),
                   half: null,
-                  empty: Icon(Icons.radio_button_off, color: Colors.amber),
+                  empty: Icon(Icons.star_rate_rounded, color: Colors.black26),
                 ),
-                itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                itemPadding: EdgeInsets.symmetric(horizontal: 0.0),
+                itemSize: 60,
                 onRatingUpdate: (rating) {
                   ratingValue = rating;
                 },
@@ -82,7 +140,7 @@ class _RatingModalState extends State<RatingModal> {
                       widget.restaurant.id, widget.menuItem.id, ratingValue);
                   Navigator.pop(context);
                 },
-                color: Colors.yellow[700],
+                color: const Color(0xFFFBD96C),
                 child: Text("submit",
                     style: TextStyle(
                         color: Colors.black,
