@@ -9,6 +9,7 @@ import 'package:bitewise/components/menuItemListTile.dart';
 import 'package:bitewise/util/restaurantUtil.dart';
 import 'package:bitewise/services/fsmanager.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:bitewise/global.dart' as global;
 
 
 class SubSectionHeader extends StatefulWidget {
@@ -38,7 +39,7 @@ class _SubSectionHeaderState extends State<SubSectionHeader> {
     super.initState();
   }
 
-  Color dividerColor = Color.fromRGBO(228,236,238,1);
+  Color dividerColor = global.accentGrayLight;
 
   @override
   Widget build(BuildContext context) {
@@ -422,7 +423,12 @@ class _RestaurantPageState extends State<RestaurantPage> {
       child: Material(
         child: Container(
           color: Colors.white,
-          child: CustomScrollView(
+          child: _menu == null ? Center(
+            // Display Progress Indicator
+              child: CircularProgressIndicator(
+                  valueColor: new AlwaysStoppedAnimation<Color>(global.mainColor)
+              )) :
+          CustomScrollView(
             controller: _menuController,
             slivers: <Widget>[
               SliverAppBar(
@@ -430,10 +436,10 @@ class _RestaurantPageState extends State<RestaurantPage> {
                 expandedHeight: 150,
                 title: Text(widget.restaurant.name, style: TextStyle(fontSize: 25, color: Colors.black)),
                 centerTitle: true,
-                backgroundColor: Color.fromRGBO(250,202,51,1),
+                backgroundColor: global.mainColor,
                 flexibleSpace: FlexibleSpaceBar(
                   background: Container(
-                    color: Color.fromRGBO(250,202,51,0.72),
+                    color: global.mainColor,
                     alignment: Alignment.center,
                     padding: EdgeInsets.fromLTRB(5, 20, 5, 10),
                     child: Row(
@@ -446,7 +452,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               SizedBox(height: 25),
-                              Text("American, Pizza, Italian", style: TextStyle(fontSize:15)),
+                              Text("American • Pizza • Italian", style: TextStyle(fontSize:15)),
                               Text(numItemsRated.toString() + " items rated", style: TextStyle(fontSize:15), textAlign: TextAlign.left),
                               Text("Hours: 1:00 - 10:00", style: TextStyle(fontSize:15), textAlign: TextAlign.left),
                             ],

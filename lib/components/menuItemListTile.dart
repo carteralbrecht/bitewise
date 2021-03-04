@@ -5,6 +5,7 @@ import 'package:flutter/rendering.dart';
 import 'package:bitewise/components/ratingModal.dart';
 import 'package:bitewise/services/fsmanager.dart';
 import 'package:bitewise/pages/ratingPage.dart';
+import 'package:bitewise/global.dart' as global;
 
 class MenuItemListTile extends StatefulWidget {
 
@@ -19,7 +20,7 @@ class MenuItemListTile extends StatefulWidget {
 
 class _MenuItemListTile extends State<MenuItemListTile> {
 
-  Color dividerColor = Color.fromRGBO(228,236,238,1);
+  Color dividerColor = global.accentGrayLight;
 
   final FirestoreManager _fsm = FirestoreManager(); 
 
@@ -79,9 +80,9 @@ class _MenuItemListTile extends State<MenuItemListTile> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.star, color: Colors.yellow[700],size: 40,),
+                      Icon(Icons.star, color: global.mainColor,size: 40,),
                       SizedBox(width:10),
-                      Text(avgRating.toStringAsFixed(1).toString(), style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
+                      Text(avgRating.toString(), style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
                     ],
                   )
                 ),
