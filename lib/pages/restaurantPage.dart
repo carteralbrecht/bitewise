@@ -426,7 +426,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
           child: _menu == null ? Center(
             // Display Progress Indicator
               child: CircularProgressIndicator(
-                  valueColor: new AlwaysStoppedAnimation<Color>(Color.fromRGBO(250,202,51,1))
+                  valueColor: new AlwaysStoppedAnimation<Color>(global.mainColor)
               )) :
           CustomScrollView(
             controller: _menuController,
