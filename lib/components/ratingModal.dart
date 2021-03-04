@@ -48,41 +48,24 @@ class _RatingModalState extends State<RatingModal> {
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Container(
-                        constraints: BoxConstraints(maxWidth: 200),
+                      Expanded(
                         child:
-                        Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                widget.menuItem.description,
-                                style: TextStyle(
-                                    color: Colors.black38,
-                                    fontSize: 12),
-                              ),
-                            ]
-                        ),
-                      ),
-                      SizedBox(width: 10),
-                      Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Icon(Icons.star_rate_rounded, size: 50, color: const Color(0xFFFBD96C)),
-                          ]
+                            Text(
+                              widget.menuItem.description,
+                              style: TextStyle(
+                                  color: Colors.black38,
+                                  fontSize: 12),
+                            ),
                       ),
                       SizedBox(width: 5),
-                      Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SizedBox(height: 5),
-                            Text(
-                              widget.avgRating.toString(),
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 25),
-                            ),
-                          ]
+                      Icon(Icons.star_rate_rounded, size: 50, color: const Color(0xFFFBD96C)),
+                      SizedBox(height: 5),
+                      Text(
+                        widget.avgRating.toStringAsFixed(1).toString(),
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 25),
                       ),
                     ]
                 ),
