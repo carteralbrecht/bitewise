@@ -36,7 +36,7 @@ class _RegisterState extends State<Register> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Container(
-              margin: EdgeInsets.fromLTRB(20, 10, 20, 0),
+              margin: EdgeInsets.fromLTRB(30, 10, 30, 0),
               child: Image(image: AssetImage('assets/Bitewise_logo-Black.png')),
             ),
             Container(

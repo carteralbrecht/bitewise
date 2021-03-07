@@ -122,13 +122,13 @@ class _HomePageState extends State<HomePage> {
         myLocationButtonEnabled: false
       ),
       DraggableScrollableSheet(
-        initialChildSize: 0.3,
-        minChildSize: 0.05,
+        initialChildSize: 0.4,
+        minChildSize: 0.2,
         maxChildSize: 1,
         builder: (BuildContext context, _scrollController) {
           _scrollController.addListener(() {
             setState(() {
-              isSheetMax = _scrollController.offset > 0;
+              isSheetMax = _scrollController.offset >= 0;
             });
             print(_scrollController.offset.toString());
           });
@@ -193,14 +193,15 @@ class _HomePageState extends State<HomePage> {
     for (Restaurant r in restList) {
       restWidgets.add(
         FlatButton(
-          color: Colors.white,
-          onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => RestaurantPage(r)));
-          },
-          child: Text(r.name, style: TextStyle(fontSize: 20, color: Colors.black)),
-        )
+          onPressed: () => {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => RestaurantPage(r)))
+              },
+          child: RestaurantListTile(r, await GeoUtil.distanceToRestaurant(currentLocation, r))
+        ),
+        
       );
     }
 
@@ -240,7 +241,7 @@ class _HomePageState extends State<HomePage> {
           child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                Icon(Icons.search, size: 26.0, color: Colors.black),
+                Icon(Icons.search, size: 26.0, color: global.accentGrayDark),
                 Expanded(
                   child: Container(
                     padding: EdgeInsets.only(left: 5, top:18.5),
@@ -263,7 +264,7 @@ class _HomePageState extends State<HomePage> {
                       readOnly: !isSearchActive,
                       decoration: InputDecoration(
                         hintText: 'Search...',
-                        hintStyle: TextStyle(fontSize: 20, color: Colors.grey),
+                        hintStyle: TextStyle(fontSize: 20, color: global.accentGrayDark),
                         border: InputBorder.none,
                       ),
                     ),
@@ -279,9 +280,9 @@ class _HomePageState extends State<HomePage> {
                       });
                     },
                     child: Icon(
-                      Icons.cancel_outlined,
+                      Icons.clear,
                       size: 26,
-                      color: Colors.black,
+                      color: global.accentGrayDark,
                     ),
                   )
                 ) : Container(height: 0, width: 0),
