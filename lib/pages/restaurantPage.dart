@@ -427,7 +427,37 @@ class _RestaurantPageState extends State<RestaurantPage> {
           slivers: <Widget>[
             SliverAppBar(
               pinned: true,
-              expandedHeight: 150,
+              expandedHeight: 125,
+              leading: GestureDetector(
+                child: Icon(Icons.chevron_left, size: 35, color: Colors.black),
+                onTap: () {
+                  Navigator.pop(context);
+                }
+              ),
+              actions: <Widget>[
+                Container(
+                    height: 35,
+                    width: 35,
+                    decoration: new BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    margin: EdgeInsets.only(right: 10.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        if (global.user == null) {
+                          Navigator.pushNamed(context, '/signin');
+                        } else {
+                          Navigator.pushNamed(context, '/profile');
+                        }
+                      },
+                      child: Icon(
+                        Icons.person,
+                        size: 30,
+                        color: global.mainColor,
+                      ),
+                    )),
+              ],
               title: Text(widget.restaurant.name, style: TextStyle(fontSize: 25, color: Colors.black)),
               centerTitle: true,
               backgroundColor: global.mainColor,
@@ -442,7 +472,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
                       Container(
                         margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                         child: _menu == null ? Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.end,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             SizedBox(height: 25),
@@ -486,7 +516,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
                             ),
                           ],
                         ) : Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.end,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             SizedBox(height: 25),
@@ -498,7 +528,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
                       ),
                       Container(
                         // padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                        margin: EdgeInsets.only(bottom: 33, left: 10, right: 10),
+                        margin: EdgeInsets.only(bottom: 15, left: 10, right: 10),
                         alignment: Alignment.bottomCenter,
                         child: restaurantIcon,
                       ),
