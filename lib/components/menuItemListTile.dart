@@ -82,7 +82,7 @@ class _MenuItemListTile extends State<MenuItemListTile> {
                     children: [
                       Icon(Icons.star, color: global.mainColor,size: 40,),
                       SizedBox(width:10),
-                      Text(avgRating.toString(), style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
+                      Text(avgRating.toStringAsFixed(1).toString(), style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
                     ],
                   )
                 ),

@@ -30,78 +30,61 @@ class _RatingModalState extends State<RatingModal> {
           children: <Widget>[
             Container(
                 child:
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          widget.menuItem.name,
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 20),
-                        ),
-                        SizedBox(height: 10),
-                      ],
-                    )
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      widget.menuItem.name,
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 20),
+                    ),
+                    SizedBox(height: 10),
+                  ],
+                )
             ),
             Container(
               child:
-                Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Container(
-                        constraints: BoxConstraints(maxWidth: 200),
-                        child:
-                        Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                widget.menuItem.description,
-                                style: TextStyle(
-                                    color: Colors.black38,
-                                    fontSize: 12),
-                              ),
-                            ]
-                        ),
+              Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      child:
+                      Text(
+                        widget.menuItem.description,
+                        style: TextStyle(
+                            color: Colors.black38,
+                            fontSize: 12),
                       ),
-                      SizedBox(width: 10),
-                      Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Icon(Icons.star_rate_rounded, size: 50, color: global.mainColor),
-                          ]
-                      ),
-                      SizedBox(width: 5),
-                      Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SizedBox(height: 5),
-                            Text(
-                              widget.avgRating.toString(),
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 25),
-                            ),
-                          ]
-                      ),
-                    ]
-                ),
+                    ),
+                    SizedBox(width: 5),
+                    Icon(Icons.star_rate_rounded, size: 50, color: const Color(0xFFFBD96C)),
+                    SizedBox(height: 5),
+                    Text(
+                      widget.avgRating.toStringAsFixed(1).toString(),
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 25),
+                    ),
+                  ]
+              ),
             ),
             Container(
                 child:
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        SizedBox(height: 10),
-                        Text(
-                          "Rate this item:",
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 16),
-                        ),
-                      ],
-                    )
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(height: 10),
+                    Text(
+                      "Rate this item:",
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16),
+                    ),
+                  ],
+                )
             ),
             Container(
               padding: EdgeInsets.symmetric(vertical: 5),
