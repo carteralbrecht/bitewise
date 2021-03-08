@@ -5,6 +5,7 @@ import 'package:bitewise/services/fsmanager.dart';
 import 'package:bitewise/models/menuItem.dart';
 import 'package:bitewise/global.dart' as global;
 import 'package:bitewise/pages/signInPage.dart';
+import 'package:flushbar/flushbar.dart';
 
 class RatingModal extends StatefulWidget {
   // final String dishName;
@@ -133,6 +134,10 @@ class _RatingModalState extends State<RatingModal> {
                     FirestoreManager().leaveRating(
                         widget.restaurant.id, widget.menuItem.id, ratingValue);
                     Navigator.pop(context);
+                    Flushbar(
+                      message:  "Successfully left rating!",
+                      duration:  Duration(seconds: 3),
+                    )..show(context);
                   }
                 },
                 color: global.mainColor,
