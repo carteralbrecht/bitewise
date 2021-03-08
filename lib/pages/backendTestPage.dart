@@ -85,7 +85,7 @@ class _TestState extends State<Test> {
                   RaisedButton(
                     onPressed: () async {
                       print("---- calling getTopFive -------");
-                      List<dynamic> res = await _fsm.getTopFive(field1);
+                      List<dynamic> res = await _fsm.getTopFiveItemsAtRestaurant(field1);
                       print("TOP 5 FOR " + field1 + ": ");
                       print(res);
                       print("attempting res[i][''itemId'']");
@@ -101,7 +101,7 @@ class _TestState extends State<Test> {
                   RaisedButton(
                     onPressed: () async {
                       print("---- calling getTopN -------");
-                      dynamic res = await _fsm.getTopN(field1, field2);
+                      dynamic res = await _fsm.getTopNItemsAtRestaurant(field1, field2);
                       print("TOP N FOR " + field1 + ": ");
                       print(res);
                     },

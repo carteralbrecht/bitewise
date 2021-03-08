@@ -52,7 +52,29 @@ class FirestoreManager {
     }
   }
 
-  Future getTopN(String restId, num numPopular) async {
+  // return the top N items out of all items from a list of restaurants
+  Future getTopNItemsAtRestaurants(List<String> restIds, int n) async {
+
+    List<dynamic> topItems = new List();
+
+    for (String restId in restIds) {
+      var topItemsAtRest = await getTopNItemsAtRestaurant(restId, n);
+      if (topItemsAtRest == null)
+        print("was null");
+      else
+        topItems.addAll(topItemsAtRest);
+    }
+
+    topItems.sort((a, b) {
+      int aAvg = a["avgRating"].toInt();
+      int bAvg = b["avgRating"].toInt();
+      return (bAvg - aAvg);
+    });
+
+    return topItems.sublist(0, n);
+  }
+
+  Future getTopNItemsAtRestaurant(String restId, num numPopular) async {
     try {
       if (numPopular <= 0) {
         return null;
@@ -77,17 +99,17 @@ class FirestoreManager {
         return null;
       }
     } catch (e) {
-      print("error in getTopN() : " + e.toString());
+      print("error in getTopNItemsAtRestaurant() : " + e.toString());
       return null;
     }
   }
 
   // Method to call getTop5 items in a restaurant
-  Future getTopFive(String restId) async {
+  Future getTopFiveItemsAtRestaurant(String restId) async {
     try {
-      return await getTopN(restId, 5);
+      return await getTopNItemsAtRestaurant(restId, 5);
     } catch (e) {
-      print("error in getTopFive() : " + e.toString());
+      print("error in getTopFiveItemsAtRestaurant() : " + e.toString());
       return null;
     }
   }

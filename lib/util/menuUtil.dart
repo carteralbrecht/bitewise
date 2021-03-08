@@ -19,7 +19,7 @@ class MenuUtil {
 
     // Get the Ids for the most popular items
     num topN = 5;
-    List<dynamic> topItemsList = await _fsm.getTopN(restaurant.id, topN);
+    List<dynamic> topItemsList = await _fsm.getTopNItemsAtRestaurant(restaurant.id, topN);
     List<String> topItemIds = new List(topN);
     if (topItemsList != null) {
       if (topItemsList.length < topN) {
