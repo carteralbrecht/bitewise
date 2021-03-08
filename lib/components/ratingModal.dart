@@ -4,6 +4,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:bitewise/services/fsmanager.dart';
 import 'package:bitewise/models/menuItem.dart';
 import 'package:bitewise/global.dart' as global;
+import 'package:bitewise/pages/signInPage.dart';
 
 class RatingModal extends StatefulWidget {
   // final String dishName;
@@ -90,7 +91,7 @@ class _RatingModalState extends State<RatingModal> {
               padding: EdgeInsets.symmetric(vertical: 5),
               child:
               RatingBar(
-                initialRating: widget.avgRating.toDouble(),
+                initialRating: global.user == null ? 0 : widget.avgRating.toDouble(),
                 direction: Axis.horizontal,
                 allowHalfRating: false,
                 itemCount: 5,
@@ -120,12 +121,22 @@ class _RatingModalState extends State<RatingModal> {
               ),
               FlatButton(
                 onPressed: () {
-                  FirestoreManager().leaveRating(
-                      widget.restaurant.id, widget.menuItem.id, ratingValue);
-                  Navigator.pop(context);
+                  if (global.user == null)
+                  {
+                    Navigator.push(
+                      context,
+                        MaterialPageRoute(
+                          builder: (context) => SignIn()));
+                  }
+                  else
+                  {
+                    FirestoreManager().leaveRating(
+                        widget.restaurant.id, widget.menuItem.id, ratingValue);
+                    Navigator.pop(context);
+                  }
                 },
                 color: global.mainColor,
-                child: Text("submit",
+                child: Text(global.user == null ? "sign in" : "submit",
                     style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.bold,
