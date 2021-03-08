@@ -1,9 +1,5 @@
-// import 'dart:html';
-
 import 'package:bitewise/models/menuItem.dart';
-import 'package:bitewise/models/menuItemFirestore.dart';
 import 'package:bitewise/models/restaurant.dart';
-import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -24,37 +20,14 @@ class MenuItemListTile extends StatefulWidget {
 }
 
 class _MenuItemListTile extends State<MenuItemListTile> {
-  // // Method to get FirestoreMenuItem from ??
-  // FirestoreMenuItem getFirestoreMenuItem(DocumentSnapshot snapshot) {
-  //   return null;
-  // }
-
-  // // Method to get FirestoreMenuItem Stream
-  // Stream<FirestoreMenuItem> get fsMenuItem {
-  //   dynamic thisItem =
-  //       _fsm.findDocById(_fsm.menuItemCollection, widget.menuItem.id);
-  //   if (thisItem is DocumentSnapshot) {
-  //     return thisItem.();
-  //   }
-  // }
-
   Color dividerColor = global.accentGrayLight;
 
   final FirestoreManager _fsm = FirestoreManager();
-
-  Stream<DocumentSnapshot> menuItemStream;
-  DocumentSnapshot menuItemRef;
 
   String itemId;
   num avgRating = 0;
 
   void getAvgRating() async {
-    DocumentSnapshot thisItem =
-        await _fsm.findDocById(_fsm.menuItemCollection, widget.menuItem.id);
-
-    Stream<DocumentSnapshot> thisItemStream =
-        await _fsm.getMenuItemStream(widget.menuItem.id);
-
     var res = await _fsm.getDocData(
         _fsm.menuItemCollection, widget.menuItem.id, "avgRating");
     if (res == null) {
@@ -62,8 +35,6 @@ class _MenuItemListTile extends State<MenuItemListTile> {
     }
     if (mounted)
       setState(() {
-        menuItemRef = thisItem;
-        menuItemStream = thisItemStream;
         avgRating = res;
       });
   }
@@ -123,29 +94,21 @@ class _MenuItemListTile extends State<MenuItemListTile> {
                       ),
                       SizedBox(width: 10),
                       StreamBuilder<Object>(
-                          stream: (Firestore.instance
-                              .collection(_fsm.menuItemCollection)
-                              .document(widget.menuItem.id)
-                              .snapshots()),
-                          builder:
-                              (BuildContext context, AsyncSnapshot snapshot) {
-                            String rate = "0";
-                            try {
-                              rate = snapshot.data['avgRating'].toString();
-                            } catch (e) {
-                              rate = "0";
-                            }
-                            return Text(
-                                // menuItemStream == null
-                                //     ? zero.toString()
-                                //     : snapshot.data['avgRating'].toString(),
-                                rate,
-                                style: TextStyle(
-                                    fontSize: 25, fontWeight: FontWeight.bold));
-                          }),
-                      // Text(avgRating.toString(),
-                      //     style: TextStyle(
-                      //         fontSize: 25, fontWeight: FontWeight.bold)),
+                        stream: (Firestore.instance.collection(_fsm.menuItemCollection).document(widget.menuItem.id).snapshots()),
+                        builder:(BuildContext context, AsyncSnapshot snapshot) {
+                          String streamAvgRating = "0";
+                          try 
+                          {
+                            streamAvgRating = snapshot.data['avgRating'].toString();
+                          } 
+                          catch (e) 
+                          {
+                            streamAvgRating = "0";
+                          }
+                          return Text(streamAvgRating,
+                              style: TextStyle(
+                                  fontSize: 25, fontWeight: FontWeight.bold));
+                      }),
                     ],
                   )),
                   title: Text(widget.menuItem.name,
