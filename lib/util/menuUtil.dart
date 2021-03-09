@@ -14,12 +14,18 @@ class MenuUtil {
       return null;
     }
 
+    // Get the Ids for the most popular items
+    List<String> mostPopularItemIds = await RestaurantUtil.getTopNItemIds(restaurant, numMostPopular);
+
+    if (mostPopularItemIds.length < numMostPopular) {
+      numMostPopular = mostPopularItemIds.length;
+    }
+
     // make the menu object with the subsections filled out
     // (subsection strings still map to empty lists)
     var menu = Menu(restaurant.subsectionNames, numMostPopular);
 
-    // Get the Ids for the most popular items
-    List<String> mostPopularItemIds = await RestaurantUtil.getTopNItemIds(restaurant, numMostPopular);
+
 
     // add each item to the right list
     List<MenuItem> allMenuItemsForRestaurant = await Documenu.getMenuItemsForRestaurant(restaurant.id);
