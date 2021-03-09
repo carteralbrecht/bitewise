@@ -1,5 +1,6 @@
 import 'package:bitewise/services/auth.dart';
 import 'package:bitewise/services/fsmanager.dart';
+import 'package:bitewise/util/restaurantUtil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -77,36 +78,6 @@ class _TestState extends State<Test> {
                     },
                     child: Text(
                       'Test 1',
-                      style: TextStyle(color: Colors.black, fontSize: 20),
-                    ),
-                    color: Colors.yellow[600],
-                  ),
-                  SizedBox(height: 20),
-                  RaisedButton(
-                    onPressed: () async {
-                      print("---- calling getTopFive -------");
-                      List<dynamic> res = await _fsm.getTopFiveItemsAtRestaurant(field1);
-                      print("TOP 5 FOR " + field1 + ": ");
-                      print(res);
-                      print("attempting res[i][''itemId'']");
-                      for (var i = 0; i < 5; i++) print(res[i]["itemId"]);
-                    },
-                    child: Text(
-                      'getTop5 test',
-                      style: TextStyle(color: Colors.black, fontSize: 20),
-                    ),
-                    color: Colors.yellow[600],
-                  ),
-                  SizedBox(height: 20),
-                  RaisedButton(
-                    onPressed: () async {
-                      print("---- calling getTopN -------");
-                      dynamic res = await _fsm.getTopNItemsAtRestaurant(field1, field2);
-                      print("TOP N FOR " + field1 + ": ");
-                      print(res);
-                    },
-                    child: Text(
-                      'getTopN test',
                       style: TextStyle(color: Colors.black, fontSize: 20),
                     ),
                     color: Colors.yellow[600],

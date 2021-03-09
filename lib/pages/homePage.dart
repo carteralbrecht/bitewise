@@ -4,6 +4,7 @@ import 'package:bitewise/models/menuItem.dart';
 import 'package:bitewise/services/documenu.dart';
 import 'package:bitewise/services/fsmanager.dart';
 import 'package:bitewise/util/geoUtil.dart';
+import 'package:bitewise/util/restaurantUtil.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:geolocator/geolocator.dart';
@@ -66,24 +67,9 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  Future<List<MenuItem>> getTopNItemsFromResults(int n) async {
-    List<String> resultIds = new List();
-    for (Restaurant restaurant in restaurantsNearUser) {
-      resultIds.add(restaurant.id);
-    }
-
-    FirestoreManager _fsm = FirestoreManager();
-
-    List<dynamic> topItemsNear = await _fsm.getTopNItemsAtRestaurants(resultIds, n);
-    List<MenuItem> items = new List();
-
-    for (int i = 0; i < topItemsNear.length; i++) {
-      MenuItem thisItem = await Documenu.getMenuItem(topItemsNear[i]["itemId"]);
-      items.add(thisItem);
-      print("Top Item " + i.toString() + ": " + thisItem.name + " " + topItemsNear[i]["avgRating"].toString());
-    }
-
-    return items;
+  Future<List<Future<MenuItem>>> getTopNItemsFromResults(int n) async {
+    List<Future<MenuItem>> topItemsNear = await RestaurantUtil.getTopNItemsFromMany(restaurantsNearUser, n);
+    return topItemsNear;
   }
 
   void getRestaurantsNearby() async {
@@ -108,8 +94,6 @@ class _HomePageState extends State<HomePage> {
       // create the map when restaurants are finished being fetched
       _homePage = createMap();
     });
-
-    await getTopNItemsFromResults(5);
   }
 
   Set<Marker> _createMarkers() {

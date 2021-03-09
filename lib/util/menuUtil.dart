@@ -3,42 +3,34 @@ import 'package:bitewise/models/menuItem.dart';
 import 'package:bitewise/models/restaurant.dart';
 import 'package:bitewise/services/documenu.dart';
 import 'package:bitewise/services/fsmanager.dart';
+import 'package:bitewise/util/restaurantUtil.dart';
 
 class MenuUtil {
 
   // makes a Menu object for the given restaurant
-  static Future<Menu> buildMenuForRestaurant(Restaurant restaurant) async {
-    final FirestoreManager _fsm = FirestoreManager();
+  static Future<Menu> buildMenuForRestaurant(Restaurant restaurant, {int numMostPopular = 5}) async {
+
     if (restaurant == null || restaurant.subsectionNames == null) {
       return null;
     }
 
     // make the menu object with the subsections filled out
     // (subsection strings still map to empty lists)
-    var menu = Menu(restaurant.subsectionNames);
+    var menu = Menu(restaurant.subsectionNames, numMostPopular);
 
     // Get the Ids for the most popular items
-    num topN = 5;
-    List<dynamic> topItemsList = await _fsm.getTopNItemsAtRestaurant(restaurant.id, topN);
-    List<String> topItemIds = new List(topN);
-    if (topItemsList != null) {
-      if (topItemsList.length < topN) {
-        topN = topItemsList.length;
-      }
-      for (var i = 0; i < topN; i++) {
-        topItemIds[i] = topItemsList[i]["itemId"];
-        menu.subsectionMap[Menu.POPULAR_ITEMS_SUBSECTION_NAME].add(null);
-        print(i);
-      }
-    }
+    List<String> mostPopularItemIds = await RestaurantUtil.getTopNItemIds(restaurant, numMostPopular);
 
     // add each item to the right list
-    List<MenuItem> items = await Documenu.getMenuItemsForRestaurant(restaurant.id);
-    for (var item in items) {
-      bool isPopular = topItemIds.contains(item.id);
-      int popIndex = -1;
-      if (isPopular) popIndex = topItemIds.indexOf(item.id);
-      menu.addItem(item, isPopular, popIndex);
+    List<MenuItem> allMenuItemsForRestaurant = await Documenu.getMenuItemsForRestaurant(restaurant.id);
+
+    for (var item in allMenuItemsForRestaurant) {
+      // if item is popular also pass in its index
+      if (mostPopularItemIds.contains(item.id)) {
+        menu.addItem(item, mostPopularItemIds.indexOf(item.id));
+      } else {
+        menu.addItem(item);
+      }
     }
 
     return menu;
