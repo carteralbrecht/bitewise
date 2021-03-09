@@ -8,21 +8,22 @@ class Menu {
 
   static const POPULAR_ITEMS_SUBSECTION_NAME = "Most Popular";
   final instanceMostPopName = POPULAR_ITEMS_SUBSECTION_NAME;
+  final numMostPopular;
 
-  Menu._(this.subsectionMap);
+  Menu._(this.subsectionMap, this.numMostPopular);
 
-  factory Menu(subsectionNames) {
+  factory Menu(subsectionNames, numMostPopular) {
     if (subsectionNames == null) {
       return null;
     }
     Map<String, List<MenuItem>> map = new Map<String, List<MenuItem>>();
-    map[POPULAR_ITEMS_SUBSECTION_NAME] = new List<MenuItem>();
+    map[POPULAR_ITEMS_SUBSECTION_NAME] = new List<MenuItem>(numMostPopular);
 
     for (String name in subsectionNames) {
       map[name] = new List<MenuItem>();
     }
 
-    return new Menu._(map);
+    return new Menu._(map, numMostPopular);
   }
 
   // returns a list of subsection names for this menu
@@ -43,7 +44,7 @@ class Menu {
   }
 
   // adds an item to the right list of documents using its subsection name
-  addItem(MenuItem item, bool isPopular, int popularIndex) {
+  addItem(MenuItem item, [int popularIndex]) {
     if (item == null || item.subsection == null) {
       return;
     }
@@ -56,13 +57,11 @@ class Menu {
     subsectionList.add(item);
 
     // Add item to the popular section if it is popular
-    if (isPopular) {
+    if (popularIndex != null) {
       var popularSubsectionList = subsectionMap[POPULAR_ITEMS_SUBSECTION_NAME];
       if (popularSubsectionList == null) {
         return;
       }
-      print("inserting popular item:");
-      print(popularIndex);
       popularSubsectionList[popularIndex] = item;
     }
 
