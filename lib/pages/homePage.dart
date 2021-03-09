@@ -279,6 +279,7 @@ class _HomePageState extends State<HomePage> {
                       searchController.clear();
                       searchFocus.unfocus();
                       setState(() {
+                        getSearch("");
                         isSearchActive = false;
                       });
                     },

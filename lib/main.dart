@@ -24,18 +24,18 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      
       initialRoute: '/',
       routes: {
         '/test' : (context) => Test(),
-
         '/' : (context) => HomePage(),
-        // '/home' : (context) => HomePage(),
         '/signin' : (context) => SignIn(),
         '/register' : (context) => Register(),
         '/profile' : (context) => ProfilePage(),
-        // ANON route for restaurant page
-
+        // Anonymous route for restaurant page
+        // Anonymous route for rating modal
       },
+
     );
   }
 }
