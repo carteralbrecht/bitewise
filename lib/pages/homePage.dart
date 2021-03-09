@@ -1,6 +1,10 @@
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+import 'package:bitewise/models/menuItem.dart';
+import 'package:bitewise/services/documenu.dart';
+import 'package:bitewise/services/fsmanager.dart';
 import 'package:bitewise/util/geoUtil.dart';
+import 'package:bitewise/util/restaurantUtil.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:geolocator/geolocator.dart';
@@ -62,6 +66,11 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       currentLocation = result;
     });
+  }
+
+  Future<List<Future<MenuItem>>> getTopNItemsFromResults(int n) async {
+    List<Future<MenuItem>> topItemsNear = await RestaurantUtil.getTopNItemsFromMany(restaurantsNearUser, n);
+    return topItemsNear;
   }
 
   void getRestaurantsNearby() async {

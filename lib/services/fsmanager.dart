@@ -13,6 +13,23 @@ class FirestoreManager {
   final String menuItemCollection = "menuitems";
   final String restaurantCollection = "restaurants";
 
+  Future getMenuItemStream(String id) async {
+    try {
+      Stream<DocumentSnapshot> stream = await _firestore
+          .collection(menuItemCollection)
+          .document(id)
+          .snapshots();
+      if (stream == null) {
+        return null;
+      } else {
+        return stream;
+      }
+    } catch (e) {
+      print("error in getMenuItemForStream() : " + e.toString());
+      return null;
+    }
+  }
+
   Future findDocById(String collection, String id) async {
     try {
       DocumentSnapshot doc =
@@ -49,62 +66,6 @@ class FirestoreManager {
     } catch (e) {
       print("error in getDocData() : " + e.toString());
       return null;
-    }
-  }
-
-  Future getTopN(String restId, num numPopular) async {
-    try {
-      if (numPopular <= 0) {
-        return null;
-      }
-      // Retrieve top items for a restaurant
-      dynamic topMenuItems =
-          await getDocData(restaurantCollection, restId, "ratedItems");
-      // Make sure the proper list was returned
-      if (topMenuItems is List) {
-        // Trim the list to hold only 'numPopular' items if necessary,
-        // and return the list
-        if (topMenuItems.length > numPopular) {
-          print(numPopular);
-          List<dynamic> topItems = new List(numPopular);
-          for (var i = 0; i < numPopular; i++) {
-            topItems[i] = topMenuItems[i];
-          }
-          return topItems;
-        }
-        return topMenuItems;
-      } else {
-        return null;
-      }
-    } catch (e) {
-      print("error in getTopN() : " + e.toString());
-      return null;
-    }
-  }
-
-  // Method to call getTop5 items in a restaurant
-  Future getTopFive(String restId) async {
-    try {
-      return await getTopN(restId, 5);
-    } catch (e) {
-      print("error in getTopFive() : " + e.toString());
-      return null;
-    }
-  }
-
-  // NOTE: THIS IS BEING CHANGED TO BE A GCF. TO BE REMOVED SOON.
-  // DO NOT CALL THIS METHOD.
-  Future createUserInfo(String uid) async {
-    try {
-      List<String> ratedItems = [];
-      _firestore
-          .collection("userInfo")
-          .document(uid)
-          .setData({"ratedItems": ratedItems});
-      return true;
-    } catch (e) {
-      print("err in createUserInfo() : " + e.toString());
-      return false;
     }
   }
 
