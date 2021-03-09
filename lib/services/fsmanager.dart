@@ -13,6 +13,23 @@ class FirestoreManager {
   final String menuItemCollection = "menuitems";
   final String restaurantCollection = "restaurants";
 
+  Future getMenuItemStream(String id) async {
+    try {
+      Stream<DocumentSnapshot> stream = await _firestore
+          .collection(menuItemCollection)
+          .document(id)
+          .snapshots();
+      if (stream == null) {
+        return null;
+      } else {
+        return stream;
+      }
+    } catch (e) {
+      print("error in getMenuItemForStream() : " + e.toString());
+      return null;
+    }
+  }
+
   Future findDocById(String collection, String id) async {
     try {
       DocumentSnapshot doc =
