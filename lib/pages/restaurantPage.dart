@@ -9,6 +9,7 @@ import 'package:bitewise/components/menuItemListTile.dart';
 import 'package:bitewise/util/restaurantUtil.dart';
 import 'package:bitewise/services/fsmanager.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:skeleton_text/skeleton_text.dart';
 import 'package:bitewise/global.dart' as global;
 
 
@@ -123,7 +124,7 @@ class _MenuSubSectionScrollbarState extends State<MenuSubSectionScrollbar> {
 
       widget._sectionController.scrollTo(index: newIndex, duration: Duration(milliseconds: 500), curve: Curves.linear);
       scrollStart.start();
-      setState(() {
+      if (mounted) setState(() {
         selectedIndex = newIndex;
       });
       return;
@@ -135,7 +136,7 @@ class _MenuSubSectionScrollbarState extends State<MenuSubSectionScrollbar> {
     scrollStart.stop();
     scrollStart.reset();
     scrollStart.start();
-    setState(() {
+    if (mounted) setState(() {
       selectedIndex = newIndex;
       widget._sectionController.scrollTo(index: newIndex, duration: Duration(milliseconds: 500), curve: Curves.linear);
       scrollMenu();
@@ -144,15 +145,14 @@ class _MenuSubSectionScrollbarState extends State<MenuSubSectionScrollbar> {
 
   void scrollMenu() {
     double scrollDistance = 0;
-    if (selectedIndex == 0) {
-      scrollDistance += menuSubsectionHeight;
-    }
+    scrollDistance += menuSubsectionHeight - 20;
+    
     for (int i = 0 ; i < selectedIndex; i++) {
       scrollDistance += menuSubsectionHeight;
       scrollDistance += widget.subsections[i].numItems * menuItemHeight;
     }
     widget._menuController.animateTo(scrollDistance, duration: Duration(milliseconds: 500), curve: Curves.linear);
-    setState(() {
+    if (mounted) setState(() {
       scrollStart.start();
     });
   }
@@ -274,18 +274,18 @@ class _RestaurantPageState extends State<RestaurantPage> {
   _scrollListener() {
     if (_menuController.offset >= _menuController.position.maxScrollExtent &&
         !_menuController.position.outOfRange) {
-      setState(() {
+      if (mounted) setState(() {
         message = "reach the bottom";
       });
     }
     if (_menuController.offset <= _menuController.position.minScrollExtent &&
         !_menuController.position.outOfRange) {
-      setState(() {
+      if (mounted) setState(() {
         message = "reach the top";
       });
     }
     else {
-      setState(() {
+      if (mounted) setState(() {
         firstIndex = _menuController.position.extentBefore ~/ itemHeight;
         
       });
@@ -328,7 +328,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
       numRated = ratedList.length;
     }
 
-    setState(() {
+    if (mounted) setState(() {
       numItemsRated = numRated;
     });
   }
@@ -338,9 +338,9 @@ class _RestaurantPageState extends State<RestaurantPage> {
       // print(widget.restaurant.cuisines.length.toString());
 
     for (int i = 0; i < widget.restaurant.cuisines.length && i < 3; i++) {
-      s += widget.restaurant.cuisines[i] + ", ";
+      s += widget.restaurant.cuisines[i] + ((i < widget.restaurant.cuisines.length && i < 3) ? ", " : "");
     }
-    setState(() {
+    if (mounted) setState(() {
       cuisineString = s;
     });
   }
@@ -360,7 +360,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
         return; 
       }
 
-      setState(() {
+      if (mounted) setState(() {
         realMenu = menu;
         menuItems = menuItemsTemp;
         _menu = generateMenu();
@@ -406,7 +406,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
     }
     sectionList.add(new SubSection(subsection, menuItems.length - prevIndex));
 
-    setState(() {
+    if (mounted) setState(() {
       subSectionWidget = new MenuSubSectionScrollbar(_key, sectionList, sectionController, _menuController, itemHeight, subSectionHeight);
       // sectionScrollState = subSectionWidget.createState();
     });
@@ -419,70 +419,145 @@ class _RestaurantPageState extends State<RestaurantPage> {
   @override
   Widget build(BuildContext context) {
     
-    return SafeArea(
-      child: Material(
-        child: Container(
-          color: Colors.white,
-          child: _menu == null ? Center(
-            // Display Progress Indicator
-              child: CircularProgressIndicator(
-                  valueColor: new AlwaysStoppedAnimation<Color>(global.mainColor)
-              )) :
-          CustomScrollView(
-            controller: _menuController,
-            slivers: <Widget>[
-              SliverAppBar(
-                pinned: true,
-                expandedHeight: 150,
-                title: Text(widget.restaurant.name, style: TextStyle(fontSize: 25, color: Colors.black)),
-                centerTitle: true,
-                backgroundColor: global.mainColor,
-                flexibleSpace: FlexibleSpaceBar(
-                  background: Container(
-                    color: global.mainColor,
-                    alignment: Alignment.center,
-                    padding: EdgeInsets.fromLTRB(5, 20, 5, 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(height: 25),
-                              Text("American • Pizza • Italian", style: TextStyle(fontSize:15)),
-                              Text(numItemsRated.toString() + " items rated", style: TextStyle(fontSize:15), textAlign: TextAlign.left),
-                              Text("Hours: 1:00 - 10:00", style: TextStyle(fontSize:15), textAlign: TextAlign.left),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          // padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                          margin: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                          alignment: Alignment.center,
-                          child: restaurantIcon,
-                        ),
-                      ],
+    return Material(
+      child: Container(
+        color: Colors.white,
+        child: CustomScrollView(
+          controller: _menuController,
+          slivers: <Widget>[
+            SliverAppBar(
+              pinned: true,
+              expandedHeight: 125,
+              leading: GestureDetector(
+                child: Icon(Icons.chevron_left, size: 35, color: Colors.black),
+                onTap: () {
+                  Navigator.pop(context);
+                }
+              ),
+              actions: <Widget>[
+                Container(
+                    height: 35,
+                    width: 35,
+                    decoration: new BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
                     ),
+                    margin: EdgeInsets.only(right: 10.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        if (global.user == null) {
+                          Navigator.pushNamed(context, '/signin');
+                        } else {
+                          Navigator.pushNamed(context, '/profile');
+                        }
+                      },
+                      child: Icon(
+                        Icons.person,
+                        size: 30,
+                        color: global.mainColor,
+                      ),
+                    )),
+              ],
+              title: Text(widget.restaurant.name, style: TextStyle(fontSize: 25, color: Colors.black)),
+              centerTitle: true,
+              backgroundColor: global.mainColor,
+              flexibleSpace: FlexibleSpaceBar(
+                background: Container(
+                  color: global.mainColor,
+                  alignment: Alignment.center,
+                  padding: EdgeInsets.fromLTRB(5, 20, 5, 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                        child: _menu == null ? Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height: 25),
+                            SkeletonAnimation(
+                              shimmerDuration: 1500,
+                              borderRadius: BorderRadius.circular(4.0),
+                              shimmerColor: Colors.grey,
+                              child: Container(
+                                height: 15,
+                                width: MediaQuery.of(context).size.width * 0.5,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(4.0),
+                                    color: Colors.grey[600]),
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            SkeletonAnimation(
+                              shimmerDuration: 1500,
+                              borderRadius: BorderRadius.circular(4.0),
+                              shimmerColor: Colors.white54,
+                              child: Container(
+                                height: 15,
+                                width: MediaQuery.of(context).size.width * 0.3,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(4.0),
+                                    color: Colors.grey[600]),
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            SkeletonAnimation(
+                              shimmerDuration: 1500,
+                              borderRadius: BorderRadius.circular(4.0),
+                              shimmerColor: Colors.grey,
+                              child: Container(
+                                height: 15,
+                                width: MediaQuery.of(context).size.width * 0.4,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(4.0),
+                                    color: Colors.grey[600]),
+                              ),
+                            ),
+                          ],
+                        ) : Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height: 25),
+                            Text("American • Pizza • Italian", style: TextStyle(fontSize:15)),
+                            Text(numItemsRated.toString() + " items rated", style: TextStyle(fontSize:15), textAlign: TextAlign.left),
+                            Text("Hours: " + widget.restaurant.hours, style: TextStyle(fontSize:15), textAlign: TextAlign.left),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        // padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                        margin: EdgeInsets.only(bottom: 15, left: 10, right: 10),
+                        alignment: Alignment.bottomCenter,
+                        child: restaurantIcon,
+                      ),
+                    ],
                   ),
                 ),
-                bottom: PreferredSize(
-                  preferredSize: firstIndex == 0 ? Size(0,0) : Size.fromHeight(50),
-                  child: firstIndex == 0 ? Container(height:0, width: 0) : (subSectionWidget == null ? Text("Loading") : subSectionWidget),
-                ),
               ),
-              SliverList(
-                delegate: SliverChildListDelegate(
-                  _menu == null ? [Text("Loading")] : _menu,
-                ),
+              bottom: PreferredSize(
+                preferredSize: firstIndex == 0 ? Size(0,0) : Size.fromHeight(50),
+                child: firstIndex == 0 ? Container(height:0, width: 0) : (subSectionWidget == null ? Text("Loading") : subSectionWidget),
               ),
-              
-            ]
-          ),
+            ),
+            _menu == null ? SliverFillRemaining(
+              hasScrollBody: false,
+              child: Center(
+                // Display Progress Indicator
+                child: CircularProgressIndicator(
+                    valueColor: new AlwaysStoppedAnimation<Color>(global.mainColor)
+                )
+              )
+            ) : SliverList(
+              delegate: SliverChildListDelegate(
+                _menu,
+              ),
+            ),
+            
+          ]
         ),
-      )
+      ),
     );
   }
 

@@ -33,10 +33,9 @@ class _MenuItemListTile extends State<MenuItemListTile> {
     if (res == null) {
       res = 0;
     }
-    if (mounted)
-      setState(() {
-        avgRating = res;
-      });
+    if (mounted) setState(() {
+      avgRating = res;
+    });
   }
 
   @override

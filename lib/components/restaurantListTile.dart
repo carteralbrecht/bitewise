@@ -34,7 +34,7 @@ class _RestaurantListTileState extends State<RestaurantListTile> {
                 borderRadius: BorderRadius.all(Radius.circular(8.0)),
       ),
       margin: EdgeInsets.only(bottom:5, top:10),
-      height: 90,
+      height: 100,
       child: Card(
         elevation: 0,
         child: ListTile(
