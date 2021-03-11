@@ -41,6 +41,7 @@ class _HomePageState extends State<HomePage> {
   FocusNode searchFocus = new FocusNode();
   int _currentCarouselIndex = 0;
   List<Widget> mostPopItems;
+  Widget _googleMap;
 
   @override
   void initState() {
@@ -101,7 +102,7 @@ class _HomePageState extends State<HomePage> {
 
       getTopItems();
       // create the map when restaurants are finished being fetched
-      _homePage = createMap();
+      _googleMap = createMap();
     });
   }
 
@@ -127,82 +128,17 @@ class _HomePageState extends State<HomePage> {
     return markersSet;
   }
 
-  Stack createMap() {
-    return Stack(children: <Widget>[
-      GoogleMap(
-        onMapCreated: _onMapCreated,
-        initialCameraPosition: CameraPosition(
-          target: LatLng(currentLocation.latitude, currentLocation.longitude),
-          zoom: 15.0,
-        ),
-        markers: _createMarkers(),
-        myLocationEnabled: true,
-        myLocationButtonEnabled: false
+  Widget createMap() {
+    return GoogleMap(
+      onMapCreated: _onMapCreated,
+      initialCameraPosition: CameraPosition(
+        target: LatLng(currentLocation.latitude, currentLocation.longitude),
+        zoom: 15.0,
       ),
-      DraggableScrollableSheet(
-        initialChildSize: 0.4,
-        minChildSize: 0.2,
-        maxChildSize: 1,
-        builder: (BuildContext context, _scrollController) {
-          _scrollController.addListener(() {
-            setState(() {
-              isSheetMax = _scrollController.offset >= 0;
-            });
-            print(_scrollController.offset.toString());
-          });
-          return Container(
-            decoration: new BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.rectangle,
-              borderRadius: isSheetMax ? BorderRadius.zero : BorderRadius.only(
-                  topLeft: Radius.circular(40.0),
-                  topRight: Radius.circular(40.0)),
-            ),
-            child: ListView.builder(
-              controller: _scrollController,
-              itemCount: restaurantsNearUser.length + 1,
-              itemBuilder: (BuildContext context, int index) {
-                if (index == 0) {
-                  return Container(
-                      alignment: Alignment.topCenter,
-                      child: Container(
-                        height: 5,
-                        width: 60,
-                        margin: EdgeInsetsDirectional.only(top: 10, bottom: 5),
-                        decoration: new BoxDecoration(
-                          color: global.accentGrayDark,
-                          shape: BoxShape.rectangle,
-                          borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                        ),
-                      ));
-                }
-                return new Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    FlatButton(
-                      onPressed: () => {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => RestaurantPage(
-                                        restaurantsNearUser[index - 1])))
-                          },
-                      child: RestaurantListTile(restaurantsNearUser[index - 1],
-                          restaurantDistances[index - 1])
-                    ),
-                    Divider(
-                      color: global.accentGrayLight,
-                      height: 5,
-                      thickness: 5,
-                    )
-                  ],
-                );
-              },
-            ),
-          );
-        },
-      ),
-    ]);
+      markers: _createMarkers(),
+      myLocationEnabled: true,
+      myLocationButtonEnabled: false
+    );
   }
 
   void getTopItems() async {
@@ -226,6 +162,14 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       mostPopItems = itemWidgetList;
     });
+  }
+
+  List<T> map<T>(List list, Function handler) {
+    List<T> result = [];
+    for (var i = 0; i < list.length; i++) {
+      result.add(handler(i, list[i]));
+    }
+    return result;
   }
 
   void getSearch(String s) async {
@@ -364,36 +308,123 @@ class _HomePageState extends State<HomePage> {
             child: ListView(
               children: searchResults,
             ),
-          ) : (_homePage != null ? _homePage : Center(
+          ) : (_googleMap != null ? _googleMap : Center(
             child: CircularProgressIndicator(
               valueColor: new AlwaysStoppedAnimation<Color>(global.mainColor),
             )
           )),
-          Container(
+          mostPopItems == null ? Container(height:0, width:0) : Container(
             alignment: Alignment.topRight,
             color: Colors.transparent,
             margin: EdgeInsets.all(10),
             child: Container(
               width: 200,
-              color: Colors.blue,
-              child: CarouselSlider(
-                options: CarouselOptions(
-                  height: 75,
-                  autoPlay: true,
-                  autoPlayInterval: Duration(seconds: 3),
-                  autoPlayAnimationDuration: Duration(milliseconds: 800),
-                  autoPlayCurve: Curves.fastOutSlowIn,
-                  viewportFraction: 1,
-                  onPageChanged: (index, reason) {
-                    setState(() {
-                      _currentCarouselIndex = index;
-                    });
-                  },
-                ),
-                items: mostPopItems == null ? [Container(height:0, width:0)] : mostPopItems,
+              decoration: new BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget> [
+                  CarouselSlider(
+                    options: CarouselOptions(
+                      height: 50,
+                      autoPlay: true,
+                      autoPlayInterval: Duration(seconds: 4),
+                      autoPlayAnimationDuration: Duration(milliseconds: 800),
+                      autoPlayCurve: Curves.fastOutSlowIn,
+                      viewportFraction: 1,
+                      onPageChanged: (index, reason) {
+                        setState(() {
+                          _currentCarouselIndex = index;
+                        });
+                      },
+                    ),
+                    items: mostPopItems == null ? [Container(height:0, width:0)] : mostPopItems,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: map<Widget>(mostPopItems, (index, url) {
+                      return Container(
+                        width: 5.0,
+                        height: 5.0,
+                        margin: EdgeInsets.symmetric(vertical: 2.0, horizontal: 2.0),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: _currentCarouselIndex == index ? global.accentGrayDark : global.accentGrayLight,
+                        ),
+                      );
+                    }),
+                  ),
+                ]
               ),
             ),
           ),
+          restaurantsNearUser == null ? Container(height: 0, width: 0) : DraggableScrollableSheet(
+            initialChildSize: 0.4,
+            minChildSize: 0.2,
+            maxChildSize: 1,
+            builder: (BuildContext context, _scrollController) {
+              _scrollController.addListener(() {
+                setState(() {
+                  isSheetMax = _scrollController.offset >= 0;
+                });
+                print(_scrollController.offset.toString());
+              });
+              return Container(
+                decoration: new BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.rectangle,
+                  borderRadius: isSheetMax ? BorderRadius.zero : BorderRadius.only(
+                      topLeft: Radius.circular(40.0),
+                      topRight: Radius.circular(40.0)),
+                ),
+                child: ListView.builder(
+                  controller: _scrollController,
+                  itemCount: restaurantsNearUser.length + 1,
+                  itemBuilder: (BuildContext context, int index) {
+                    if (index == 0) {
+                      return Container(
+                          alignment: Alignment.topCenter,
+                          child: Container(
+                            height: 5,
+                            width: 60,
+                            margin: EdgeInsetsDirectional.only(top: 10, bottom: 5),
+                            decoration: new BoxDecoration(
+                              color: global.accentGrayDark,
+                              shape: BoxShape.rectangle,
+                              borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                            ),
+                          ));
+                    }
+                    return new Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        FlatButton(
+                          onPressed: () => {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => RestaurantPage(
+                                            restaurantsNearUser[index - 1])))
+                              },
+                          child: RestaurantListTile(restaurantsNearUser[index - 1],
+                              restaurantDistances[index - 1])
+                        ),
+                        Divider(
+                          color: global.accentGrayLight,
+                          height: 5,
+                          thickness: 5,
+                        )
+                      ],
+                    );
+                  },
+                ),
+              );
+            },
+          ),
+          
         ]
       ),
     );

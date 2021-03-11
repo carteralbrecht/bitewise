@@ -41,7 +41,8 @@ class _MostPopularItemCardState extends State<MostPopularItemCard> {
             Container(
               child: Row(
                 children: [
-                  Icon(Icons.star, color: global.mainColor,),
+                  Icon(Icons.star, color: global.mainColor, size: 25),
+                  SizedBox(width:5),
                   Text(widget.avgRating.toStringAsFixed(1), style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold,)),
                 ],
               ),
@@ -49,13 +50,28 @@ class _MostPopularItemCardState extends State<MostPopularItemCard> {
             SizedBox(width:10),
             VerticalDivider(
               width: 2,
+              thickness: 2,
               color: global.accentGrayDark,
+              indent: 5,
+              endIndent: 5,
             ),
             SizedBox(width:10),
             Expanded(
-              child: Text(
-                widget.menuItem.name,
-                overflow: TextOverflow.ellipsis,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget> [
+                  Text(
+                    widget.menuItem.name,
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold,),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    widget.restaurant.name,
+                    style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic, color: global.accentGrayDark,),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ]
               ),
             ),
           ]
