@@ -14,7 +14,10 @@ import 'package:bitewise/pages/restaurantPage.dart';
 import 'package:bitewise/services/auth.dart';
 import 'package:bitewise/util/restaurantSearchUtil.dart';
 import 'package:bitewise/models/restaurant.dart';
+import 'package:bitewise/components/mostPopularItemCard.dart';
 import '../components/restaurantListTile.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+
 
 class HomePage extends StatefulWidget {
   @override
@@ -23,6 +26,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final AuthService _auth = AuthService();
+  final FirestoreManager _fsm = FirestoreManager();
   GoogleMapController mapController;
   Position currentLocation;
   Stack _homePage;
@@ -35,6 +39,8 @@ class _HomePageState extends State<HomePage> {
   List<Widget> searchResults = new List<Widget>();
   TextEditingController searchController = new TextEditingController();
   FocusNode searchFocus = new FocusNode();
+  int _currentCarouselIndex = 0;
+  List<Widget> mostPopItems;
 
   @override
   void initState() {
@@ -92,6 +98,8 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       restaurantsNearUser = resultsNear;
       restaurantDistances = restDistances;
+
+      getTopItems();
       // create the map when restaurants are finished being fetched
       _homePage = createMap();
     });
@@ -195,6 +203,29 @@ class _HomePageState extends State<HomePage> {
         },
       ),
     ]);
+  }
+
+  void getTopItems() async {
+    List<Future<MenuItem>> items = await RestaurantUtil.getTopNItemsFromMany(restaurantsNearUser, 3);
+    List<Widget> itemWidgetList = new List<Widget>();
+
+    for (Future<MenuItem> i in items) {
+      MenuItem mi = await i;
+      Restaurant rs;
+      for (Restaurant r in restaurantsNearUser) {
+        if (r.id == mi.restaurantId) {
+          rs = r;
+          break;
+        }
+      }
+      var avg = await _fsm.getDocData(_fsm.menuItemCollection, mi.id, "avgRating");
+      itemWidgetList.add(new MostPopularItemCard(mi, rs, avg));
+    }
+
+
+    setState(() {
+      mostPopItems = itemWidgetList;
+    });
   }
 
   void getSearch(String s) async {
@@ -326,16 +357,45 @@ class _HomePageState extends State<HomePage> {
               )),
         ],
       ),
-      body: isSearchActive ?  Container(
-        color: Colors.white,
-        child: ListView(
-          children: searchResults,
-        ),
-      ) : (_homePage != null ? _homePage : Center(
-        child: CircularProgressIndicator(
-          valueColor: new AlwaysStoppedAnimation<Color>(global.mainColor),
-        )
-      )),
+      body: Stack(
+        children: <Widget>[
+          isSearchActive ?  Container(
+            color: Colors.white,
+            child: ListView(
+              children: searchResults,
+            ),
+          ) : (_homePage != null ? _homePage : Center(
+            child: CircularProgressIndicator(
+              valueColor: new AlwaysStoppedAnimation<Color>(global.mainColor),
+            )
+          )),
+          Container(
+            alignment: Alignment.topRight,
+            color: Colors.transparent,
+            margin: EdgeInsets.all(10),
+            child: Container(
+              width: 200,
+              color: Colors.blue,
+              child: CarouselSlider(
+                options: CarouselOptions(
+                  height: 75,
+                  autoPlay: true,
+                  autoPlayInterval: Duration(seconds: 3),
+                  autoPlayAnimationDuration: Duration(milliseconds: 800),
+                  autoPlayCurve: Curves.fastOutSlowIn,
+                  viewportFraction: 1,
+                  onPageChanged: (index, reason) {
+                    setState(() {
+                      _currentCarouselIndex = index;
+                    });
+                  },
+                ),
+                items: mostPopItems == null ? [Container(height:0, width:0)] : mostPopItems,
+              ),
+            ),
+          ),
+        ]
+      ),
     );
   }
 }
