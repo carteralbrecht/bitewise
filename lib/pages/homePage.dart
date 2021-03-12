@@ -313,7 +313,7 @@ class _HomePageState extends State<HomePage> {
               valueColor: new AlwaysStoppedAnimation<Color>(global.mainColor),
             )
           )),
-          mostPopItems == null ? Container(height:0, width:0) : Container(
+          mostPopItems == null || mostPopItems.length == 0 ? Container(height:0, width:0) : Container(
             alignment: Alignment.topRight,
             color: Colors.transparent,
             margin: EdgeInsets.all(10),
