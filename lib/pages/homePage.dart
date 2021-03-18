@@ -303,22 +303,17 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Stack(
         children: <Widget>[
-          isSearchActive ?  Container(
-            color: Colors.white,
-            child: ListView(
-              children: searchResults,
-            ),
-          ) : (_googleMap != null ? _googleMap : Center(
+          (_googleMap != null ? _googleMap : Center(
             child: CircularProgressIndicator(
               valueColor: new AlwaysStoppedAnimation<Color>(global.mainColor),
             )
           )),
-          mostPopItems == null || mostPopItems?.length == 0 ? Container(height:0, width:0) : Container(
-            alignment: Alignment.topRight,
-            color: Colors.transparent,
-            margin: EdgeInsets.all(10),
+          mostPopItems == null || mostPopItems?.length == 0 ? Container(height:0, width:0) : Positioned(
+            top:0,
+            right:0,
             child: Container(
-              width: 200,
+              margin: EdgeInsets.all(10),
+              width: 220,
               decoration: new BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.rectangle,
@@ -424,7 +419,12 @@ class _HomePageState extends State<HomePage> {
               );
             },
           ),
-          
+          isSearchActive ?  Container(
+            color: Colors.white,
+            child: ListView(
+              children: searchResults,
+            ),
+          ) : Container(height: 0, width: 0),
         ]
       ),
     );
