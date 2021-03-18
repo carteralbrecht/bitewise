@@ -14,7 +14,10 @@ import 'package:bitewise/pages/restaurantPage.dart';
 import 'package:bitewise/services/auth.dart';
 import 'package:bitewise/util/restaurantSearchUtil.dart';
 import 'package:bitewise/models/restaurant.dart';
+import 'package:bitewise/components/mostPopularItemCard.dart';
 import '../components/restaurantListTile.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+
 
 class HomePage extends StatefulWidget {
   @override
@@ -23,6 +26,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final AuthService _auth = AuthService();
+  final FirestoreManager _fsm = FirestoreManager();
   GoogleMapController mapController;
   Position currentLocation;
   Stack _homePage;
@@ -35,6 +39,9 @@ class _HomePageState extends State<HomePage> {
   List<Widget> searchResults = new List<Widget>();
   TextEditingController searchController = new TextEditingController();
   FocusNode searchFocus = new FocusNode();
+  int _currentCarouselIndex = 0;
+  List<Widget> mostPopItems;
+  Widget _googleMap;
 
   @override
   void initState() {
@@ -92,8 +99,10 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       restaurantsNearUser = resultsNear;
       restaurantDistances = restDistances;
+
+      getTopItems();
       // create the map when restaurants are finished being fetched
-      _homePage = createMap();
+      _googleMap = createMap();
     });
   }
 
@@ -119,82 +128,48 @@ class _HomePageState extends State<HomePage> {
     return markersSet;
   }
 
-  Stack createMap() {
-    return Stack(children: <Widget>[
-      GoogleMap(
-        onMapCreated: _onMapCreated,
-        initialCameraPosition: CameraPosition(
-          target: LatLng(currentLocation.latitude, currentLocation.longitude),
-          zoom: 15.0,
-        ),
-        markers: _createMarkers(),
-        myLocationEnabled: true,
-        myLocationButtonEnabled: false
+  Widget createMap() {
+    return GoogleMap(
+      onMapCreated: _onMapCreated,
+      initialCameraPosition: CameraPosition(
+        target: LatLng(currentLocation.latitude, currentLocation.longitude),
+        zoom: 15.0,
       ),
-      DraggableScrollableSheet(
-        initialChildSize: 0.4,
-        minChildSize: 0.2,
-        maxChildSize: 1,
-        builder: (BuildContext context, _scrollController) {
-          _scrollController.addListener(() {
-            setState(() {
-              isSheetMax = _scrollController.offset >= 0;
-            });
-            print(_scrollController.offset.toString());
-          });
-          return Container(
-            decoration: new BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.rectangle,
-              borderRadius: isSheetMax ? BorderRadius.zero : BorderRadius.only(
-                  topLeft: Radius.circular(40.0),
-                  topRight: Radius.circular(40.0)),
-            ),
-            child: ListView.builder(
-              controller: _scrollController,
-              itemCount: restaurantsNearUser.length + 1,
-              itemBuilder: (BuildContext context, int index) {
-                if (index == 0) {
-                  return Container(
-                      alignment: Alignment.topCenter,
-                      child: Container(
-                        height: 5,
-                        width: 60,
-                        margin: EdgeInsetsDirectional.only(top: 10, bottom: 5),
-                        decoration: new BoxDecoration(
-                          color: global.accentGrayDark,
-                          shape: BoxShape.rectangle,
-                          borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                        ),
-                      ));
-                }
-                return new Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    FlatButton(
-                      onPressed: () => {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => RestaurantPage(
-                                        restaurantsNearUser[index - 1])))
-                          },
-                      child: RestaurantListTile(restaurantsNearUser[index - 1],
-                          restaurantDistances[index - 1])
-                    ),
-                    Divider(
-                      color: global.accentGrayLight,
-                      height: 5,
-                      thickness: 5,
-                    )
-                  ],
-                );
-              },
-            ),
-          );
-        },
-      ),
-    ]);
+      markers: _createMarkers(),
+      myLocationEnabled: true,
+      myLocationButtonEnabled: false
+    );
+  }
+
+  void getTopItems() async {
+    List<Future<MenuItem>> items = await RestaurantUtil.getTopNItemsFromMany(restaurantsNearUser, 3);
+    List<Widget> itemWidgetList = new List<Widget>();
+
+    for (Future<MenuItem> i in items) {
+      MenuItem mi = await i;
+      Restaurant rs;
+      for (Restaurant r in restaurantsNearUser) {
+        if (r.id == mi.restaurantId) {
+          rs = r;
+          break;
+        }
+      }
+      var avg = await _fsm.getDocData(_fsm.menuItemCollection, mi.id, "avgRating");
+      itemWidgetList.add(new MostPopularItemCard(mi, rs, avg));
+    }
+
+
+    setState(() {
+      mostPopItems = itemWidgetList;
+    });
+  }
+
+  List<T> map<T>(List list, Function handler) {
+    List<T> result = [];
+    for (var i = 0; i < list.length; i++) {
+      result.add(handler(i, list[i]));
+    }
+    return result;
   }
 
   void getSearch(String s) async {
@@ -326,16 +301,132 @@ class _HomePageState extends State<HomePage> {
               )),
         ],
       ),
-      body: isSearchActive ?  Container(
-        color: Colors.white,
-        child: ListView(
-          children: searchResults,
-        ),
-      ) : (_homePage != null ? _homePage : Center(
-        child: CircularProgressIndicator(
-          valueColor: new AlwaysStoppedAnimation<Color>(global.mainColor),
-        )
-      )),
+      body: Stack(
+        children: <Widget>[
+          isSearchActive ?  Container(
+            color: Colors.white,
+            child: ListView(
+              children: searchResults,
+            ),
+          ) : (_googleMap != null ? _googleMap : Center(
+            child: CircularProgressIndicator(
+              valueColor: new AlwaysStoppedAnimation<Color>(global.mainColor),
+            )
+          )),
+          mostPopItems == null || mostPopItems?.length == 0 ? Container(height:0, width:0) : Container(
+            alignment: Alignment.topRight,
+            color: Colors.transparent,
+            margin: EdgeInsets.all(10),
+            child: Container(
+              width: 200,
+              decoration: new BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget> [
+                  CarouselSlider(
+                    options: CarouselOptions(
+                      height: 50,
+                      autoPlay: true,
+                      autoPlayInterval: Duration(seconds: 4),
+                      autoPlayAnimationDuration: Duration(milliseconds: 800),
+                      autoPlayCurve: Curves.fastOutSlowIn,
+                      viewportFraction: 1,
+                      onPageChanged: (index, reason) {
+                        setState(() {
+                          _currentCarouselIndex = index;
+                        });
+                      },
+                    ),
+                    items: mostPopItems == null ? [Container(height:0, width:0)] : mostPopItems,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: map<Widget>(mostPopItems, (index, url) {
+                      return Container(
+                        width: 5.0,
+                        height: 5.0,
+                        margin: EdgeInsets.symmetric(vertical: 2.0, horizontal: 2.0),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: _currentCarouselIndex == index ? global.accentGrayDark : global.accentGrayLight,
+                        ),
+                      );
+                    }),
+                  ),
+                ]
+              ),
+            ),
+          ),
+          restaurantsNearUser == null ? Container(height: 0, width: 0) : DraggableScrollableSheet(
+            initialChildSize: 0.4,
+            minChildSize: 0.2,
+            maxChildSize: 1,
+            builder: (BuildContext context, _scrollController) {
+              _scrollController.addListener(() {
+                setState(() {
+                  isSheetMax = _scrollController.offset >= 0;
+                });
+                print(_scrollController.offset.toString());
+              });
+              return Container(
+                decoration: new BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.rectangle,
+                  borderRadius: isSheetMax ? BorderRadius.zero : BorderRadius.only(
+                      topLeft: Radius.circular(40.0),
+                      topRight: Radius.circular(40.0)),
+                ),
+                child: ListView.builder(
+                  controller: _scrollController,
+                  itemCount: restaurantsNearUser.length + 1,
+                  itemBuilder: (BuildContext context, int index) {
+                    if (index == 0) {
+                      return Container(
+                          alignment: Alignment.topCenter,
+                          child: Container(
+                            height: 5,
+                            width: 60,
+                            margin: EdgeInsetsDirectional.only(top: 10, bottom: 5),
+                            decoration: new BoxDecoration(
+                              color: global.accentGrayDark,
+                              shape: BoxShape.rectangle,
+                              borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                            ),
+                          ));
+                    }
+                    return new Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        FlatButton(
+                          onPressed: () => {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => RestaurantPage(
+                                            restaurantsNearUser[index - 1])))
+                              },
+                          child: RestaurantListTile(restaurantsNearUser[index - 1],
+                              restaurantDistances[index - 1])
+                        ),
+                        Divider(
+                          color: global.accentGrayLight,
+                          height: 5,
+                          thickness: 5,
+                        )
+                      ],
+                    );
+                  },
+                ),
+              );
+            },
+          ),
+          
+        ]
+      ),
     );
   }
 }
