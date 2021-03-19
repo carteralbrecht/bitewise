@@ -98,12 +98,6 @@ class _HomePageState extends State<HomePage> {
       restDistances.add(await GeoUtil.distanceToRestaurant(currentLocation, restaurant));
     }
 
-    List<Future<MenuItem>> menuItems = await ItemListUtil.getPreviouslyRatedItems();
-
-    for (Future<MenuItem> futureItem in menuItems) {
-      MenuItem item = await futureItem;
-    }
-
     setState(() {
       restaurantsNearUser = resultsNear;
       restaurantDistances = restDistances;
