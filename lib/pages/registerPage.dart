@@ -19,144 +19,144 @@ class _RegisterState extends State<Register> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        resizeToAvoidBottomInset: false,
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          leading: GestureDetector(
-            onTap: () {
-              Navigator.popUntil(context, ModalRoute.withName('/'));
-            },
-            child: Icon(Icons.clear, color: Colors.black, size: 30),
-          ),
+      resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Icon(Icons.clear, color: Colors.black, size: 30),
         ),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Container(
-              margin: EdgeInsets.fromLTRB(30, 10, 30, 0),
-              child: Image(image: AssetImage('assets/Bitewise_logo-Black.png')),
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 50),
-              child: Form(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Container(
-                      margin: EdgeInsets.symmetric(vertical: 10),
-                      child: TextFormField(
-                        style: TextStyle(
-                          fontSize: 20,
-                        ),
-                        onChanged: (val) {
-                          setState(() {
-                            email = val;
-                          });
-                        },
-                        decoration: InputDecoration(
-                          hintText: 'email',
-                          hintStyle: TextStyle(
-                            fontSize: 20,
-                            color: global.accentGrayDark
-                          ),
-                        ),
+      ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Container(
+            margin: EdgeInsets.fromLTRB(30, 10, 30, 0),
+            child: Image(image: AssetImage('assets/Bitewise_logo-Black.png')),
+          ),
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: 50),
+            child: Form(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    child: TextFormField(
+                      style: TextStyle(
+                        fontSize: 20,
                       ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.symmetric(vertical:10),
-                      child: TextFormField(
-                        obscureText: true,
-                        style: TextStyle(
-                          fontSize: 20,
-                        ),
-                        onChanged: (val) {
-                          setState(() {
-                            password = val;
-                          });
-                        },
-                        decoration: InputDecoration(
-                          hintText: 'password',
-                          hintStyle: TextStyle(
-                            fontSize: 20,
-                            color: global.accentGrayDark
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.symmetric(vertical: 10),
-                      child: TextFormField(
-                        style: TextStyle(
-                          fontSize: 20,
-                        ),
-                        obscureText: true,
-                        onChanged: (val) {
-                          setState(() {
-                            password = val;
-                          });
-                        },
-                        decoration: InputDecoration(
-                          hintText: 'confirm password',
-                          hintStyle: TextStyle(
-                            fontSize: 20,
-                            color: global.accentGrayDark
-                          ),
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () async {
-                          // Get current account, and upgrade it to an email/pass account
-                        dynamic result =
-                            await _auth.registerByEmail(email, password);
-                        if (result == null) {
-                          print('error registering');
-                        } else {
-                          global.user = result;
-                          print('registered');
-                          print(result);
-                          Navigator.popUntil(context, ModalRoute.withName('/'));
-                        }
+                      onChanged: (val) {
+                        setState(() {
+                          email = val;
+                        });
                       },
-                      child: Container(
-                        margin: EdgeInsets.only(top: 30),
-                        padding: EdgeInsets.symmetric(vertical: 13, horizontal: 40),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: global.mainColor),
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                          color: global.mainColor,
+                      decoration: InputDecoration(
+                        hintText: 'email',
+                        hintStyle: TextStyle(
+                          fontSize: 20,
+                          color: global.accentGrayDark
                         ),
-                        child: Text("Register", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical:10),
+                    child: TextFormField(
+                      obscureText: true,
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
+                      onChanged: (val) {
+                        setState(() {
+                          password = val;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'password',
+                        hintStyle: TextStyle(
+                          fontSize: 20,
+                          color: global.accentGrayDark
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    child: TextFormField(
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
+                      obscureText: true,
+                      onChanged: (val) {
+                        setState(() {
+                          password = val;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'confirm password',
+                        hintStyle: TextStyle(
+                          fontSize: 20,
+                          color: global.accentGrayDark
+                        ),
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                        // Get current account, and upgrade it to an email/pass account
+                      dynamic result =
+                          await _auth.registerByEmail(email, password);
+                      if (result == null) {
+                        print('error registering');
+                      } else {
+                        global.user = result;
+                        print('registered');
+                        print(result);
+                        Navigator.pop(context);
+                      }
+                    },
+                    child: Container(
+                      margin: EdgeInsets.only(top: 30),
+                      padding: EdgeInsets.symmetric(vertical: 13, horizontal: 40),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: global.mainColor),
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        color: global.mainColor,
+                      ),
+                      child: Text("Register", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                    ),
+                  ),
+                ],
               ),
             ),
-            Container(
-              margin: EdgeInsets.only(top: 10, bottom: 40),
-              child: RichText(
-                text: TextSpan(
-                  children: <TextSpan>[
-                    TextSpan(text: 'Already have a Bitewise account? ', style: TextStyle(color: global.accentGrayDark, fontSize: 15)),
-                    TextSpan(
-                      text: 'Sign in',
-                      style: TextStyle(color: Colors.blue, fontSize: 15, decoration: TextDecoration.underline),
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () {
-                          Navigator.pushNamed(context, '/signin');
-                        }
-                    ),
-                  ],
-                ),
-              )
-            ),
-          ],
-        ),
-        );
+          ),
+          Container(
+            margin: EdgeInsets.only(top: 10, bottom: 40),
+            child: RichText(
+              text: TextSpan(
+                children: <TextSpan>[
+                  TextSpan(text: 'Already have a Bitewise account? ', style: TextStyle(color: global.accentGrayDark, fontSize: 15)),
+                  TextSpan(
+                    text: 'Sign in',
+                    style: TextStyle(color: Colors.blue, fontSize: 15, decoration: TextDecoration.underline),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        Navigator.popAndPushNamed(context, '/signin');
+                      }
+                  ),
+                ],
+              ),
+            )
+          ),
+        ],
+      ),
+    );
   }
 }
 

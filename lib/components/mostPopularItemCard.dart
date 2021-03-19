@@ -57,11 +57,15 @@ class _MostPopularItemCardState extends State<MostPopularItemCard> {
                       ],
                     ),
                   ),
-                  Text(
-                    widget.restaurant.name,
-                    style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic, color: global.accentGrayDark,),
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      widget.restaurant.name,
+                      style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic, color: global.accentGrayDark,),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  )
                 ]
               ),
             ]
