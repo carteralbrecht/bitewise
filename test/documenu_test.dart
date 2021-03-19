@@ -2,7 +2,7 @@ import 'package:bitewise/models/menu.dart';
 import 'package:bitewise/models/menuItem.dart';
 import 'package:bitewise/models/restaurant.dart';
 import 'package:bitewise/util/menuUtil.dart';
-import 'package:bitewise/util/restaurantSearchUtil.dart';
+import 'package:bitewise/util/searchUtil.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:test/test.dart';
 import 'package:bitewise/services/documenu.dart';
@@ -37,7 +37,7 @@ void main() async {
   // Does a restaurant search by location
   // Checks one of the results
   test('searchByGeo', () async {
-    var restaurants = await RestaurantSearchUtil.searchByGeo(
+    var restaurants = await SearchUtil.restaurantByGeo(
         Position(longitude: -77.17103, latitude: 39.114805), 2);
 
     var shouldContain = "Baja Fresh";
@@ -53,7 +53,7 @@ void main() async {
   });
 
   test('SearchRestaurantsZipName', () async {
-    var restaurants = await RestaurantSearchUtil.searchByZipAndName("32817", "Panera");
+    var restaurants = await SearchUtil.restaurantByZipAndName("32817", "Panera");
 
     expect(restaurants.first.name.contains("Panera"), true);
   });

@@ -12,7 +12,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:bitewise/global.dart' as global;
 import 'package:bitewise/pages/restaurantPage.dart';
 import 'package:bitewise/services/auth.dart';
-import 'package:bitewise/util/restaurantSearchUtil.dart';
+import 'package:bitewise/util/searchUtil.dart';
 import 'package:bitewise/models/restaurant.dart';
 import 'package:bitewise/components/mostPopularItemCard.dart';
 import '../components/restaurantListTile.dart';
@@ -86,7 +86,7 @@ class _HomePageState extends State<HomePage> {
       await Future.delayed(Duration(milliseconds: 500));
     }
 
-    var restaurants = await RestaurantSearchUtil.searchByGeo(currentLocation, 2);
+    var restaurants = await SearchUtil.restaurantByGeo(currentLocation, 2);
 
     List<Restaurant> resultsNear = new List<Restaurant>();
     List<double> restDistances = new List<double>();
@@ -173,7 +173,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void getSearch(String s) async {
-    var restList = await RestaurantSearchUtil.searchByGeoAndName(currentLocation, s);
+    var restList = await SearchUtil.restaurantByGeoAndName(currentLocation, s);
     List<Widget> restWidgets = new List<Widget>();
     for (Restaurant r in restList) {
       restWidgets.add(
