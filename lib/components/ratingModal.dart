@@ -19,7 +19,40 @@ class RatingModal extends StatefulWidget {
 }
 
 class _RatingModalState extends State<RatingModal> {
+  final FirestoreManager _fsm = FirestoreManager();
   double ratingValue = 0;
+  bool alreadyRated = false;
+  double rating;
+
+  @override
+  void initState() {
+    rating = widget.avgRating.toDouble();
+    _getRating();
+    super.initState();
+  }
+
+  void _getRating() async {
+    var prevRating = 0.0;
+    if (global.user == null)
+      rating = 0.0;
+    var result = await _fsm.getUserRating(global.user.uid, widget.menuItem.id);
+    if (result != null)
+      prevRating = await _fsm.getDocData('ratings', result, 'rating');
+    if (result == null)
+    {
+      setState(() {
+        rating = widget.avgRating.toDouble();
+      });
+    }
+    else
+    {
+      setState(() {
+        rating = prevRating.toDouble();
+        alreadyRated = true;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -80,7 +113,7 @@ class _RatingModalState extends State<RatingModal> {
                   children: [
                     SizedBox(height: 10),
                     Text(
-                      "Rate this item:",
+                      alreadyRated ? "Update your rating:" : "Rate this item:",
                       style: TextStyle(
                           color: Colors.black,
                           fontSize: 16),
@@ -92,10 +125,11 @@ class _RatingModalState extends State<RatingModal> {
               padding: EdgeInsets.symmetric(vertical: 5),
               child:
               RatingBar(
-                initialRating: global.user == null ? 0 : widget.avgRating.toDouble(),
+                initialRating: rating,
                 direction: Axis.horizontal,
                 allowHalfRating: false,
                 itemCount: 5,
+                ignoreGestures: global.user == null ? true : false,
                 ratingWidget: RatingWidget(
                   full: Icon(Icons.star_rate_rounded, color: global.mainColor),
                   half: null,
@@ -135,7 +169,7 @@ class _RatingModalState extends State<RatingModal> {
                         widget.restaurant.id, widget.menuItem.id, ratingValue);
                     Navigator.pop(context);
                     Flushbar(
-                      message:  "Successfully left rating!",
+                      message: alreadyRated ? "Successfully updated rating!" : "Successfully left rating!",
                       duration:  Duration(seconds: 3),
                     )..show(context);
                   }
