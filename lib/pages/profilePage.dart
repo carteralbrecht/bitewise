@@ -31,15 +31,15 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.yellow[300],
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.yellow[600],
-        title: Text(
-          "Profile Page",
-          style: TextStyle(
-            color: Colors.black,
-          ),
-        ),
+        // title: Text(
+        //   "My Account",
+        //   style: TextStyle(
+        //     color: Colors.black,
+        //   ),
+        // ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           color: Colors.grey,
@@ -69,23 +69,187 @@ class _ProfilePageState extends State<ProfilePage> {
         ],
       ),
       body: Container(
-          alignment: Alignment.center,
+          alignment: Alignment.topLeft,
+          margin: EdgeInsets.all(20),
           child: Column(
             children: <Widget>[
               // Text(currentUser == null ? "loading.." : currentUser.toString(), style: TextStyle(color: Colors.black, fontSize: 20)),
-              FlatButton(
-                onPressed: () async => {doSignOut()},
-                child: Text("Sign out"),
-                height: 40,
-                color: Colors.white,
-                textColor: Colors.black,
+              Container(
+                alignment: Alignment.center,
+                margin: EdgeInsets.only(bottom: 20),
+                child: Text("My Account",
+                    style: TextStyle(color: Colors.black, fontSize: 40)),
               ),
-              FlatButton(
-                onPressed: () async => {doDelete()},
-                child: Text("Delete"),
-                height: 40,
-                color: Colors.white,
-                textColor: Colors.black,
+              Container(
+                alignment: Alignment.topLeft,
+                child: Text("Change Password",
+                    style: TextStyle(color: Colors.black, fontSize: 22)),
+              ),
+              Container(
+                margin: EdgeInsets.all(7),
+                child: TextFormField(
+                  obscureText: true,
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
+                  onChanged: (val) {
+                    setState(() {
+                      // password = val;
+                    });
+                  },
+                  decoration: InputDecoration(
+                    hintText: 'old password',
+                    hintStyle:
+                        TextStyle(fontSize: 20, color: global.accentGrayDark),
+                  ),
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.all(7),
+                child: TextFormField(
+                  obscureText: true,
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
+                  onChanged: (val) {
+                    setState(() {
+                      // password = val;
+                    });
+                  },
+                  decoration: InputDecoration(
+                    hintText: 'new password',
+                    hintStyle:
+                        TextStyle(fontSize: 20, color: global.accentGrayDark),
+                  ),
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.all(7),
+                child: TextFormField(
+                  obscureText: true,
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
+                  onChanged: (val) {
+                    setState(() {
+                      // password = val;
+                    });
+                  },
+                  decoration: InputDecoration(
+                    hintText: 'confirm new password',
+                    hintStyle:
+                        TextStyle(fontSize: 20, color: global.accentGrayDark),
+                  ),
+                ),
+              ),
+              GestureDetector(
+                onTap: () async {
+                  // dynamic result =
+                  //     await _auth.registerByEmail(email, password);
+                  // if (result == null) {
+                  //   print('error registering');
+                  // } else {
+                  //   global.user = result;
+                  //   print('registered');
+                  //   print(result);
+                  //   Navigator.popUntil(context, ModalRoute.withName('/'));
+                  // }
+                },
+                child: Container(
+                  alignment: Alignment.topLeft,
+                  margin: EdgeInsets.all(10),
+                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: global.mainColor),
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    color: global.mainColor,
+                  ),
+                  child: Text("Save",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                ),
+              ),
+              Divider(thickness: 5, height: 5),
+              GestureDetector(
+                onTap: () async {
+                  // dynamic result =
+                  //     await _auth.registerByEmail(email, password);
+                  // if (result == null) {
+                  //   print('error registering');
+                  // } else {
+                  //   global.user = result;
+                  //   print('registered');
+                  //   print(result);
+                  //   Navigator.popUntil(context, ModalRoute.withName('/'));
+                  // }
+                },
+                child: Container(
+                  alignment: Alignment.topLeft,
+                  margin: EdgeInsets.only(top: 15),
+                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: global.mainColor),
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    color: global.mainColor,
+                  ),
+                  child: Text("Previously rated items",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                ),
+              ),
+              GestureDetector(
+                onTap: () async {
+                  // dynamic result =
+                  //     await _auth.registerByEmail(email, password);
+                  // if (result == null) {
+                  //   print('error registering');
+                  // } else {
+                  //   global.user = result;
+                  //   print('registered');
+                  //   print(result);
+                  //   Navigator.popUntil(context, ModalRoute.withName('/'));
+                  // }
+                },
+                child: Container(
+                  alignment: Alignment.topLeft,
+                  margin: EdgeInsets.only(top: 15),
+                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: global.mainColor),
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    color: global.mainColor,
+                  ),
+                  child: Text("Sign out",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                ),
+              ),
+              GestureDetector(
+                onTap: () async {
+                  // dynamic result =
+                  //     await _auth.registerByEmail(email, password);
+                  // if (result == null) {
+                  //   print('error registering');
+                  // } else {
+                  //   global.user = result;
+                  //   print('registered');
+                  //   print(result);
+                  //   Navigator.popUntil(context, ModalRoute.withName('/'));
+                  // }
+                },
+                child: Container(
+                  alignment: Alignment.topLeft,
+                  margin: EdgeInsets.only(top: 15),
+                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: global.mainColor),
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    color: global.mainColor,
+                  ),
+                  child: Text("Delete account",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                ),
               ),
             ],
           )),
