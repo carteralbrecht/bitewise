@@ -1,9 +1,11 @@
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+import 'package:bitewise/models/menu.dart';
 import 'package:bitewise/models/menuItem.dart';
 import 'package:bitewise/services/documenu.dart';
 import 'package:bitewise/services/fsmanager.dart';
 import 'package:bitewise/util/geoUtil.dart';
+import 'package:bitewise/util/itemListUtil.dart';
 import 'package:bitewise/util/restaurantUtil.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
@@ -94,6 +96,12 @@ class _HomePageState extends State<HomePage> {
     for (Restaurant restaurant in restaurants) {
       resultsNear.add(restaurant);
       restDistances.add(await GeoUtil.distanceToRestaurant(currentLocation, restaurant));
+    }
+
+    List<Future<MenuItem>> menuItems = await ItemListUtil.getPreviouslyRatedItems();
+
+    for (Future<MenuItem> futureItem in menuItems) {
+      MenuItem item = await futureItem;
     }
 
     setState(() {
