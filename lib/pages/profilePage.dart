@@ -25,7 +25,7 @@ class _ProfilePageState extends State<ProfilePage> {
     user = null;
     global.user = user;
 
-    Navigator.pushNamed(context, '/signin');
+    Navigator.popAndPushNamed(context, '/signin');
   }
 
   @override
