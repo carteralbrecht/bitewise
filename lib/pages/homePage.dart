@@ -17,7 +17,7 @@ import 'package:bitewise/models/restaurant.dart';
 import 'package:bitewise/components/mostPopularItemCard.dart';
 import '../components/restaurantListTile.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-
+import 'package:easy_debounce/easy_debounce.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -238,8 +238,10 @@ class _HomePageState extends State<HomePage> {
                       style: TextStyle(fontSize: 20),
                       onChanged: (val) {
                         setState(() {
-                          print("Search for: " + val);
-                          getSearch(val);
+                          EasyDebounce.debounce(
+                              'restaurant-search-debouncer',
+                              Duration(milliseconds: 500),
+                              () => getSearch(val));
                         });
                       },
                       onTap: () {
@@ -257,7 +259,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 isSearchActive ? Container(
-                  alignment: Alignment.centerRight, 
+                  alignment: Alignment.centerRight,
                   child: GestureDetector(
                     onTap: () {
                       searchController.clear();
@@ -303,129 +305,129 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Stack(
         children: <Widget>[
-          (_googleMap != null ? _googleMap : Center(
-            child: CircularProgressIndicator(
-              valueColor: new AlwaysStoppedAnimation<Color>(global.mainColor),
-            )
-          )),
-          mostPopItems == null || mostPopItems?.length == 0 ? Container(height:0, width:0) : Positioned(
-            top:0,
-            right:0,
-            child: Container(
-              margin: EdgeInsets.all(10),
-              width: 220,
-              decoration: new BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+        (_googleMap != null ? _googleMap : Center(
+                child: CircularProgressIndicator(
+                valueColor: new AlwaysStoppedAnimation<Color>(global.mainColor),
+              )
+            )),
+            mostPopItems == null || mostPopItems?.length == 0 ? Container(height:0, width:0) : Positioned(
+                top:0,
+                right:0,
+                child: Container(
+                  margin: EdgeInsets.all(10),
+                  width: 220,
+                  decoration: new BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget> [
+                    CarouselSlider(
+                      options: CarouselOptions(
+                        height: 50,
+                        autoPlay: true,
+                        autoPlayInterval: Duration(seconds: 4),
+                        autoPlayAnimationDuration: Duration(milliseconds: 800),
+                        autoPlayCurve: Curves.fastOutSlowIn,
+                        viewportFraction: 1,
+                        onPageChanged: (index, reason) {
+                          setState(() {
+                            _currentCarouselIndex = index;
+                          });
+                        },
+                      ),
+                      items: mostPopItems == null ? [Container(height:0, width:0)] : mostPopItems,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: map<Widget>(mostPopItems, (index, url) {
+                        return Container(
+                          width: 5.0,
+                          height: 5.0,
+                          margin: EdgeInsets.symmetric(vertical: 2.0, horizontal: 2.0),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: _currentCarouselIndex == index ? global.accentGrayDark : global.accentGrayLight,
+                          ),
+                        );
+                      }),
+                    ),
+                  ]
+                ),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget> [
-                  CarouselSlider(
-                    options: CarouselOptions(
-                      height: 50,
-                      autoPlay: true,
-                      autoPlayInterval: Duration(seconds: 4),
-                      autoPlayAnimationDuration: Duration(milliseconds: 800),
-                      autoPlayCurve: Curves.fastOutSlowIn,
-                      viewportFraction: 1,
-                      onPageChanged: (index, reason) {
-                        setState(() {
-                          _currentCarouselIndex = index;
-                        });
+            ),
+        restaurantsNearUser == null ? Container(height: 0, width: 0) : DraggableScrollableSheet(
+                initialChildSize: 0.4,
+                minChildSize: 0.2,
+                maxChildSize: 1,
+                builder: (BuildContext context, _scrollController) {
+                  _scrollController.addListener(() {
+                    setState(() {
+                      isSheetMax = _scrollController.offset >= 0;
+                    });
+                    print(_scrollController.offset.toString());
+                  });
+                  return Container(
+                    decoration: new BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.rectangle,
+                      borderRadius: isSheetMax ? BorderRadius.zero : BorderRadius.only(
+                              topLeft: Radius.circular(40.0),
+                              topRight: Radius.circular(40.0)),
+                    ),
+                    child: ListView.builder(
+                      controller: _scrollController,
+                      itemCount: restaurantsNearUser.length + 1,
+                      itemBuilder: (BuildContext context, int index) {
+                        if (index == 0) {
+                          return Container(
+                              alignment: Alignment.topCenter,
+                              child: Container(
+                                height: 5,
+                                width: 60,
+                                margin: EdgeInsetsDirectional.only(top: 10, bottom: 5),
+                                decoration: new BoxDecoration(
+                                  color: global.accentGrayDark,
+                                  shape: BoxShape.rectangle,
+                                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                                ),
+                              ));
+                        }
+                        return new Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            FlatButton(
+                                onPressed: () => {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => RestaurantPage(
+                                                restaurantsNearUser[index - 1])))
+                                    },
+                                child: RestaurantListTile(restaurantsNearUser[index - 1],
+                                    restaurantDistances[index - 1])
+                                    ),
+                            Divider(
+                              color: global.accentGrayLight,
+                              height: 5,
+                              thickness: 5,
+                            )
+                          ],
+                        );
                       },
                     ),
-                    items: mostPopItems == null ? [Container(height:0, width:0)] : mostPopItems,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: map<Widget>(mostPopItems, (index, url) {
-                      return Container(
-                        width: 5.0,
-                        height: 5.0,
-                        margin: EdgeInsets.symmetric(vertical: 2.0, horizontal: 2.0),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: _currentCarouselIndex == index ? global.accentGrayDark : global.accentGrayLight,
-                        ),
-                      );
-                    }),
-                  ),
-                ]
+                  );
+                },
               ),
-            ),
-          ),
-          restaurantsNearUser == null ? Container(height: 0, width: 0) : DraggableScrollableSheet(
-            initialChildSize: 0.4,
-            minChildSize: 0.2,
-            maxChildSize: 1,
-            builder: (BuildContext context, _scrollController) {
-              _scrollController.addListener(() {
-                setState(() {
-                  isSheetMax = _scrollController.offset >= 0;
-                });
-                print(_scrollController.offset.toString());
-              });
-              return Container(
-                decoration: new BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.rectangle,
-                  borderRadius: isSheetMax ? BorderRadius.zero : BorderRadius.only(
-                      topLeft: Radius.circular(40.0),
-                      topRight: Radius.circular(40.0)),
+              isSearchActive ?  Container(
+                color: Colors.white,
+                child: ListView(
+                  children: searchResults,
                 ),
-                child: ListView.builder(
-                  controller: _scrollController,
-                  itemCount: restaurantsNearUser.length + 1,
-                  itemBuilder: (BuildContext context, int index) {
-                    if (index == 0) {
-                      return Container(
-                          alignment: Alignment.topCenter,
-                          child: Container(
-                            height: 5,
-                            width: 60,
-                            margin: EdgeInsetsDirectional.only(top: 10, bottom: 5),
-                            decoration: new BoxDecoration(
-                              color: global.accentGrayDark,
-                              shape: BoxShape.rectangle,
-                              borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                            ),
-                          ));
-                    }
-                    return new Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        FlatButton(
-                          onPressed: () => {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => RestaurantPage(
-                                            restaurantsNearUser[index - 1])))
-                              },
-                          child: RestaurantListTile(restaurantsNearUser[index - 1],
-                              restaurantDistances[index - 1])
-                        ),
-                        Divider(
-                          color: global.accentGrayLight,
-                          height: 5,
-                          thickness: 5,
-                        )
-                      ],
-                    );
-                  },
-                ),
-              );
-            },
-          ),
-          isSearchActive ?  Container(
-            color: Colors.white,
-            child: ListView(
-              children: searchResults,
-            ),
-          ) : Container(height: 0, width: 0),
-        ]
+              ) : Container(height: 0, width: 0),
+       ]
       ),
     );
   }
