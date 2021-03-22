@@ -17,6 +17,7 @@ import 'package:bitewise/models/restaurant.dart';
 import 'package:bitewise/components/mostPopularItemCard.dart';
 import '../components/restaurantListTile.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:easy_debounce/easy_debounce.dart';
 
 
 class HomePage extends StatefulWidget {
@@ -237,10 +238,10 @@ class _HomePageState extends State<HomePage> {
                       textAlignVertical: TextAlignVertical.bottom,
                       style: TextStyle(fontSize: 20),
                       onChanged: (val) {
-                        setState(() {
-                          print("Search for: " + val);
-                          getSearch(val);
-                        });
+                        EasyDebounce.debounce(
+                              'restaurant-search-debouncer',
+                              Duration(milliseconds: 500),
+                              () => getSearch(val));
                       },
                       onTap: () {
                         setState(() {
