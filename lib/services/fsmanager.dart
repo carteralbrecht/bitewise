@@ -4,6 +4,9 @@ import 'package:bitewise/services/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class FirestoreManager {
+
+  static final FirestoreManager _instance = FirestoreManager._internal();
+
   final AuthService _authServ = AuthService();
   final Firestore _firestore = Firestore.instance;
 
@@ -12,6 +15,12 @@ class FirestoreManager {
   final String ratingsCollection = "ratings";
   final String menuItemCollection = "menuitems";
   final String restaurantCollection = "restaurants";
+
+  factory FirestoreManager() {
+    return _instance;
+  }
+
+  FirestoreManager._internal();
 
   Future getMenuItemStream(String id) async {
     try {
