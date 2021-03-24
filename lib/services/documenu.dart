@@ -53,6 +53,23 @@ class Documenu {
     return _getModel<List<Restaurant>>(uri, restaurantsFromJson);
   }
 
+  static Future<List<MenuItem>> searchMenuItemsGeo(String lat, String lng, String radius, String query) async {
+    var queryParameters = {
+      'lat': lat,
+      'lon': lng,
+      'distance': radius,
+      'search': query
+    };
+
+    var uri = Uri.https(AUTHORITY, "/v2/menuitems/search/geo", queryParameters);
+
+    final response = await http.get(uri, headers: {
+      "X-API-KEY": key
+    });
+
+    return menuItemsFromJson(response.body);
+  }
+
   static Future<List<MenuItem>> getMenuItemsForRestaurant(String id) async {
     var uri = Uri.https(AUTHORITY, "/v2/restaurant/$id/menuitems");
 
