@@ -98,7 +98,7 @@ class _MenuItemListTile extends State<MenuItemListTile> {
                           String streamAvgRating = "0";
                           try 
                           {
-                            streamAvgRating = snapshot.data['avgRating'].toString();
+                            streamAvgRating = snapshot.data['avgRating'].toStringAsFixed(1);
                           } 
                           catch (e) 
                           {

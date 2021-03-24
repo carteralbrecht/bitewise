@@ -20,6 +20,7 @@ import 'package:bitewise/components/mostPopularItemCard.dart';
 import '../components/restaurantListTile.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:easy_debounce/easy_debounce.dart';
+import 'package:bitewise/components/menuItemSearchTile.dart';
 
 
 class HomePage extends StatefulWidget {
@@ -39,12 +40,14 @@ class _HomePageState extends State<HomePage> {
   String _mapStyle;
   bool isSheetMax = false;
   bool isSearchActive = false;
-  List<Widget> searchResults = new List<Widget>();
+  List<Widget> restSearchResults = new List<Widget>();
+  List<Widget> itemSearchResults = new List<Widget>();
   TextEditingController searchController = new TextEditingController();
   FocusNode searchFocus = new FocusNode();
   int _currentCarouselIndex = 0;
   List<Widget> mostPopItems;
   Widget _googleMap;
+  List<bool> isSelected = [true, false];
 
   @override
   void initState() {
@@ -177,7 +180,10 @@ class _HomePageState extends State<HomePage> {
 
   void getSearch(String s) async {
     var restList = await SearchUtil.restaurantByGeoAndName(currentLocation, s);
+    var itemList = await SearchUtil.menuItemByGeoAndName(currentLocation, 20, s);
+    
     List<Widget> restWidgets = new List<Widget>();
+    List<Widget> itemWidgets = new List<Widget>();
     for (Restaurant r in restList) {
       restWidgets.add(
         FlatButton(
@@ -193,6 +199,23 @@ class _HomePageState extends State<HomePage> {
       );
     }
 
+    for (MenuItem i in itemList) {
+      Restaurant r = await Documenu.getRestaurant(i.restaurantId);
+      var avg = await _fsm.getDocData(_fsm.menuItemCollection, i.id, "avgRating");
+      var dist = await GeoUtil.distanceToRestaurant(currentLocation, r);
+      itemWidgets.add(
+        FlatButton(
+          onPressed: () {
+            Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => RestaurantPage(r)));
+          },
+          child: new MenuItemSearchTile(i, r, avg, dist),
+        ),
+      );
+    }
+
     if (restWidgets.length == 0) {
       restWidgets.add(
         FlatButton(
@@ -205,8 +228,21 @@ class _HomePageState extends State<HomePage> {
       );
     }
 
+    if (itemWidgets.length == 0) {
+      itemWidgets.add(
+        FlatButton(
+          color: Colors.white,
+          onPressed: () {
+            
+          },
+          child: Text("No Results", style: TextStyle(fontSize: 20, color: Colors.black)),
+        )
+      );
+    }
+
     setState(() {
-      searchResults = restWidgets;
+      restSearchResults = restWidgets;
+      itemSearchResults = itemWidgets;
     });
   }
 
@@ -422,12 +458,71 @@ class _HomePageState extends State<HomePage> {
               );
             },
           ),
-          isSearchActive ?  Container(
-            color: Colors.white,
-            child: ListView(
-              children: searchResults,
+          // isSearchActive ?  Column(
+          //   children: [
+          //     Container(
+          //       child: ToggleButtons(
+          //         children: <Widget>[
+          //           Text("Restaurants"),
+          //           Text("Menu Items"),
+          //         ],
+          //         isSelected: isSelected,
+          //         onPressed: (int index) {
+          //           setState(() {
+          //             isSelected[index] = true;
+          //             isSelected[(index + 1) % 2] = false;
+          //           });
+          //         },
+          //       ),
+          //     ),
+          //     Container(
+          //       color: Colors.white,
+          //       child: ListView(
+          //         children: isSelected[0] ? restSearchResults : itemSearchResults,
+          //       ),
+          //     )
+          //   ],
+          // ) : Container(height: 0, width: 0),
+
+          isSearchActive ? DefaultTabController(
+            initialIndex: 1,
+            length: 2,
+            child: Scaffold(
+              appBar: AppBar(
+                backgroundColor: global.mainColor,
+                title: TabBar(
+                  labelColor: Colors.black,
+                  labelStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  unselectedLabelStyle: TextStyle(fontSize: 20),
+                  indicatorColor: Colors.black,
+                  tabs: <Widget>[
+                    Tab(
+                      text: "Restaurants",
+                    ),
+                    Tab(
+                      text: "Menu Items",
+                    ),
+                  ],
+                ),
+              ),
+              body: TabBarView(
+                children: <Widget>[
+                  Container(
+                    color: Colors.white,
+                    child: ListView(
+                      children: restSearchResults,
+                    ),
+                  ),
+                  Container(
+                    color: Colors.white,
+                    child: ListView(
+                      children: itemSearchResults,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ) : Container(height: 0, width: 0),
+          ) : Container(height: 0, width: 0)
         ]
       ),
     );
