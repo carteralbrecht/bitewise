@@ -11,6 +11,8 @@ import 'package:bitewise/services/fsmanager.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:skeleton_text/skeleton_text.dart';
 import 'package:bitewise/global.dart' as global;
+import 'package:maps_launcher/maps_launcher.dart';
+import 'package:flutter/gestures.dart';
 
 
 class SubSectionHeader extends StatefulWidget {
@@ -520,10 +522,18 @@ class _RestaurantPageState extends State<RestaurantPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             SizedBox(height: 25),
-                            Text("American • Pizza • Italian", style: TextStyle(fontSize:15)),
                             Text(numItemsRated.toString() + " items rated", style: TextStyle(fontSize:15), textAlign: TextAlign.left),
-                            Text("Hours: " + widget.restaurant.hours, style: TextStyle(fontSize:15), textAlign: TextAlign.left),
-                          ],
+                            Text(widget.restaurant.address, style: TextStyle(fontSize:15), overflow: TextOverflow.ellipsis),
+                            RichText(
+                              text: TextSpan(
+                                text: "Open in maps",
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = ()  {
+                                      MapsLauncher.launchQuery(widget.restaurant.address);
+                                  }
+                              ),
+                            ),
+                          ]
                         ),
                       ),
                       Container(
