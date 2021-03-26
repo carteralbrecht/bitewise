@@ -5,6 +5,8 @@ import 'package:bitewise/models/menuItem.dart';
 import 'package:bitewise/util/itemListUtil.dart';
 import 'package:bitewise/components/prevRatedItemTile.dart';
 import 'package:bitewise/services/documenu.dart';
+import 'package:bitewise/services/fsmanager.dart';
+
 
 class PrevRatedItemsPage extends StatefulWidget {
   @override
@@ -12,8 +14,11 @@ class PrevRatedItemsPage extends StatefulWidget {
 }
 
 class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
+  Color dividerColor = global.accentGrayLight;
+  final FirestoreManager _fsm = FirestoreManager();
   var prevRatedItems;
   var restaurants;
+  var ratings;
 
   @override
   void initState() {
@@ -25,15 +30,22 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
     List<Future<MenuItem>> menuItems = await ItemListUtil.getPreviouslyRatedItems();
     List<MenuItem> items = new List<MenuItem>();
     List<Restaurant> rest = new List<Restaurant>();
+    List<double> prevRatings = new List<double>();
     for (Future<MenuItem> futureItem in menuItems) {
       MenuItem item = await futureItem;
       items.add(item);
       Restaurant r = await Documenu.getRestaurant(item.restaurantId);
       rest.add(r);
+      var result = await _fsm.getUserRating(global.user.uid, item.id);
+      if (result != null) {
+        var prevRating = await _fsm.getDocData('ratings', result, 'rating');
+        prevRatings.add(prevRating.toDouble());
+      }
     }
     setState(() {
       prevRatedItems = items;
       restaurants = rest;
+      ratings = prevRatings;
     });
   }
 
@@ -84,9 +96,24 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
             if (index == 0) {
               return Container(
                 height: 90,
-                child: Text("Rating History",
-                  style: TextStyle(color: Colors.black, fontSize: 20),
-                ),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.fromLTRB(32, 22, 20, 0),
+                      child: Text("Rating History",
+                          style: TextStyle(color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 30)
+                      ),
+                    ),
+                    Divider(
+                      thickness: 4,
+                      color: dividerColor,
+                    ),
+                  ]),
               );
             }
             return new Column(
@@ -96,7 +123,7 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
                     onPressed: () => {
                       // TODO Figure out how to scroll to certain position in the menu.
                     },
-                    child: PrevRatedItemTile(prevRatedItems[index - 1], restaurants[index - 1])
+                    child: PrevRatedItemTile(prevRatedItems[index - 1], restaurants[index - 1], ratings[index - 1])
                 ),
                 Divider(
                   color: global.accentGrayLight,

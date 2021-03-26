@@ -1,4 +1,5 @@
 import 'package:bitewise/pages/homePage.dart';
+import 'package:bitewise/pages/prevRatedItemsPage.dart';
 import 'package:bitewise/pages/signInPage.dart';
 import 'package:bitewise/pages/registerPage.dart';
 import 'package:bitewise/pages/profilePage.dart';
@@ -32,6 +33,7 @@ class MyApp extends StatelessWidget {
         '/signin' : (context) => SignIn(),
         '/register' : (context) => Register(),
         '/profile' : (context) => ProfilePage(),
+        '/prevRatedItemsPage' : (context) => PrevRatedItemsPage(),
         // Anonymous route for restaurant page
         // Anonymous route for rating modal
       },
