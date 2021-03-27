@@ -527,9 +527,16 @@ class _RestaurantPageState extends State<RestaurantPage> {
                             RichText(
                               text: TextSpan(
                                 text: "Open in maps",
+                                style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = ()  {
-                                      MapsLauncher.launchQuery(widget.restaurant.address);
+                                      if (widget.restaurant.address != null) {
+                                        MapsLauncher.launchQuery(widget.restaurant.address);
+                                      }
+                                      else {
+                                        MapsLauncher.launchCoordinates(widget.restaurant.geo.latitude, widget.restaurant.geo.longitude);
+                                      }
+                                      
                                   }
                               ),
                             ),
