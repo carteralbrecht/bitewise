@@ -168,7 +168,7 @@ class _ProfilePageState extends State<ProfilePage> {
               Divider(thickness: 5, height: 5),
               GestureDetector(
                 onTap: () async {
-                  Navigator.pushNamed(context, '/signin');
+                  Navigator.pushNamed(context, '/prevRatedItemsPage');
                 },
                 child: Container(
                   alignment: Alignment.topLeft,
