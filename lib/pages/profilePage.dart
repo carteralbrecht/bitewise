@@ -11,6 +11,10 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   final AuthService _auth = AuthService();
 
+  String oldPassword = '';
+  String newPassword = '';
+  String confirmNewPassword = '';
+
   void doSignOut() async {
     var user = await _auth.signOut();
 
@@ -49,23 +53,23 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
         centerTitle: true,
         actions: <Widget>[
-          Container(
-              height: 35,
-              width: 35,
-              // decoration: new BoxDecoration(
-              //   color: Colors.white,
-              //   shape: BoxShape.circle,
-              // ),
-              margin: EdgeInsets.only(right: 10.0),
-              child: GestureDetector(
-                onTap: () {
-                  print("Settings");
-                },
-                child: Icon(
-                  Icons.settings,
-                  color: Colors.grey,
-                ),
-              )),
+          // Container(
+          //     height: 35,
+          //     width: 35,
+          //     // decoration: new BoxDecoration(
+          //     //   color: Colors.white,
+          //     //   shape: BoxShape.circle,
+          //     // ),
+          //     margin: EdgeInsets.only(right: 10.0),
+          //     child: GestureDetector(
+          //       onTap: () {
+          //         print("Settings");
+          //       },
+          //       child: Icon(
+          //         Icons.settings,
+          //         color: Colors.grey,
+          //       ),
+          //     )),
         ],
       ),
       body: Container(
@@ -94,7 +98,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   onChanged: (val) {
                     setState(() {
-                      // password = val;
+                      oldPassword = val;
                     });
                   },
                   decoration: InputDecoration(
@@ -113,7 +117,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   onChanged: (val) {
                     setState(() {
-                      // password = val;
+                      newPassword = val;
                     });
                   },
                   decoration: InputDecoration(
@@ -132,7 +136,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   onChanged: (val) {
                     setState(() {
-                      // password = val;
+                      confirmNewPassword = val;
                     });
                   },
                   decoration: InputDecoration(
@@ -144,16 +148,8 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               GestureDetector(
                 onTap: () async {
-                  // dynamic result =
-                  //     await _auth.registerByEmail(email, password);
-                  // if (result == null) {
-                  //   print('error registering');
-                  // } else {
-                  //   global.user = result;
-                  //   print('registered');
-                  //   print(result);
-                  //   Navigator.popUntil(context, ModalRoute.withName('/'));
-                  // }
+                  // update password if newPassword == confirmNewPassword
+                  // and oldPassword is correct
                 },
                 child: Container(
                   alignment: Alignment.topLeft,
@@ -172,16 +168,7 @@ class _ProfilePageState extends State<ProfilePage> {
               Divider(thickness: 5, height: 5),
               GestureDetector(
                 onTap: () async {
-                  // dynamic result =
-                  //     await _auth.registerByEmail(email, password);
-                  // if (result == null) {
-                  //   print('error registering');
-                  // } else {
-                  //   global.user = result;
-                  //   print('registered');
-                  //   print(result);
-                  //   Navigator.popUntil(context, ModalRoute.withName('/'));
-                  // }
+                  Navigator.pushNamed(context, '/signin');
                 },
                 child: Container(
                   alignment: Alignment.topLeft,
@@ -192,23 +179,14 @@ class _ProfilePageState extends State<ProfilePage> {
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                     color: global.mainColor,
                   ),
-                  child: Text("Previously rated items",
+                  child: Text("Rating History",
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
                 ),
               ),
               GestureDetector(
                 onTap: () async {
-                  // dynamic result =
-                  //     await _auth.registerByEmail(email, password);
-                  // if (result == null) {
-                  //   print('error registering');
-                  // } else {
-                  //   global.user = result;
-                  //   print('registered');
-                  //   print(result);
-                  //   Navigator.popUntil(context, ModalRoute.withName('/'));
-                  // }
+                  doSignOut();
                 },
                 child: Container(
                   alignment: Alignment.topLeft,
@@ -226,16 +204,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               GestureDetector(
                 onTap: () async {
-                  // dynamic result =
-                  //     await _auth.registerByEmail(email, password);
-                  // if (result == null) {
-                  //   print('error registering');
-                  // } else {
-                  //   global.user = result;
-                  //   print('registered');
-                  //   print(result);
-                  //   Navigator.popUntil(context, ModalRoute.withName('/'));
-                  // }
+                  doDelete();
                 },
                 child: Container(
                   alignment: Alignment.topLeft,
