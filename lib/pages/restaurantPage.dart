@@ -50,7 +50,7 @@ class _SubSectionHeaderState extends State<SubSectionHeader> {
       height: widget.height,
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
             color: Colors.white,
@@ -81,8 +81,9 @@ class MenuSubSectionScrollbar extends StatefulWidget {
   final ScrollController _menuController;
   final double menuItemHeight;
   final double menuSSHeight;
+  final MenuItem target;
 
-  MenuSubSectionScrollbar(this._key, this.subsections, this._sectionController, this._menuController, this.menuItemHeight, this.menuSSHeight) : super(key: _key);
+  MenuSubSectionScrollbar(this._key, this.subsections, this._sectionController, this._menuController, this.menuItemHeight, this.menuSSHeight, {this.target = null}) : super(key: _key);
 
   @override
   _MenuSubSectionScrollbarState createState() => _MenuSubSectionScrollbarState();
@@ -169,6 +170,9 @@ class _MenuSubSectionScrollbarState extends State<MenuSubSectionScrollbar> {
     menuSubsectionHeight = widget.menuSSHeight;
     selectedIndex = 0;
     scrollStart.start();
+    if (widget.target != null) {
+      tryUpdateSubSection(widget.target.name);
+    }
   }
 
 
@@ -262,7 +266,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
 
 
   final double itemHeight = 125.0;
-  final double subSectionHeight = 90;
+  final double subSectionHeight = 75;
   ScrollController _menuController;
   int firstIndex = 0;
   String message = "";
@@ -409,18 +413,14 @@ class _RestaurantPageState extends State<RestaurantPage> {
     }
     sectionList.add(new SubSection(subsection, menuItems.length - prevIndex));
 
-    if (mounted) setState(() {
-      subSectionWidget = new MenuSubSectionScrollbar(_key, sectionList, sectionController, _menuController, itemHeight, subSectionHeight);
-      // sectionScrollState = subSectionWidget.createState();
-    });
-
-
+    MenuItem target;
     if (widget.itemId != "-1") {
       double offset = 0;
       int itemIndex = 0;
       // find index of item to be scrolled to
       for (MenuItem i in menuItems) {
         if (i.id == widget.itemId) {
+          target = i;
           break;
         }
         itemIndex++;
@@ -439,8 +439,16 @@ class _RestaurantPageState extends State<RestaurantPage> {
           offset += s.numItems * itemHeight;
         }
       }
-      _menuController.animateTo(offset + itemHeight, duration: Duration(milliseconds: 500), curve: Curves.linear);
+      _menuController.animateTo(offset + itemHeight - 20, duration: Duration(milliseconds: 500), curve: Curves.linear);
     }
+
+    if (mounted) setState(() {
+      subSectionWidget = new MenuSubSectionScrollbar(_key, sectionList, sectionController, _menuController, itemHeight, subSectionHeight, target: target);
+      // sectionScrollState = subSectionWidget.createState();
+    });
+
+
+    
 
     return listylist;
   }
@@ -500,38 +508,12 @@ class _RestaurantPageState extends State<RestaurantPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
-                        margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                        margin: EdgeInsets.only(top: 20, right:10, left: 10),
                         child: _menu == null ? Column(
                           mainAxisAlignment: MainAxisAlignment.end,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             SizedBox(height: 25),
-                            SkeletonAnimation(
-                              shimmerDuration: 1500,
-                              borderRadius: BorderRadius.circular(4.0),
-                              shimmerColor: Colors.grey,
-                              child: Container(
-                                height: 15,
-                                width: MediaQuery.of(context).size.width * 0.5,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(4.0),
-                                    color: Colors.grey[600]),
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            SkeletonAnimation(
-                              shimmerDuration: 1500,
-                              borderRadius: BorderRadius.circular(4.0),
-                              shimmerColor: Colors.white54,
-                              child: Container(
-                                height: 15,
-                                width: MediaQuery.of(context).size.width * 0.3,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(4.0),
-                                    color: Colors.grey[600]),
-                              ),
-                            ),
-                            SizedBox(height: 4),
                             SkeletonAnimation(
                               shimmerDuration: 1500,
                               borderRadius: BorderRadius.circular(4.0),
@@ -544,6 +526,32 @@ class _RestaurantPageState extends State<RestaurantPage> {
                                     color: Colors.grey[600]),
                               ),
                             ),
+                            SizedBox(height: 4),
+                            SkeletonAnimation(
+                              shimmerDuration: 1500,
+                              borderRadius: BorderRadius.circular(4.0),
+                              shimmerColor: Colors.white54,
+                              child: Container(
+                                height: 15,
+                                width: MediaQuery.of(context).size.width * 0.6,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(4.0),
+                                    color: Colors.grey[600]),
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            SkeletonAnimation(
+                              shimmerDuration: 1500,
+                              borderRadius: BorderRadius.circular(4.0),
+                              shimmerColor: Colors.grey,
+                              child: Container(
+                                height: 15,
+                                width: MediaQuery.of(context).size.width * 0.3,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(4.0),
+                                    color: Colors.grey[600]),
+                              ),
+                            ),
                           ],
                         ) : Column(
                           mainAxisAlignment: MainAxisAlignment.end,
@@ -551,7 +559,10 @@ class _RestaurantPageState extends State<RestaurantPage> {
                           children: [
                             SizedBox(height: 25),
                             Text(numItemsRated.toString() + " items rated", style: TextStyle(fontSize:15), textAlign: TextAlign.left),
-                            Text(widget.restaurant.address, style: TextStyle(fontSize:15), overflow: TextOverflow.ellipsis),
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.65,
+                              child: Text(widget.restaurant.address, style: TextStyle(fontSize:15), maxLines: 2, overflow: TextOverflow.ellipsis),
+                            ),
                             RichText(
                               text: TextSpan(
                                 text: "Open in maps",
