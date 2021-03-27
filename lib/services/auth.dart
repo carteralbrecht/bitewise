@@ -122,6 +122,20 @@ class AuthService {
     }
   }
 
+  Future passwordResetLoggedIn(
+      String email, String oldPassword, String newPassword) async {
+    try {
+      FirebaseUser user = await signInByEmail(email, oldPassword);
+      if (user != null) {
+        user.updatePassword(newPassword);
+      }
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
   // Feature to sign in a user upon app load.
   // (currently unused)
   Future signInOnLoad() async {

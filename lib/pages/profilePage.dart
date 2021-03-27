@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:bitewise/services/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:bitewise/services/auth.dart';
 import 'package:bitewise/global.dart' as global;
 
 class ProfilePage extends StatefulWidget {
@@ -148,8 +148,11 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               GestureDetector(
                 onTap: () async {
-                  // update password if newPassword == confirmNewPassword
-                  // and oldPassword is correct
+                  if (newPassword == confirmNewPassword) {
+                    FirebaseUser user = await _auth.getUser();
+                    _auth.passwordResetLoggedIn(
+                        user.email, oldPassword, newPassword);
+                  }
                 },
                 child: Container(
                   alignment: Alignment.topLeft,
