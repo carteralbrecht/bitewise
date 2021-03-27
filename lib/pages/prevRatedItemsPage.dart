@@ -90,50 +90,54 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
         ],
       ),
       body: Container(
-        child: ListView.builder(
-          itemCount: prevRatedItems.length + 1,
-          itemBuilder: (BuildContext context, int index) {
-            if (index == 0) {
-              return Container(
-                height: 90,
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.fromLTRB(32, 22, 20, 0),
-                      child: Text("Rating History",
-                          style: TextStyle(color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 30)
+        child: (ratings == null ? Center(
+          child: CircularProgressIndicator(
+            valueColor: new AlwaysStoppedAnimation<Color>(global.mainColor),
+          )) :
+        ListView.builder(
+            itemCount: prevRatedItems.length + 1,
+            itemBuilder: (BuildContext context, int index) {
+              if (index == 0) {
+                return Container(
+                  height: 90,
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.fromLTRB(32, 22, 20, 0),
+                        child: Text("Rating History",
+                            style: TextStyle(color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 30)
+                        ),
                       ),
-                    ),
-                    Divider(
-                      thickness: 4,
-                      color: dividerColor,
-                    ),
-                  ]),
+                      Divider(
+                        thickness: 4,
+                        color: dividerColor,
+                      ),
+                    ]),
+                );
+              }
+              return new Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  FlatButton(
+                      onPressed: () => {
+                        // TODO Figure out how to scroll to certain position in the menu.
+                      },
+                      child: PrevRatedItemTile(prevRatedItems[index - 1], restaurants[index - 1], ratings[index - 1])
+                  ),
+                  Divider(
+                    color: global.accentGrayLight,
+                    height: 5,
+                    thickness: 5,
+                  )
+                ],
               );
-            }
-            return new Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                FlatButton(
-                    onPressed: () => {
-                      // TODO Figure out how to scroll to certain position in the menu.
-                    },
-                    child: PrevRatedItemTile(prevRatedItems[index - 1], restaurants[index - 1], ratings[index - 1])
-                ),
-                Divider(
-                  color: global.accentGrayLight,
-                  height: 5,
-                  thickness: 5,
-                )
-              ],
-            );
-          },
-        ),
+            },
+          )),
       ),
     );
   }

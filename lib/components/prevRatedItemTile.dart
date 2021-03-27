@@ -42,56 +42,60 @@ class _PrevRatedItemTileState extends State<PrevRatedItemTile> {
         left: 0,
         right: 0,
       ),
-      height: 155.0,
+      height: 110.0,
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
+        // mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Card(
             elevation: 0,
             child: ListTile(
               // contentPadding: EdgeInsets.only(left:20, right: 20, top: 10),
               tileColor: Colors.white,
+              trailing: Container(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(height: 60),
+                      Icon(
+                        Icons.star,
+                        color: global.mainColor,
+                        size: 45,
+                      ),
+                      SizedBox(width: 10),
+                      Text(widget.rating.toStringAsFixed(1),
+                          style: TextStyle(color: Colors.black, fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1),
+                    ],
+                  )),
               title: Text(widget.menuItem.name,
-                  style: TextStyle(color: Colors.black, fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(color: Colors.black, fontSize: 20),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1),
-              subtitle: Container(
-                padding: EdgeInsets.fromLTRB(0, 5, 20, 0),
-                child: Column(
+              subtitle: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(widget.restaurant.name,
-                    style: TextStyle(color: global.accentGrayDark, fontSize: 15),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 2),
-                    Text(widget.menuItem.description,
-                    style: TextStyle(color: Colors.black, fontSize: 15),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 2),
-                    RatingBar(
-                      initialRating: widget.rating,
-                      direction: Axis.horizontal,
-                      allowHalfRating: false,
-                      itemCount: 5,
-                      ignoreGestures: false,
-                      ratingWidget: RatingWidget(
-                        full: Icon(Icons.star_rate_rounded, color: global.mainColor),
-                        half: null,
-                        empty: Icon(Icons.star_rate_rounded, color: Colors.black26),
-                      ),
-                      itemPadding: EdgeInsets.symmetric(horizontal: 0.0),
-                      itemSize: 50,
-                      onRatingUpdate: (rating){
-                        // Dont do anything
-                      },
+                    Container(
+                      padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                      child: Text(widget.restaurant.name,
+                          style: TextStyle(color: global.accentGrayDark, fontSize: 15),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2),
                     ),
-                ]),
-              ),
+                    Container(
+                      padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                      child: Text(widget.menuItem.description,
+                      style: TextStyle(fontSize: 15),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2),
+                    ),
+              ]),
               isThreeLine: false,
             ),
           ),
