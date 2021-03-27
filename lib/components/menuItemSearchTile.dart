@@ -37,13 +37,13 @@ class _MenuItemSearchTileState extends State<MenuItemSearchTile> {
                 child: Text(widget.menuItem.name, style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold))
               ),
               Container(
-                child: Row(
+                child: widget.avgRating != null ? Row(
                   children: [
                     Icon(Icons.star, color: global.mainColor, size: 25),
                     SizedBox(width:5),
                     Text(widget.avgRating.toStringAsFixed(1), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold,)),
                   ],
-                ),
+                ) : Container(height:0, width: 0),
               ),
             ]
           ),

@@ -243,7 +243,8 @@ class SubSection {
 class RestaurantPage extends StatefulWidget {
 
   final Restaurant restaurant;
-  const RestaurantPage(this.restaurant);
+  final String itemId;
+  const RestaurantPage(this.restaurant, {this.itemId = "-1"});
 
   @override
   _RestaurantPageState createState() => _RestaurantPageState();
@@ -413,6 +414,33 @@ class _RestaurantPageState extends State<RestaurantPage> {
       // sectionScrollState = subSectionWidget.createState();
     });
 
+
+    if (widget.itemId != "-1") {
+      double offset = 0;
+      int itemIndex = 0;
+      // find index of item to be scrolled to
+      for (MenuItem i in menuItems) {
+        if (i.id == widget.itemId) {
+          break;
+        }
+        itemIndex++;
+      }
+      int i = 0;
+      // calculate scroll offset
+      for (SubSection s in sectionList) {
+        if (i + s.numItems >= itemIndex) {
+          offset += subSectionHeight;
+          offset += (itemIndex - i) * itemHeight;
+          break;
+        }
+        else {
+          i += s.numItems;
+          offset += subSectionHeight;
+          offset += s.numItems * itemHeight;
+        }
+      }
+      _menuController.animateTo(offset + itemHeight, duration: Duration(milliseconds: 500), curve: Curves.linear);
+    }
 
     return listylist;
   }

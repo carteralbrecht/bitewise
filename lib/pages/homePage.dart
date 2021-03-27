@@ -209,7 +209,7 @@ class _HomePageState extends State<HomePage> {
             Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => RestaurantPage(r)));
+                        builder: (context) => RestaurantPage(r, itemId: i.id)));
           },
           child: new MenuItemSearchTile(i, r, avg, dist),
         ),
