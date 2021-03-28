@@ -182,7 +182,8 @@ class _RatingModalState extends State<RatingModal> {
                         fontSize: 15)),
               ),
             ]),
-          ]),
+          ]
+      ),
     );
   }
 }
