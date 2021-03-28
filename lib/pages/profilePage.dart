@@ -87,6 +87,22 @@ class _ProfilePageState extends State<ProfilePage> {
                 color: Colors.white,
                 textColor: Colors.black,
               ),
+              FlatButton(
+                onPressed: () async => {
+                  if (global.user == null)
+                  {
+                    print('Woah woah woah cant do that if youre not logged in!')
+                  }
+                  else
+                  {
+                    Navigator.pushNamed(context, '/prevRatedItemsPage')
+                  }
+                },
+                child: Text("Rating History"),
+                height: 40,
+                color: Colors.white,
+                textColor: Colors.black,
+              ),
             ],
           )),
     );
