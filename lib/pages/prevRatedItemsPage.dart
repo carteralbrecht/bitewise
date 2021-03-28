@@ -63,31 +63,6 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
               Navigator.pop(context);
             }
         ),
-        actions: <Widget>[
-          Container(
-              height: 35,
-              width: 35,
-              decoration: new BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
-              margin: EdgeInsets.only(right: 10.0),
-              child: GestureDetector(
-                onTap: () {
-                  if (global.user == null) {
-                    Navigator.pushNamed(context, '/signin');
-                  } else {
-                    Navigator.pushNamed(context, '/profile');
-                  }
-                },
-                child: Icon(
-                  Icons.person,
-                  size: 30,
-                  color: global.mainColor,
-                ),
-              )
-          ),
-        ],
       ),
       body: Container(
         child: (ratings == null ? Center(
