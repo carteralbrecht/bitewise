@@ -6,6 +6,7 @@ import 'package:bitewise/util/itemListUtil.dart';
 import 'package:bitewise/components/prevRatedItemTile.dart';
 import 'package:bitewise/services/documenu.dart';
 import 'package:bitewise/services/fsmanager.dart';
+import 'package:bitewise/pages/restaurantPage.dart';
 
 
 class PrevRatedItemsPage extends StatefulWidget {
@@ -100,7 +101,10 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
                 children: [
                   FlatButton(
                       onPressed: () => {
-                        // TODO Figure out how to scroll to certain position in the menu.
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => RestaurantPage(restaurants[index - 1], itemId: prevRatedItems[index - 1])))
                       },
                       child: PrevRatedItemTile(prevRatedItems[index - 1], restaurants[index - 1], ratings[index - 1])
                   ),
