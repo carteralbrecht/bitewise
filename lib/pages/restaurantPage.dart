@@ -171,7 +171,13 @@ class _MenuSubSectionScrollbarState extends State<MenuSubSectionScrollbar> {
     selectedIndex = 0;
     scrollStart.start();
     if (widget.target != null) {
-      tryUpdateSubSection(widget.target.name);
+      for (int i = 0; i < widget.subsections.length; i++) {
+        if (widget.subsections[i].name == widget.target.subsection) {
+          selectedIndex = i;
+          // widget._sectionController.scrollTo(index: selectedIndex, duration: Duration(milliseconds: 500), curve: Curves.linear);
+          break;
+        }
+      }
     }
   }
 
@@ -266,7 +272,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
 
 
   final double itemHeight = 125.0;
-  final double subSectionHeight = 75;
+  final double subSectionHeight = 90;
   ScrollController _menuController;
   int firstIndex = 0;
   String message = "";
@@ -276,6 +282,10 @@ class _RestaurantPageState extends State<RestaurantPage> {
   String currentSubSection = "";
 
   Icon restaurantIcon;
+
+  bool scrollToItem;
+  MenuItem target;
+
 
 
   _scrollListener() {
@@ -296,6 +306,10 @@ class _RestaurantPageState extends State<RestaurantPage> {
         firstIndex = _menuController.position.extentBefore ~/ itemHeight;
         
       });
+      if (_key.currentState != null && firstIndex != 0 && scrollToItem) {
+        _key.currentState.tryUpdateSubSection(target?.subsection);
+        scrollToItem = false;
+      }
       if (_menu[firstIndex] is SubSectionHeader) {
         SubSectionHeader h = _menu[firstIndex];
         if (_key.currentState != null) {
@@ -322,6 +336,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
     _menuController = ScrollController();
     _menuController.addListener(_scrollListener);
     restaurantIcon = RestaurantUtil.assignIcon(widget.restaurant);
+    scrollToItem = widget.itemId != "-1";
     getMenuItems();
     getNumItemsRated();
     getCuisineString();
@@ -413,14 +428,15 @@ class _RestaurantPageState extends State<RestaurantPage> {
     }
     sectionList.add(new SubSection(subsection, menuItems.length - prevIndex));
 
-    MenuItem target;
-    if (widget.itemId != "-1") {
+    if (scrollToItem) {
       double offset = 0;
       int itemIndex = 0;
       // find index of item to be scrolled to
       for (MenuItem i in menuItems) {
         if (i.id == widget.itemId) {
-          target = i;
+          setState(() {
+            target = i;
+          });
           break;
         }
         itemIndex++;
@@ -439,7 +455,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
           offset += s.numItems * itemHeight;
         }
       }
-      _menuController.animateTo(offset + itemHeight - 20, duration: Duration(milliseconds: 500), curve: Curves.linear);
+      _menuController.animateTo(offset + itemHeight + 40, duration: Duration(milliseconds: 500), curve: Curves.linear);
     }
 
     if (mounted) setState(() {
@@ -447,7 +463,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
       // sectionScrollState = subSectionWidget.createState();
     });
 
-
+    
     
 
     return listylist;
