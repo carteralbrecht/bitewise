@@ -4,6 +4,9 @@ import 'package:google_sign_in/google_sign_in.dart';
 // import 'package:bitewise/services/fsmanager.dart';
 
 class AuthService {
+
+  static final AuthService _instance = AuthService._internal();
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
   // final FirestoreManager _fsm = FirestoreManager();
   final GoogleSignIn _googleSignIn = GoogleSignIn(
@@ -11,6 +14,12 @@ class AuthService {
     hostedDomain: "",
     clientId: "",
   );
+
+  factory AuthService() {
+    return _instance;
+  }
+
+  AuthService._internal();
 
   // Gets the current signed in user
   // test comment
