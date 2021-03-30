@@ -54,7 +54,7 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        centerTitle: false,
+        centerTitle: true,
         backgroundColor: global.mainColor,
         elevation: 0,
         leading: GestureDetector(
@@ -63,6 +63,7 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
               Navigator.pop(context);
             }
         ),
+        title: Text("Rating History", style: TextStyle(fontSize: 25, color: Colors.black)),
       ),
       body: Container(
         child: (ratings == null ? Center(
@@ -70,9 +71,9 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
             valueColor: new AlwaysStoppedAnimation<Color>(global.mainColor),
           )) :
         ListView.builder(
-            itemCount: prevRatedItems == null ? 1 : prevRatedItems.length + 1,
+            itemCount: prevRatedItems.length == 0 ? 1 : prevRatedItems.length,
             itemBuilder: (BuildContext context, int index) {
-              if (index == 0) {
+              if (index == 0 && prevRatedItems.length == 0) {
                 return Container(
                   height: 90,
                   child: Column(
@@ -82,10 +83,9 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
                     children: [
                       Container(
                         padding: EdgeInsets.fromLTRB(32, 22, 20, 0),
-                        child: Text((prevRatedItems.length == 0) ? "No rating history" : "Rating History",
+                        child: Text("No rating history",
                             style: TextStyle(color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 30)
+                            fontSize: 20)
                         ),
                       ),
                       Divider(
@@ -102,7 +102,7 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
                       onPressed: () => {
                         // TODO Figure out how to scroll to certain position in the menu.
                       },
-                      child: PrevRatedItemTile(prevRatedItems[index - 1], restaurants[index - 1], ratings[index - 1])
+                      child: PrevRatedItemTile(prevRatedItems[index], restaurants[index], ratings[index])
                   ),
                   Divider(
                     color: global.accentGrayLight,
