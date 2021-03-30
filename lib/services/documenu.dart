@@ -9,8 +9,10 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 class Documenu {
 
-  static const String AUTHORITY = "api.documenu.com";
+  static final bool mock = env['MOCK_DATA'].toLowerCase() == "true";
+  static String AUTHORITY = mock ? "mockumenu.herokuapp.com" : "api.documenu.com";
   static final String key = env['DOCUMENU_KEY'];
+  
 
 // TODO: Add Error Handling
 // TODO: Find better way to store key
