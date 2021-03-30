@@ -13,9 +13,9 @@ import 'package:bitewise/global.dart' as global;
 class MenuItemSearchTile extends StatefulWidget {
 
   final MenuItem menuItem;
-  final Future<Restaurant> restaurant;
-  final num avgRating;
-  final double milesAway;
+  final dynamic restaurant;
+  final Future avgRating;
+  final Future milesAway;
 
   const MenuItemSearchTile(this.menuItem, this.restaurant, this.avgRating, this.milesAway);
 
@@ -25,6 +25,8 @@ class MenuItemSearchTile extends StatefulWidget {
 
 class _MenuItemSearchTileState extends State<MenuItemSearchTile> {
 
+  var avgRating;
+  var milesAway;
   Restaurant restaurant;
 
   @override 
@@ -35,8 +37,12 @@ class _MenuItemSearchTileState extends State<MenuItemSearchTile> {
 
   void getRestaurant() async {
     Restaurant r = await widget.restaurant;
+    var avg = await widget.avgRating;
+    var mi = await widget.milesAway;
     setState(() {
       restaurant = r;
+      avgRating = avg;
+      milesAway = mi;
     });
   }
 
@@ -57,7 +63,7 @@ class _MenuItemSearchTileState extends State<MenuItemSearchTile> {
                   children: [
                     Icon(Icons.star, color: global.mainColor, size: 25),
                     SizedBox(width:5),
-                    Text(widget.avgRating == null ? "0" : widget.avgRating.toStringAsFixed(1), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold,)),
+                    Text(avgRating == null ? "0" : avgRating.toStringAsFixed(1), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold,)),
                   ],
                 ),
               ),
@@ -74,7 +80,7 @@ class _MenuItemSearchTileState extends State<MenuItemSearchTile> {
                 ),
               ),
               Container(
-                child: Text(widget.milesAway.toStringAsFixed(2) + " mi", style: TextStyle(fontSize: 15))
+                child: milesAway == null ? null : Text(milesAway.toStringAsFixed(2) + " mi", style: TextStyle(fontSize: 15))
               ),
             ]
           )

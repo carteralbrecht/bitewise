@@ -188,6 +188,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   void getSearchRestaurant(String s) async {
+    print("searching for restaurant" + s);
     var restList = await SearchUtil.restaurantByGeoAndName(currentLocation, s);
     
     List<Widget> restWidgets = new List<Widget>();
@@ -230,8 +231,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
     for (MenuItem i in itemList) {
       Future<Restaurant> r = Documenu.getRestaurant(i.restaurantId);
-      var avg = await _fsm.getDocData(_fsm.menuItemCollection, i.id, "avgRating");
-      var dist = await GeoUtil.distanceToItem(currentLocation, i);
+      Future<dynamic> avg = _fsm.getDocData(_fsm.menuItemCollection, i.id, "avgRating");
+      Future<double> dist = GeoUtil.distanceToItem(currentLocation, i);
       itemWidgets.add(
         FlatButton(
           onPressed: () {
@@ -292,10 +293,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       textAlignVertical: TextAlignVertical.bottom,
                       style: TextStyle(fontSize: 20),
                       onChanged: (val) {
-                        print("Tab Index" + tabIndex.toString());
+                        //print("Tab Index" + tabIndex.toString());
                         EasyDebounce.debounce(
                               'restaurant-search-debouncer',
-                              Duration(milliseconds: 500),
+                              Duration(milliseconds: 400),
                               () => tabIndex == 0 ? getSearchRestaurant(val) : getSearchItem(val));
                       },
                       onTap: () {
