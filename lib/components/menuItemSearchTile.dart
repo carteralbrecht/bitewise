@@ -34,7 +34,7 @@ class _MenuItemSearchTileState extends State<MenuItemSearchTile> {
   }
 
   void getRestaurant() async {
-    Restaurant r = await  widget.restaurant;
+    Restaurant r = await widget.restaurant;
     setState(() {
       restaurant = r;
     });
@@ -67,7 +67,7 @@ class _MenuItemSearchTileState extends State<MenuItemSearchTile> {
             children: [
               Expanded(
                 child: Text(
-                  restaurant == null ? "" : restaurant.name,
+                  restaurant == null ? " " : restaurant.name,
                   style: TextStyle(fontSize: 15, fontStyle: FontStyle.italic, color: global.accentGrayDark,),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

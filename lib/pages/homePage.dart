@@ -320,7 +320,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       searchFocus.unfocus();
                       setState(() {
                         getSearchRestaurant("");
-                        getSearchItem("");
+                        itemSearchResults = [];
                         isSearchActive = false;
                       });
                     },

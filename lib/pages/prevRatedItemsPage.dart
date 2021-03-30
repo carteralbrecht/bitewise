@@ -32,17 +32,20 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
     List<MenuItem> items = new List<MenuItem>();
     List<Future<Restaurant>> rest = new List<Future<Restaurant>>();
     List<double> prevRatings = new List<double>();
-    for (Future<MenuItem> futureItem in menuItems) {
-      MenuItem item = await futureItem;
-      items.add(item);
-      Future<Restaurant> r = Documenu.getRestaurant(item.restaurantId);
-      rest.add(r);
-      var result = await _fsm.getUserRating(global.user.uid, item.id);
-      if (result != null) {
-        var prevRating = await _fsm.getDocData('ratings', result, 'rating');
-        prevRatings.add(prevRating.toDouble());
+    if (menuItems != null) {
+      for (Future<MenuItem> futureItem in menuItems) {
+        MenuItem item = await futureItem;
+        items.add(item);
+        Future<Restaurant> r = Documenu.getRestaurant(item.restaurantId);
+        rest.add(r);
+        var result = await _fsm.getUserRating(global.user.uid, item.id);
+        if (result != null) {
+          var prevRating = await _fsm.getDocData('ratings', result, 'rating');
+          prevRatings.add(prevRating.toDouble());
+        }
       }
     }
+    
     setState(() {
       prevRatedItems = items;
       restaurants = rest;

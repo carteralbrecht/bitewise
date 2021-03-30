@@ -467,7 +467,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
           offset += s.numItems * itemHeight;
         }
       }
-      _menuController.animateTo(offset + itemHeight + 40, duration: Duration(milliseconds: 500), curve: Curves.linear);
+      _menuController.animateTo(offset + 40, duration: Duration(milliseconds: 500), curve: Curves.linear);
     }
 
     if (mounted) setState(() {
