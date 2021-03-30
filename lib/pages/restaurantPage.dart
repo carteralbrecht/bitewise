@@ -340,9 +340,6 @@ class _RestaurantPageState extends State<RestaurantPage> {
     _menuController.addListener(_scrollListener);
     scrollToItem = widget.itemId != "-1";
     getRestaurant();
-    getMenuItems();
-    getNumItemsRated();
-    getCuisineString();
     super.initState();
   }
 
@@ -353,6 +350,9 @@ class _RestaurantPageState extends State<RestaurantPage> {
       restaurant = r;
       restaurantIcon = icon;
     });
+    getMenuItems();
+    getNumItemsRated();
+    getCuisineString();
   }
 
   void getNumItemsRated() async {
@@ -524,7 +524,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
                       ),
                     )),
               ],
-              title: Text(restaurant.name, style: TextStyle(fontSize: 25, color: Colors.black)),
+              title: Text(restaurant == null ? "Loading" : restaurant.name, style: TextStyle(fontSize: 25, color: Colors.black)),
               centerTitle: true,
               backgroundColor: global.mainColor,
               flexibleSpace: FlexibleSpaceBar(
@@ -589,7 +589,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
                             Text(numItemsRated.toString() + " items rated", style: TextStyle(fontSize:15), textAlign: TextAlign.left),
                             Container(
                               width: MediaQuery.of(context).size.width * 0.65,
-                              child: Text(restaurant.address, style: TextStyle(fontSize:15), maxLines: 2, overflow: TextOverflow.ellipsis),
+                              child: Text(restaurant == null ? "" : restaurant.address, style: TextStyle(fontSize:15), maxLines: 2, overflow: TextOverflow.ellipsis),
                             ),
                             RichText(
                               text: TextSpan(
