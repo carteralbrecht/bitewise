@@ -4,7 +4,6 @@ import 'package:google_sign_in/google_sign_in.dart';
 // import 'package:bitewise/services/fsmanager.dart';
 
 class AuthService {
-
   static final AuthService _instance = AuthService._internal();
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -137,8 +136,10 @@ class AuthService {
       FirebaseUser user = await signInByEmail(email, oldPassword);
       if (user != null) {
         user.updatePassword(newPassword);
+        return true;
+      } else {
+        return false;
       }
-      return true;
     } catch (e) {
       print(e.toString());
       return false;
