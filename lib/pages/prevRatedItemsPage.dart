@@ -71,7 +71,7 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
             valueColor: new AlwaysStoppedAnimation<Color>(global.mainColor),
           )) :
         ListView.builder(
-            itemCount: prevRatedItems.length + 1,
+            itemCount: prevRatedItems == null ? 1 : prevRatedItems.length + 1,
             itemBuilder: (BuildContext context, int index) {
               if (index == 0) {
                 return Container(
@@ -83,7 +83,7 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
                     children: [
                       Container(
                         padding: EdgeInsets.fromLTRB(32, 22, 20, 0),
-                        child: Text("Rating History",
+                        child: Text((prevRatedItems.length == 0) ? "No rating history" : "Rating History",
                             style: TextStyle(color: Colors.black,
                             fontWeight: FontWeight.bold,
                             fontSize: 30)
