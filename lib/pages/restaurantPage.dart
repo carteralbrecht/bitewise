@@ -252,9 +252,11 @@ class SubSection {
 
 class RestaurantPage extends StatefulWidget {
 
+  final Future<Restaurant> futureRestaurant;
   final Restaurant restaurant;
   final String itemId;
-  const RestaurantPage(this.restaurant, {this.itemId = "-1"});
+
+  const RestaurantPage({this.futureRestaurant, this.itemId = "-1", this.restaurant});
 
   @override
   _RestaurantPageState createState() => _RestaurantPageState();
@@ -270,7 +272,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
   // ScrollController sectionController = new ScrollController();
   final ItemScrollController sectionController = ItemScrollController();
 
-
+  Restaurant restaurant;
   final double itemHeight = 125.0;
   final double subSectionHeight = 90;
   ScrollController _menuController;
@@ -333,18 +335,28 @@ class _RestaurantPageState extends State<RestaurantPage> {
 
   @override
   void initState() {
+    
     _menuController = ScrollController();
     _menuController.addListener(_scrollListener);
-    restaurantIcon = RestaurantUtil.assignIcon(widget.restaurant);
     scrollToItem = widget.itemId != "-1";
+    getRestaurant();
     getMenuItems();
     getNumItemsRated();
     getCuisineString();
     super.initState();
   }
 
+  void getRestaurant() async {
+    Restaurant r = widget.restaurant == null ? await widget.futureRestaurant : widget.restaurant;
+    Icon icon = RestaurantUtil.assignIcon(r);
+    setState(() {
+      restaurant = r;
+      restaurantIcon = icon;
+    });
+  }
+
   void getNumItemsRated() async {
-    var ratedList = await _fsm.getDocData(_fsm.restaurantCollection, widget.restaurant.id, "ratedItems");
+    var ratedList = await _fsm.getDocData(_fsm.restaurantCollection, restaurant.id, "ratedItems");
     int numRated = 0;
     if (ratedList is List) {
       numRated = ratedList.length;
@@ -357,10 +369,10 @@ class _RestaurantPageState extends State<RestaurantPage> {
 
   void getCuisineString() {
     String s = "";
-      // print(widget.restaurant.cuisines.length.toString());
+      // print(restaurant.cuisines.length.toString());
 
-    for (int i = 0; i < widget.restaurant.cuisines.length && i < 3; i++) {
-      s += widget.restaurant.cuisines[i] + ((i < widget.restaurant.cuisines.length && i < 3) ? ", " : "");
+    for (int i = 0; i < restaurant.cuisines.length && i < 3; i++) {
+      s += restaurant.cuisines[i] + ((i < restaurant.cuisines.length && i < 3) ? ", " : "");
     }
     if (mounted) setState(() {
       cuisineString = s;
@@ -370,7 +382,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
 
   void getMenuItems() async {
       List<MenuItem> menuItemsTemp = new List<MenuItem>();
-      var menu = await MenuUtil.buildMenuForRestaurant(widget.restaurant);
+      var menu = await MenuUtil.buildMenuForRestaurant(restaurant);
       var allItems = menu.getAllItems();
 
       for (MenuItem menuItem in allItems)
@@ -407,7 +419,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
       listylist.add(new SubSectionHeader("Most Popular", sectionNum, subSectionHeight));
       sectionList.add(new SubSection("Most Popular", mostPopLen));
       for (int i = 0; i < mostPopLen; i++) {
-        listylist.add(new MenuItemListTile(menuItems[i], widget.restaurant, itemHeight));
+        listylist.add(new MenuItemListTile(menuItems[i], restaurant, itemHeight));
       }
     }
     
@@ -424,7 +436,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
         prevIndex = i;
         listylist.add( new SubSectionHeader(subsection, sectionNum, subSectionHeight));
       }
-      listylist.add(new MenuItemListTile(menuItems[i], widget.restaurant, itemHeight));
+      listylist.add(new MenuItemListTile(menuItems[i], restaurant, itemHeight));
     }
     sectionList.add(new SubSection(subsection, menuItems.length - prevIndex));
 
@@ -512,7 +524,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
                       ),
                     )),
               ],
-              title: Text(widget.restaurant.name, style: TextStyle(fontSize: 25, color: Colors.black)),
+              title: Text(restaurant.name, style: TextStyle(fontSize: 25, color: Colors.black)),
               centerTitle: true,
               backgroundColor: global.mainColor,
               flexibleSpace: FlexibleSpaceBar(
@@ -577,7 +589,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
                             Text(numItemsRated.toString() + " items rated", style: TextStyle(fontSize:15), textAlign: TextAlign.left),
                             Container(
                               width: MediaQuery.of(context).size.width * 0.65,
-                              child: Text(widget.restaurant.address, style: TextStyle(fontSize:15), maxLines: 2, overflow: TextOverflow.ellipsis),
+                              child: Text(restaurant.address, style: TextStyle(fontSize:15), maxLines: 2, overflow: TextOverflow.ellipsis),
                             ),
                             RichText(
                               text: TextSpan(
@@ -585,11 +597,11 @@ class _RestaurantPageState extends State<RestaurantPage> {
                                 style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = ()  {
-                                      if (widget.restaurant.address != null) {
-                                        MapsLauncher.launchQuery(widget.restaurant.address);
+                                      if (restaurant.address != null) {
+                                        MapsLauncher.launchQuery(restaurant.address);
                                       }
                                       else {
-                                        MapsLauncher.launchCoordinates(widget.restaurant.geo.latitude, widget.restaurant.geo.longitude);
+                                        MapsLauncher.launchCoordinates(restaurant.geo.latitude, restaurant.geo.longitude);
                                       }
                                       
                                   }

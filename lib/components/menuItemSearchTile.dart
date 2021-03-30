@@ -13,7 +13,7 @@ import 'package:bitewise/global.dart' as global;
 class MenuItemSearchTile extends StatefulWidget {
 
   final MenuItem menuItem;
-  final Restaurant restaurant;
+  final Future<Restaurant> restaurant;
   final num avgRating;
   final double milesAway;
 
@@ -24,6 +24,22 @@ class MenuItemSearchTile extends StatefulWidget {
 }
 
 class _MenuItemSearchTileState extends State<MenuItemSearchTile> {
+
+  Restaurant restaurant;
+
+  @override 
+  void initState() {
+    getRestaurant();
+    super.initState();
+  }
+
+  void getRestaurant() async {
+    Restaurant r = await  widget.restaurant;
+    setState(() {
+      restaurant = r;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -51,7 +67,7 @@ class _MenuItemSearchTileState extends State<MenuItemSearchTile> {
             children: [
               Expanded(
                 child: Text(
-                  widget.restaurant.name,
+                  restaurant == null ? "" : restaurant.name,
                   style: TextStyle(fontSize: 15, fontStyle: FontStyle.italic, color: global.accentGrayDark,),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

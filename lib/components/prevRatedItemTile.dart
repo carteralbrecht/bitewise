@@ -14,19 +14,32 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 class PrevRatedItemTile extends StatefulWidget {
   final MenuItem menuItem;
   final Restaurant restaurant;
+  final Future<Restaurant> futureRestaurant;
   final double rating;
-  const PrevRatedItemTile(this.menuItem, this.restaurant, this.rating);
+  const PrevRatedItemTile(this.menuItem, this.rating, {this.restaurant, this.futureRestaurant});
 
   @override
   _PrevRatedItemTileState createState() => _PrevRatedItemTileState();
 }
 
 class _PrevRatedItemTileState extends State<PrevRatedItemTile> {
+
   Color dividerColor = global.accentGrayLight;
+  Restaurant restaurant;
+
 
   @override
   initState() {
+    getRestaurant();
     super.initState();
+
+  }
+
+  void getRestaurant() async {
+    Restaurant r = widget.restaurant == null ? await widget.futureRestaurant : widget.restaurant;
+    setState(() {
+      restaurant = r;
+    });
   }
 
   @override

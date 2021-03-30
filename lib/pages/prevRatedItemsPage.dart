@@ -17,9 +17,9 @@ class PrevRatedItemsPage extends StatefulWidget {
 class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
   Color dividerColor = global.accentGrayLight;
   final FirestoreManager _fsm = FirestoreManager();
-  var prevRatedItems;
-  var restaurants;
-  var ratings;
+  List<MenuItem> prevRatedItems;
+  List<Future<Restaurant>> restaurants;
+  List<double> ratings;
 
   @override
   void initState() {
@@ -30,12 +30,12 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
   void getPrevRatedItems() async {
     List<Future<MenuItem>> menuItems = await ItemListUtil.getPreviouslyRatedItems();
     List<MenuItem> items = new List<MenuItem>();
-    List<Restaurant> rest = new List<Restaurant>();
+    List<Future<Restaurant>> rest = new List<Future<Restaurant>>();
     List<double> prevRatings = new List<double>();
     for (Future<MenuItem> futureItem in menuItems) {
       MenuItem item = await futureItem;
       items.add(item);
-      Restaurant r = await Documenu.getRestaurant(item.restaurantId);
+      Future<Restaurant> r = Documenu.getRestaurant(item.restaurantId);
       rest.add(r);
       var result = await _fsm.getUserRating(global.user.uid, item.id);
       if (result != null) {
@@ -104,9 +104,9 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => RestaurantPage(restaurants[index - 1], itemId: prevRatedItems[index - 1])))
+                              builder: (context) => RestaurantPage(futureRestaurant: restaurants[index - 1], itemId: prevRatedItems[index - 1].id)))
                       },
-                      child: PrevRatedItemTile(prevRatedItems[index - 1], restaurants[index - 1], ratings[index - 1])
+                      child: PrevRatedItemTile(prevRatedItems[index - 1], ratings[index - 1], futureRestaurant: restaurants[index - 1]),
                   ),
                   Divider(
                     color: global.accentGrayLight,

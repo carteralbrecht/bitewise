@@ -134,7 +134,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => RestaurantPage(restaurant)))
+                          builder: (context) => RestaurantPage(restaurant: restaurant)))
                 }),
         icon: BitmapDescriptor.fromBytes(markerIcon),
       ));
@@ -170,7 +170,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         }
       }
       var avg = await _fsm.getDocData(_fsm.menuItemCollection, mi.id, "avgRating");
-      itemWidgetList.add(new MostPopularItemCard(mi, rs, avg));
+      itemWidgetList.add(new MostPopularItemCard(mi, avg, restaurant: rs));
     }
 
 
@@ -198,7 +198,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => RestaurantPage(r)))
+                        builder: (context) => RestaurantPage(restaurant: r)))
               },
           child: RestaurantListTile(r, await GeoUtil.distanceToRestaurant(currentLocation, r))
         ),
@@ -229,16 +229,16 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     List<Widget> itemWidgets = new List<Widget>();
 
     for (MenuItem i in itemList) {
-      Restaurant r = await Documenu.getRestaurant(i.restaurantId);
+      Future<Restaurant> r = Documenu.getRestaurant(i.restaurantId);
       var avg = await _fsm.getDocData(_fsm.menuItemCollection, i.id, "avgRating");
-      var dist = await GeoUtil.distanceToRestaurant(currentLocation, r);
+      var dist = await GeoUtil.distanceToItem(currentLocation, i);
       itemWidgets.add(
         FlatButton(
           onPressed: () {
             Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => RestaurantPage(r, itemId: i.id)));
+                        builder: (context) => RestaurantPage(futureRestaurant: r, itemId: i.id)));
           },
           child: new MenuItemSearchTile(i, r, avg, dist),
         ),
@@ -459,7 +459,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => RestaurantPage(
-                                            restaurantsNearUser[index - 1])))
+                                            restaurant: restaurantsNearUser[index - 1])))
                               },
                           child: RestaurantListTile(restaurantsNearUser[index - 1],
                               restaurantDistances[index - 1])
