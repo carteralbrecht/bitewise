@@ -52,13 +52,13 @@ class _MenuItemSearchTileState extends State<MenuItemSearchTile> {
               Expanded(
                 child: Text(
                   widget.restaurant.name,
-                  style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic, color: global.accentGrayDark,),
+                  style: TextStyle(fontSize: 15, fontStyle: FontStyle.italic, color: global.accentGrayDark,),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
               Container(
-                child: Text(" • " + widget.milesAway.toStringAsFixed(2))
+                child: Text(widget.milesAway.toStringAsFixed(2) + " mi", style: TextStyle(fontSize: 15))
               ),
             ]
           )

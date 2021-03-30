@@ -28,7 +28,7 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
   final AuthService _auth = AuthService();
   final FirestoreManager _fsm = FirestoreManager();
   GoogleMapController mapController;
@@ -48,16 +48,25 @@ class _HomePageState extends State<HomePage> {
   List<Widget> mostPopItems;
   Widget _googleMap;
   List<bool> isSelected = [true, false];
+  TabController tabController;
+  int tabIndex = 0;
 
   @override
   void initState() {
+    super.initState();
     setPinImage();
     getUserLocation();
     getRestaurantsNearby();
     rootBundle.loadString('assets/MapStyle.txt').then((string) {
       _mapStyle = string;
     });
-    super.initState();
+    tabController = TabController(length: 2, vsync: this);
+    tabController.addListener(() { 
+      setState(() {
+        tabIndex = tabController.index;
+      });
+    });
+    
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -178,12 +187,10 @@ class _HomePageState extends State<HomePage> {
     return result;
   }
 
-  void getSearch(String s) async {
+  void getSearchRestaurant(String s) async {
     var restList = await SearchUtil.restaurantByGeoAndName(currentLocation, s);
-    var itemList = await SearchUtil.menuItemByGeoAndName(currentLocation, 20, s);
     
     List<Widget> restWidgets = new List<Widget>();
-    List<Widget> itemWidgets = new List<Widget>();
     for (Restaurant r in restList) {
       restWidgets.add(
         FlatButton(
@@ -198,6 +205,28 @@ class _HomePageState extends State<HomePage> {
         
       );
     }
+
+    if (restWidgets.length == 0) {
+      restWidgets.add(
+        FlatButton(
+          color: Colors.white,
+          onPressed: () {
+            
+          },
+          child: Text("No Results", style: TextStyle(fontSize: 20, color: Colors.black)),
+        )
+      );
+    }
+
+    setState(() {
+      restSearchResults = restWidgets;
+    });
+  }
+
+  void getSearchItem(String s) async {
+    var itemList = await SearchUtil.menuItemByGeoAndName(currentLocation, 20, s);
+    
+    List<Widget> itemWidgets = new List<Widget>();
 
     for (MenuItem i in itemList) {
       Restaurant r = await Documenu.getRestaurant(i.restaurantId);
@@ -216,18 +245,6 @@ class _HomePageState extends State<HomePage> {
       );
     }
 
-    if (restWidgets.length == 0) {
-      restWidgets.add(
-        FlatButton(
-          color: Colors.white,
-          onPressed: () {
-            
-          },
-          child: Text("No Results", style: TextStyle(fontSize: 20, color: Colors.black)),
-        )
-      );
-    }
-
     if (itemWidgets.length == 0) {
       itemWidgets.add(
         FlatButton(
@@ -241,7 +258,6 @@ class _HomePageState extends State<HomePage> {
     }
 
     setState(() {
-      restSearchResults = restWidgets;
       itemSearchResults = itemWidgets;
     });
   }
@@ -276,10 +292,11 @@ class _HomePageState extends State<HomePage> {
                       textAlignVertical: TextAlignVertical.bottom,
                       style: TextStyle(fontSize: 20),
                       onChanged: (val) {
+                        print("Tab Index" + tabIndex.toString());
                         EasyDebounce.debounce(
                               'restaurant-search-debouncer',
                               Duration(milliseconds: 500),
-                              () => getSearch(val));
+                              () => tabIndex == 0 ? getSearchRestaurant(val) : getSearchItem(val));
                       },
                       onTap: () {
                         setState(() {
@@ -302,7 +319,8 @@ class _HomePageState extends State<HomePage> {
                       searchController.clear();
                       searchFocus.unfocus();
                       setState(() {
-                        getSearch("");
+                        getSearchRestaurant("");
+                        getSearchItem("");
                         isSearchActive = false;
                       });
                     },
@@ -485,8 +503,8 @@ class _HomePageState extends State<HomePage> {
           // ) : Container(height: 0, width: 0),
 
           isSearchActive ? DefaultTabController(
-            initialIndex: 1,
             length: 2,
+            initialIndex: 0,
             child: Scaffold(
               appBar: AppBar(
                 backgroundColor: global.mainColor,
@@ -495,6 +513,9 @@ class _HomePageState extends State<HomePage> {
                   labelStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   unselectedLabelStyle: TextStyle(fontSize: 20),
                   indicatorColor: Colors.black,
+                  onTap: (index) {
+
+                  },
                   tabs: <Widget>[
                     Tab(
                       text: "Restaurants",
@@ -503,6 +524,8 @@ class _HomePageState extends State<HomePage> {
                       text: "Menu Items",
                     ),
                   ],
+                  controller: tabController,
+
                 ),
               ),
               body: TabBarView(
@@ -520,8 +543,10 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ],
+                controller: tabController,
+
               ),
-            ),
+            )
           ) : Container(height: 0, width: 0)
         ]
       ),
