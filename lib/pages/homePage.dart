@@ -64,6 +64,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     tabController.addListener(() { 
       setState(() {
         tabIndex = tabController.index;
+        tabIndex == 0 ? getSearchRestaurant(searchController.text) : getSearchItem(searchController.text);
       });
     });
     
