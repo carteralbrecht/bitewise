@@ -96,7 +96,7 @@ class _PrevRatedItemTileState extends State<PrevRatedItemTile> {
                   children: [
                     Container(
                       padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
-                      child: Text(widget.restaurant.name,
+                      child: Text(restaurant == null ? "" : restaurant.name,
                           style: TextStyle(color: global.accentGrayDark, fontSize: 15),
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1),
