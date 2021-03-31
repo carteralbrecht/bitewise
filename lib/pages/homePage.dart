@@ -225,6 +225,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   void getSearchItem(String s) async {
+    print("searching for item " + s);
     var itemList = await SearchUtil.menuItemByGeoAndName(currentLocation, 20, s);
     
     List<Widget> itemWidgets = new List<Widget>();
@@ -296,8 +297,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                         //print("Tab Index" + tabIndex.toString());
                         EasyDebounce.debounce(
                               'restaurant-search-debouncer',
-                              Duration(milliseconds: 400),
-                              () => tabIndex == 0 ? getSearchRestaurant(val) : getSearchItem(val));
+                              Duration(milliseconds: 500),
+                              () {
+                                if (val.length <= 2) 
+                                  return;
+                                tabIndex == 0 ? getSearchRestaurant(val) : getSearchItem(val);
+                              });
                       },
                       onTap: () {
                         setState(() {
