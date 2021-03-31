@@ -35,6 +35,9 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
     if (menuItems != null) {
       for (Future<MenuItem> futureItem in menuItems) {
         MenuItem item = await futureItem;
+        if (item == null) {
+          continue;
+        }
         items.add(item);
         Future<Restaurant> r = Documenu.getRestaurant(item.restaurantId);
         rest.add(r);
@@ -107,9 +110,9 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => RestaurantPage(futureRestaurant: restaurants[index - 1], itemId: prevRatedItems[index - 1].id)))
+                              builder: (context) => RestaurantPage(futureRestaurant: restaurants[index], itemId: prevRatedItems[index].id)))
                       },
-                      child: PrevRatedItemTile(prevRatedItems[index - 1], ratings[index - 1], futureRestaurant: restaurants[index - 1]),
+                      child: PrevRatedItemTile(prevRatedItems[index], ratings[index], futureRestaurant: restaurants[index]),
                   ),
                   Divider(
                     color: global.accentGrayLight,
