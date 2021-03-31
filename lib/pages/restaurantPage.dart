@@ -148,7 +148,6 @@ class _MenuSubSectionScrollbarState extends State<MenuSubSectionScrollbar> {
 
   void scrollMenu() {
     double scrollDistance = 0;
-    scrollDistance += menuSubsectionHeight - 20;
     
     for (int i = 0 ; i < selectedIndex; i++) {
       scrollDistance += menuSubsectionHeight;
@@ -426,6 +425,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
     
 
     String subsection = menuItems.elementAt(mostPopLen).subsection;
+    prevIndex = mostPopLen;
     listylist.add(new SubSectionHeader(subsection, sectionNum, subSectionHeight));
    
 
