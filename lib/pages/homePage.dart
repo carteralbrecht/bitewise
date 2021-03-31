@@ -62,7 +62,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     });
     tabController = TabController(length: 2, vsync: this);
     tabController.addListener(() { 
-      setState(() {
+      if (mounted) setState(() {
         tabIndex = tabController.index;
         tabIndex == 0 ? getSearchRestaurant(searchController.text) : getSearchItem(searchController.text);
       });
@@ -86,7 +86,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   void getUserLocation() async {
     Position result = await Geolocator
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    setState(() {
+    if (mounted) setState(() {
       currentLocation = result;
     });
   }
@@ -112,7 +112,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       restDistances.add(await GeoUtil.distanceToRestaurant(currentLocation, restaurant));
     }
 
-    setState(() {
+    if (mounted) setState(() {
       restaurantsNearUser = resultsNear;
       restaurantDistances = restDistances;
 
@@ -175,7 +175,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     }
 
 
-    setState(() {
+    if (mounted) setState(() {
       mostPopItems = itemWidgetList;
     });
   }
@@ -220,7 +220,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       );
     }
 
-    setState(() {
+    if (mounted) setState(() {
       restSearchResults = restWidgets;
     });
   }
@@ -260,7 +260,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       );
     }
 
-    setState(() {
+    if (mounted) setState(() {
       itemSearchResults = itemWidgets;
     });
   }
@@ -302,7 +302,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                               () {
                                 if (val.length <= 2) 
                                   return;
-                                setState(() {
+                                if (mounted) setState(() {
                                   if (tabIndex == 1) itemSearchResults = [];
                                   else restSearchResults = [];
                                 });
@@ -310,7 +310,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                               });
                       },
                       onTap: () {
-                        setState(() {
+                        if (mounted) setState(() {
                           isSearchActive = true;
                         });
                       },
@@ -329,7 +329,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     onTap: () {
                       searchController.clear();
                       searchFocus.unfocus();
-                      setState(() {
+                      if (mounted) setState(() {
                         getSearchRestaurant("");
                         itemSearchResults = [];
                         isSearchActive = false;
@@ -399,7 +399,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       autoPlayCurve: Curves.fastOutSlowIn,
                       viewportFraction: 1,
                       onPageChanged: (index, reason) {
-                        setState(() {
+                        if (mounted) setState(() {
                           _currentCarouselIndex = index;
                         });
                       },
@@ -430,7 +430,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             maxChildSize: 1,
             builder: (BuildContext context, _scrollController) {
               _scrollController.addListener(() {
-                setState(() {
+                if (mounted) setState(() {
                   isSheetMax = _scrollController.offset >= 0;
                 });
                 print(_scrollController.offset.toString());
