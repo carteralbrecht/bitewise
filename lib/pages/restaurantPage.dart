@@ -11,6 +11,8 @@ import 'package:bitewise/services/fsmanager.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:skeleton_text/skeleton_text.dart';
 import 'package:bitewise/global.dart' as global;
+import 'package:maps_launcher/maps_launcher.dart';
+import 'package:flutter/gestures.dart';
 
 
 class SubSectionHeader extends StatefulWidget {
@@ -48,7 +50,7 @@ class _SubSectionHeaderState extends State<SubSectionHeader> {
       height: widget.height,
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
             color: Colors.white,
@@ -79,8 +81,9 @@ class MenuSubSectionScrollbar extends StatefulWidget {
   final ScrollController _menuController;
   final double menuItemHeight;
   final double menuSSHeight;
+  final MenuItem target;
 
-  MenuSubSectionScrollbar(this._key, this.subsections, this._sectionController, this._menuController, this.menuItemHeight, this.menuSSHeight) : super(key: _key);
+  MenuSubSectionScrollbar(this._key, this.subsections, this._sectionController, this._menuController, this.menuItemHeight, this.menuSSHeight, {this.target = null}) : super(key: _key);
 
   @override
   _MenuSubSectionScrollbarState createState() => _MenuSubSectionScrollbarState();
@@ -167,6 +170,15 @@ class _MenuSubSectionScrollbarState extends State<MenuSubSectionScrollbar> {
     menuSubsectionHeight = widget.menuSSHeight;
     selectedIndex = 0;
     scrollStart.start();
+    if (widget.target != null) {
+      for (int i = 0; i < widget.subsections.length; i++) {
+        if (widget.subsections[i].name == widget.target.subsection) {
+          selectedIndex = i;
+          // widget._sectionController.scrollTo(index: selectedIndex, duration: Duration(milliseconds: 500), curve: Curves.linear);
+          break;
+        }
+      }
+    }
   }
 
 
@@ -240,8 +252,11 @@ class SubSection {
 
 class RestaurantPage extends StatefulWidget {
 
+  final Future<Restaurant> futureRestaurant;
   final Restaurant restaurant;
-  const RestaurantPage(this.restaurant);
+  final String itemId;
+
+  const RestaurantPage({this.futureRestaurant, this.itemId = "-1", this.restaurant});
 
   @override
   _RestaurantPageState createState() => _RestaurantPageState();
@@ -257,7 +272,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
   // ScrollController sectionController = new ScrollController();
   final ItemScrollController sectionController = ItemScrollController();
 
-
+  Restaurant restaurant;
   final double itemHeight = 125.0;
   final double subSectionHeight = 90;
   ScrollController _menuController;
@@ -269,6 +284,10 @@ class _RestaurantPageState extends State<RestaurantPage> {
   String currentSubSection = "";
 
   Icon restaurantIcon;
+
+  bool scrollToItem;
+  MenuItem target;
+
 
 
   _scrollListener() {
@@ -289,6 +308,10 @@ class _RestaurantPageState extends State<RestaurantPage> {
         firstIndex = _menuController.position.extentBefore ~/ itemHeight;
         
       });
+      if (_key.currentState != null && firstIndex != 0 && scrollToItem) {
+        _key.currentState.tryUpdateSubSection(target?.subsection);
+        scrollToItem = false;
+      }
       if (_menu[firstIndex] is SubSectionHeader) {
         SubSectionHeader h = _menu[firstIndex];
         if (_key.currentState != null) {
@@ -312,17 +335,28 @@ class _RestaurantPageState extends State<RestaurantPage> {
 
   @override
   void initState() {
+    
     _menuController = ScrollController();
     _menuController.addListener(_scrollListener);
-    restaurantIcon = RestaurantUtil.assignIcon(widget.restaurant);
-    getMenuItems();
-    getNumItemsRated();
-    getCuisineString();
+    scrollToItem = widget.itemId != "-1";
+    getRestaurant();
     super.initState();
   }
 
+  void getRestaurant() async {
+    Restaurant r = widget.restaurant == null ? await widget.futureRestaurant : widget.restaurant;
+    Icon icon = RestaurantUtil.assignIcon(r);
+    setState(() {
+      restaurant = r;
+      restaurantIcon = icon;
+    });
+    getMenuItems();
+    getNumItemsRated();
+    getCuisineString();
+  }
+
   void getNumItemsRated() async {
-    var ratedList = await _fsm.getDocData(_fsm.restaurantCollection, widget.restaurant.id, "ratedItems");
+    var ratedList = await _fsm.getDocData(_fsm.restaurantCollection, restaurant.id, "ratedItems");
     int numRated = 0;
     if (ratedList is List) {
       numRated = ratedList.length;
@@ -335,10 +369,10 @@ class _RestaurantPageState extends State<RestaurantPage> {
 
   void getCuisineString() {
     String s = "";
-      // print(widget.restaurant.cuisines.length.toString());
+      // print(restaurant.cuisines.length.toString());
 
-    for (int i = 0; i < widget.restaurant.cuisines.length && i < 3; i++) {
-      s += widget.restaurant.cuisines[i] + ((i < widget.restaurant.cuisines.length && i < 3) ? ", " : "");
+    for (int i = 0; i < restaurant.cuisines.length && i < 3; i++) {
+      s += restaurant.cuisines[i] + ((i < restaurant.cuisines.length && i < 3) ? ", " : "");
     }
     if (mounted) setState(() {
       cuisineString = s;
@@ -348,7 +382,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
 
   void getMenuItems() async {
       List<MenuItem> menuItemsTemp = new List<MenuItem>();
-      var menu = await MenuUtil.buildMenuForRestaurant(widget.restaurant);
+      var menu = await MenuUtil.buildMenuForRestaurant(restaurant);
       var allItems = menu.getAllItems();
 
       for (MenuItem menuItem in allItems)
@@ -385,7 +419,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
       listylist.add(new SubSectionHeader("Most Popular", sectionNum, subSectionHeight));
       sectionList.add(new SubSection("Most Popular", mostPopLen));
       for (int i = 0; i < mostPopLen; i++) {
-        listylist.add(new MenuItemListTile(menuItems[i], widget.restaurant, itemHeight));
+        listylist.add(new MenuItemListTile(menuItems[i], restaurant, itemHeight));
       }
     }
     
@@ -402,15 +436,47 @@ class _RestaurantPageState extends State<RestaurantPage> {
         prevIndex = i;
         listylist.add( new SubSectionHeader(subsection, sectionNum, subSectionHeight));
       }
-      listylist.add(new MenuItemListTile(menuItems[i], widget.restaurant, itemHeight));
+      listylist.add(new MenuItemListTile(menuItems[i], restaurant, itemHeight));
     }
     sectionList.add(new SubSection(subsection, menuItems.length - prevIndex));
 
+    if (scrollToItem) {
+      double offset = 0;
+      int itemIndex = 0;
+      // find index of item to be scrolled to
+      for (MenuItem i in menuItems) {
+        if (i.id == widget.itemId) {
+          setState(() {
+            target = i;
+          });
+          break;
+        }
+        itemIndex++;
+      }
+      int i = 0;
+      // calculate scroll offset
+      for (SubSection s in sectionList) {
+        if (i + s.numItems >= itemIndex) {
+          offset += subSectionHeight;
+          offset += (itemIndex - i) * itemHeight;
+          break;
+        }
+        else {
+          i += s.numItems;
+          offset += subSectionHeight;
+          offset += s.numItems * itemHeight;
+        }
+      }
+      _menuController.animateTo(offset + 40, duration: Duration(milliseconds: 500), curve: Curves.linear);
+    }
+
     if (mounted) setState(() {
-      subSectionWidget = new MenuSubSectionScrollbar(_key, sectionList, sectionController, _menuController, itemHeight, subSectionHeight);
+      subSectionWidget = new MenuSubSectionScrollbar(_key, sectionList, sectionController, _menuController, itemHeight, subSectionHeight, target: target);
       // sectionScrollState = subSectionWidget.createState();
     });
 
+    
+    
 
     return listylist;
   }
@@ -458,7 +524,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
                       ),
                     )),
               ],
-              title: Text(widget.restaurant.name, style: TextStyle(fontSize: 25, color: Colors.black)),
+              title: Text(restaurant == null ? "Loading" : restaurant.name, style: TextStyle(fontSize: 25, color: Colors.black)),
               centerTitle: true,
               backgroundColor: global.mainColor,
               flexibleSpace: FlexibleSpaceBar(
@@ -470,38 +536,12 @@ class _RestaurantPageState extends State<RestaurantPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
-                        margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                        margin: EdgeInsets.only(top: 20, right:10, left: 10),
                         child: _menu == null ? Column(
                           mainAxisAlignment: MainAxisAlignment.end,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             SizedBox(height: 25),
-                            SkeletonAnimation(
-                              shimmerDuration: 1500,
-                              borderRadius: BorderRadius.circular(4.0),
-                              shimmerColor: Colors.grey,
-                              child: Container(
-                                height: 15,
-                                width: MediaQuery.of(context).size.width * 0.5,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(4.0),
-                                    color: Colors.grey[600]),
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            SkeletonAnimation(
-                              shimmerDuration: 1500,
-                              borderRadius: BorderRadius.circular(4.0),
-                              shimmerColor: Colors.white54,
-                              child: Container(
-                                height: 15,
-                                width: MediaQuery.of(context).size.width * 0.3,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(4.0),
-                                    color: Colors.grey[600]),
-                              ),
-                            ),
-                            SizedBox(height: 4),
                             SkeletonAnimation(
                               shimmerDuration: 1500,
                               borderRadius: BorderRadius.circular(4.0),
@@ -514,16 +554,60 @@ class _RestaurantPageState extends State<RestaurantPage> {
                                     color: Colors.grey[600]),
                               ),
                             ),
+                            SizedBox(height: 4),
+                            SkeletonAnimation(
+                              shimmerDuration: 1500,
+                              borderRadius: BorderRadius.circular(4.0),
+                              shimmerColor: Colors.white54,
+                              child: Container(
+                                height: 15,
+                                width: MediaQuery.of(context).size.width * 0.6,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(4.0),
+                                    color: Colors.grey[600]),
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            SkeletonAnimation(
+                              shimmerDuration: 1500,
+                              borderRadius: BorderRadius.circular(4.0),
+                              shimmerColor: Colors.grey,
+                              child: Container(
+                                height: 15,
+                                width: MediaQuery.of(context).size.width * 0.3,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(4.0),
+                                    color: Colors.grey[600]),
+                              ),
+                            ),
                           ],
                         ) : Column(
                           mainAxisAlignment: MainAxisAlignment.end,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             SizedBox(height: 25),
-                            Text("American • Pizza • Italian", style: TextStyle(fontSize:15)),
                             Text(numItemsRated.toString() + " items rated", style: TextStyle(fontSize:15), textAlign: TextAlign.left),
-                            Text("Hours: " + widget.restaurant.hours, style: TextStyle(fontSize:15), textAlign: TextAlign.left),
-                          ],
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.65,
+                              child: Text(restaurant == null ? "" : restaurant.address, style: TextStyle(fontSize:15), maxLines: 2, overflow: TextOverflow.ellipsis),
+                            ),
+                            RichText(
+                              text: TextSpan(
+                                text: "Open in maps",
+                                style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = ()  {
+                                      if (restaurant.address != null) {
+                                        MapsLauncher.launchQuery(restaurant.address);
+                                      }
+                                      else {
+                                        MapsLauncher.launchCoordinates(restaurant.geo.latitude, restaurant.geo.longitude);
+                                      }
+                                      
+                                  }
+                              ),
+                            ),
+                          ]
                         ),
                       ),
                       Container(

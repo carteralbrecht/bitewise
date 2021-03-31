@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:bitewise/services/auth.dart';
 import 'package:bitewise/global.dart' as global;
+import 'package:flushbar/flushbar.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -37,13 +38,13 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.yellow[600],
-        // title: Text(
-        //   "My Account",
-        //   style: TextStyle(
-        //     color: Colors.black,
-        //   ),
-        // ),
+        backgroundColor: global.mainColor,
+        title: Text(
+          "My Account",
+          style: TextStyle(
+            color: Colors.black,
+          ),
+        ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           color: Colors.grey,
@@ -78,12 +79,6 @@ class _ProfilePageState extends State<ProfilePage> {
           child: Column(
             children: <Widget>[
               // Text(currentUser == null ? "loading.." : currentUser.toString(), style: TextStyle(color: Colors.black, fontSize: 20)),
-              Container(
-                alignment: Alignment.center,
-                margin: EdgeInsets.only(bottom: 20),
-                child: Text("My Account",
-                    style: TextStyle(color: Colors.black, fontSize: 40)),
-              ),
               Container(
                 alignment: Alignment.topLeft,
                 child: Text("Change Password",
@@ -150,8 +145,24 @@ class _ProfilePageState extends State<ProfilePage> {
                 onTap: () async {
                   if (newPassword == confirmNewPassword) {
                     FirebaseUser user = await _auth.getUser();
-                    _auth.passwordResetLoggedIn(
+                    bool success = await _auth.passwordResetLoggedIn(
                         user.email, oldPassword, newPassword);
+                    if (success == true) {
+                      Flushbar(
+                        message: "Password updated",
+                        duration: Duration(seconds: 5),
+                      )..show(context);
+                    } else {
+                      Flushbar(
+                        message: "Incorrect password",
+                        duration: Duration(seconds: 5),
+                      )..show(context);
+                    }
+                  } else {
+                    Flushbar(
+                      message: "Passwords must match",
+                      duration: Duration(seconds: 5),
+                    )..show(context);
                   }
                 },
                 child: Container(
@@ -222,22 +233,6 @@ class _ProfilePageState extends State<ProfilePage> {
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
                 ),
-              ),
-              FlatButton(
-                onPressed: () async => {
-                  if (global.user == null)
-                  {
-                    print('Woah woah woah cant do that if youre not logged in!')
-                  }
-                  else
-                  {
-                    Navigator.pushNamed(context, '/prevRatedItemsPage')
-                  }
-                },
-                child: Text("Rating History"),
-                height: 40,
-                color: Colors.white,
-                textColor: Colors.black,
               ),
             ],
           )),

@@ -20,6 +20,7 @@ import 'package:bitewise/components/mostPopularItemCard.dart';
 import '../components/restaurantListTile.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:easy_debounce/easy_debounce.dart';
+import 'package:bitewise/components/menuItemSearchTile.dart';
 
 
 class HomePage extends StatefulWidget {
@@ -27,7 +28,7 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
   final AuthService _auth = AuthService();
   final FirestoreManager _fsm = FirestoreManager();
   GoogleMapController mapController;
@@ -39,22 +40,34 @@ class _HomePageState extends State<HomePage> {
   String _mapStyle;
   bool isSheetMax = false;
   bool isSearchActive = false;
-  List<Widget> searchResults = new List<Widget>();
+  List<Widget> restSearchResults = new List<Widget>();
+  List<Widget> itemSearchResults = new List<Widget>();
   TextEditingController searchController = new TextEditingController();
   FocusNode searchFocus = new FocusNode();
   int _currentCarouselIndex = 0;
   List<Widget> mostPopItems;
   Widget _googleMap;
+  List<bool> isSelected = [true, false];
+  TabController tabController;
+  int tabIndex = 0;
 
   @override
   void initState() {
+    super.initState();
     setPinImage();
     getUserLocation();
     getRestaurantsNearby();
     rootBundle.loadString('assets/MapStyle.txt').then((string) {
       _mapStyle = string;
     });
-    super.initState();
+    tabController = TabController(length: 2, vsync: this);
+    tabController.addListener(() { 
+      if (mounted) setState(() {
+        tabIndex = tabController.index;
+        tabIndex == 0 ? getSearchRestaurant(searchController.text) : getSearchItem(searchController.text);
+      });
+    });
+    
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -73,7 +86,7 @@ class _HomePageState extends State<HomePage> {
   void getUserLocation() async {
     Position result = await Geolocator
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    setState(() {
+    if (mounted) setState(() {
       currentLocation = result;
     });
   }
@@ -99,7 +112,7 @@ class _HomePageState extends State<HomePage> {
       restDistances.add(await GeoUtil.distanceToRestaurant(currentLocation, restaurant));
     }
 
-    setState(() {
+    if (mounted) setState(() {
       restaurantsNearUser = resultsNear;
       restaurantDistances = restDistances;
 
@@ -122,7 +135,7 @@ class _HomePageState extends State<HomePage> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => RestaurantPage(restaurant)))
+                          builder: (context) => RestaurantPage(restaurant: restaurant)))
                 }),
         icon: BitmapDescriptor.fromBytes(markerIcon),
       ));
@@ -158,11 +171,11 @@ class _HomePageState extends State<HomePage> {
         }
       }
       var avg = await _fsm.getDocData(_fsm.menuItemCollection, mi.id, "avgRating");
-      itemWidgetList.add(new MostPopularItemCard(mi, rs, avg));
+      itemWidgetList.add(new MostPopularItemCard(mi, avg, restaurant: rs));
     }
 
 
-    setState(() {
+    if (mounted) setState(() {
       mostPopItems = itemWidgetList;
     });
   }
@@ -175,8 +188,10 @@ class _HomePageState extends State<HomePage> {
     return result;
   }
 
-  void getSearch(String s) async {
+  void getSearchRestaurant(String s) async {
+    print("searching for restaurant" + s);
     var restList = await SearchUtil.restaurantByGeoAndName(currentLocation, s);
+    
     List<Widget> restWidgets = new List<Widget>();
     for (Restaurant r in restList) {
       restWidgets.add(
@@ -185,7 +200,7 @@ class _HomePageState extends State<HomePage> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => RestaurantPage(r)))
+                        builder: (context) => RestaurantPage(restaurant: r)))
               },
           child: RestaurantListTile(r, await GeoUtil.distanceToRestaurant(currentLocation, r))
         ),
@@ -205,8 +220,48 @@ class _HomePageState extends State<HomePage> {
       );
     }
 
-    setState(() {
-      searchResults = restWidgets;
+    if (mounted) setState(() {
+      restSearchResults = restWidgets;
+    });
+  }
+
+  void getSearchItem(String s) async {
+    print("searching for item " + s);
+    var itemList = await SearchUtil.menuItemByGeoAndName(currentLocation, 20, s);
+    
+    List<Widget> itemWidgets = new List<Widget>();
+
+    for (MenuItem i in itemList) {
+      Future<Restaurant> r = Documenu.getRestaurant(i.restaurantId);
+      Future<dynamic> avg = _fsm.getDocData(_fsm.menuItemCollection, i.id, "avgRating");
+      Future<double> dist = GeoUtil.distanceToItem(currentLocation, i);
+      itemWidgets.add(
+        FlatButton(
+          onPressed: () {
+            Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => RestaurantPage(futureRestaurant: r, itemId: i.id)));
+          },
+          child: new MenuItemSearchTile(i, r, avg, dist),
+        ),
+      );
+    }
+
+    if (itemWidgets.length == 0) {
+      itemWidgets.add(
+        FlatButton(
+          color: Colors.white,
+          onPressed: () {
+            
+          },
+          child: Text("No Results", style: TextStyle(fontSize: 20, color: Colors.black)),
+        )
+      );
+    }
+
+    if (mounted) setState(() {
+      itemSearchResults = itemWidgets;
     });
   }
 
@@ -240,13 +295,22 @@ class _HomePageState extends State<HomePage> {
                       textAlignVertical: TextAlignVertical.bottom,
                       style: TextStyle(fontSize: 20),
                       onChanged: (val) {
+                        //print("Tab Index" + tabIndex.toString());
                         EasyDebounce.debounce(
                               'restaurant-search-debouncer',
                               Duration(milliseconds: 500),
-                              () => getSearch(val));
+                              () {
+                                if (val.length <= 2) 
+                                  return;
+                                if (mounted) setState(() {
+                                  if (tabIndex == 1) itemSearchResults = [];
+                                  else restSearchResults = [];
+                                });
+                                tabIndex == 0 ? getSearchRestaurant(val) : getSearchItem(val);
+                              });
                       },
                       onTap: () {
-                        setState(() {
+                        if (mounted) setState(() {
                           isSearchActive = true;
                         });
                       },
@@ -265,8 +329,9 @@ class _HomePageState extends State<HomePage> {
                     onTap: () {
                       searchController.clear();
                       searchFocus.unfocus();
-                      setState(() {
-                        getSearch("");
+                      if (mounted) setState(() {
+                        getSearchRestaurant("");
+                        itemSearchResults = [];
                         isSearchActive = false;
                       });
                     },
@@ -334,7 +399,7 @@ class _HomePageState extends State<HomePage> {
                       autoPlayCurve: Curves.fastOutSlowIn,
                       viewportFraction: 1,
                       onPageChanged: (index, reason) {
-                        setState(() {
+                        if (mounted) setState(() {
                           _currentCarouselIndex = index;
                         });
                       },
@@ -365,7 +430,7 @@ class _HomePageState extends State<HomePage> {
             maxChildSize: 1,
             builder: (BuildContext context, _scrollController) {
               _scrollController.addListener(() {
-                setState(() {
+                if (mounted) setState(() {
                   isSheetMax = _scrollController.offset >= 0;
                 });
                 print(_scrollController.offset.toString());
@@ -405,7 +470,7 @@ class _HomePageState extends State<HomePage> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => RestaurantPage(
-                                            restaurantsNearUser[index - 1])))
+                                            restaurant: restaurantsNearUser[index - 1])))
                               },
                           child: RestaurantListTile(restaurantsNearUser[index - 1],
                               restaurantDistances[index - 1])
@@ -422,12 +487,78 @@ class _HomePageState extends State<HomePage> {
               );
             },
           ),
-          isSearchActive ?  Container(
-            color: Colors.white,
-            child: ListView(
-              children: searchResults,
-            ),
-          ) : Container(height: 0, width: 0),
+          // isSearchActive ?  Column(
+          //   children: [
+          //     Container(
+          //       child: ToggleButtons(
+          //         children: <Widget>[
+          //           Text("Restaurants"),
+          //           Text("Menu Items"),
+          //         ],
+          //         isSelected: isSelected,
+          //         onPressed: (int index) {
+          //           setState(() {
+          //             isSelected[index] = true;
+          //             isSelected[(index + 1) % 2] = false;
+          //           });
+          //         },
+          //       ),
+          //     ),
+          //     Container(
+          //       color: Colors.white,
+          //       child: ListView(
+          //         children: isSelected[0] ? restSearchResults : itemSearchResults,
+          //       ),
+          //     )
+          //   ],
+          // ) : Container(height: 0, width: 0),
+
+          isSearchActive ? DefaultTabController(
+            length: 2,
+            initialIndex: 0,
+            child: Scaffold(
+              appBar: AppBar(
+                backgroundColor: global.mainColor,
+                title: TabBar(
+                  labelColor: Colors.black,
+                  labelStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  unselectedLabelStyle: TextStyle(fontSize: 20),
+                  indicatorColor: Colors.black,
+                  onTap: (index) {
+
+                  },
+                  tabs: <Widget>[
+                    Tab(
+                      text: "Restaurants",
+                    ),
+                    Tab(
+                      text: "Menu Items",
+                    ),
+                  ],
+                  controller: tabController,
+
+                ),
+              ),
+              body: TabBarView(
+                children: <Widget>[
+                  Container(
+                    color: Colors.white,
+                    child: ListView(
+                      children: restSearchResults,
+                    ),
+                  ),
+                  Container(
+                    color: Colors.white,
+                    child: ListView(
+                      children: itemSearchResults,
+                    ),
+                  ),
+                ],
+                controller: tabController,
+
+              ),
+            )
+          ) : Container(height: 0, width: 0)
         ]
       ),
     );

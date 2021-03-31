@@ -30,7 +30,7 @@ class _MenuItemListTile extends State<MenuItemListTile> {
   void getAvgRating() async {
     var res = await _fsm.getDocData(
         _fsm.menuItemCollection, widget.menuItem.id, "avgRating");
-    if (res == null) {
+    if (res == null || res == double.nan) {
       res = 0;
     }
     if (mounted) setState(() {
@@ -98,7 +98,13 @@ class _MenuItemListTile extends State<MenuItemListTile> {
                           String streamAvgRating = "0";
                           try 
                           {
-                            streamAvgRating = snapshot.data['avgRating'].toString();
+                            streamAvgRating = snapshot.data['avgRating'].toStringAsFixed(1);
+                            if(streamAvgRating == "NaN") {
+                              streamAvgRating = "0";
+                            }
+                            if (double.parse(streamAvgRating) < 0.05) {
+                              streamAvgRating = "0";
+                            }
                           } 
                           catch (e) 
                           {

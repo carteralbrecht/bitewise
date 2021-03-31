@@ -6,6 +6,7 @@ import 'package:bitewise/util/itemListUtil.dart';
 import 'package:bitewise/components/prevRatedItemTile.dart';
 import 'package:bitewise/services/documenu.dart';
 import 'package:bitewise/services/fsmanager.dart';
+import 'package:bitewise/pages/restaurantPage.dart';
 
 
 class PrevRatedItemsPage extends StatefulWidget {
@@ -16,9 +17,9 @@ class PrevRatedItemsPage extends StatefulWidget {
 class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
   Color dividerColor = global.accentGrayLight;
   final FirestoreManager _fsm = FirestoreManager();
-  var prevRatedItems;
-  var restaurants;
-  var ratings;
+  List<MenuItem> prevRatedItems;
+  List<Future<Restaurant>> restaurants;
+  List<double> ratings;
 
   @override
   void initState() {
@@ -29,19 +30,22 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
   void getPrevRatedItems() async {
     List<Future<MenuItem>> menuItems = await ItemListUtil.getPreviouslyRatedItems();
     List<MenuItem> items = new List<MenuItem>();
-    List<Restaurant> rest = new List<Restaurant>();
+    List<Future<Restaurant>> rest = new List<Future<Restaurant>>();
     List<double> prevRatings = new List<double>();
-    for (Future<MenuItem> futureItem in menuItems) {
-      MenuItem item = await futureItem;
-      items.add(item);
-      Restaurant r = await Documenu.getRestaurant(item.restaurantId);
-      rest.add(r);
-      var result = await _fsm.getUserRating(global.user.uid, item.id);
-      if (result != null) {
-        var prevRating = await _fsm.getDocData('ratings', result, 'rating');
-        prevRatings.add(prevRating.toDouble());
+    if (menuItems != null) {
+      for (Future<MenuItem> futureItem in menuItems) {
+        MenuItem item = await futureItem;
+        items.add(item);
+        Future<Restaurant> r = Documenu.getRestaurant(item.restaurantId);
+        rest.add(r);
+        var result = await _fsm.getUserRating(global.user.uid, item.id);
+        if (result != null) {
+          var prevRating = await _fsm.getDocData('ratings', result, 'rating');
+          prevRatings.add(prevRating.toDouble());
+        }
       }
     }
+    
     setState(() {
       prevRatedItems = items;
       restaurants = rest;
@@ -54,7 +58,7 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        centerTitle: false,
+        centerTitle: true,
         backgroundColor: global.mainColor,
         elevation: 0,
         leading: GestureDetector(
@@ -63,6 +67,7 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
               Navigator.pop(context);
             }
         ),
+        title: Text("Rating History", style: TextStyle(fontSize: 25, color: Colors.black)),
       ),
       body: Container(
         child: (ratings == null ? Center(
@@ -70,9 +75,9 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
             valueColor: new AlwaysStoppedAnimation<Color>(global.mainColor),
           )) :
         ListView.builder(
-            itemCount: prevRatedItems.length + 1,
+            itemCount: prevRatedItems.length == 0 ? 1 : prevRatedItems.length,
             itemBuilder: (BuildContext context, int index) {
-              if (index == 0) {
+              if (index == 0 && prevRatedItems.length == 0) {
                 return Container(
                   height: 90,
                   child: Column(
@@ -82,10 +87,9 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
                     children: [
                       Container(
                         padding: EdgeInsets.fromLTRB(32, 22, 20, 0),
-                        child: Text("Rating History",
+                        child: Text("No rating history",
                             style: TextStyle(color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 30)
+                            fontSize: 20)
                         ),
                       ),
                       Divider(
@@ -100,9 +104,12 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
                 children: [
                   FlatButton(
                       onPressed: () => {
-                        // TODO Figure out how to scroll to certain position in the menu.
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => RestaurantPage(futureRestaurant: restaurants[index - 1], itemId: prevRatedItems[index - 1].id)))
                       },
-                      child: PrevRatedItemTile(prevRatedItems[index - 1], restaurants[index - 1], ratings[index - 1])
+                      child: PrevRatedItemTile(prevRatedItems[index - 1], ratings[index - 1], futureRestaurant: restaurants[index - 1]),
                   ),
                   Divider(
                     color: global.accentGrayLight,

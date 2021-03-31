@@ -1,4 +1,5 @@
 import 'package:bitewise/models/restaurant.dart';
+import 'package:bitewise/models/menuItem.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -22,6 +23,11 @@ class GeoUtil {
   // calculates the distance to a restaurant from the current location (in miles)
   static Future<double> distanceToRestaurant(Position p, Restaurant restaurant) async {
     return milesBetween(p.latitude, p.longitude, restaurant.geo.latitude, restaurant.geo.longitude);
+  }
+
+  // calculates the distance to a MenuItem from the current location (in miles)
+  static Future<double> distanceToItem(Position p, MenuItem item) async {
+    return milesBetween(p.latitude, p.longitude, item.geo.latitude, item.geo.longitude);
   }
 
   // returns the zip code string for a position
