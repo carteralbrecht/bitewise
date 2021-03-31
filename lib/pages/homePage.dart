@@ -301,6 +301,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                               () {
                                 if (val.length <= 2) 
                                   return;
+                                setState(() {
+                                  if (tabIndex == 1) itemSearchResults = [];
+                                  else restSearchResults = [];
+                                });
                                 tabIndex == 0 ? getSearchRestaurant(val) : getSearchItem(val);
                               });
                       },
