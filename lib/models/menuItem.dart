@@ -47,19 +47,25 @@ class MenuItem {
   });
 
   factory MenuItem.fromJson(Map<String, dynamic> json) {
-    var geoFromJson = json["geo"];
-    Position position = geoFromJson == null ? null : new Position(latitude: geoFromJson["lat"], longitude: geoFromJson["lon"]);
+    try {
+      var geoFromJson = json["geo"];
+      Position position = geoFromJson == null ? null : new Position(latitude: geoFromJson["lat"], longitude: geoFromJson["lon"]);
 
-    return new MenuItem(
-        id: json["item_id"].toString(),
-        name: json["menu_item_name"].toString(),
-        description: json["menu_item_description"].toString(),
-        price: json["menu_item_price"].toString(),
-        priceRange: json["price_range"].toString(),
-        restaurantId: json["restaurant_id"].toString(),
-        subsection: json["subsection"].toString(),
-        subsectionDescription: json["subsection_description"].toString(),
-        geo: position
-    );
+      return new MenuItem(
+          id: json["item_id"].toString(),
+          name: json["menu_item_name"].toString(),
+          description: json["menu_item_description"].toString(),
+          price: json["menu_item_price"].toString(),
+          priceRange: json["price_range"].toString(),
+          restaurantId: json["restaurant_id"].toString(),
+          subsection: json["subsection"].toString(),
+          subsectionDescription: json["subsection_description"].toString(),
+          geo: position
+      ); 
+    } catch (e) {
+      print("Error building MenuItem. This is probably due to mocumenu trying to build an item that it does not have in the DB");
+      print(e);
+      return null;
+    }
   }
 }

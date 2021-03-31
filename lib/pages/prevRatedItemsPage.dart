@@ -35,6 +35,9 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
     if (menuItems != null) {
       for (Future<MenuItem> futureItem in menuItems) {
         MenuItem item = await futureItem;
+        if (item == null) {
+          continue;
+        }
         items.add(item);
         Future<Restaurant> r = Documenu.getRestaurant(item.restaurantId);
         rest.add(r);

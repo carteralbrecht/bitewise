@@ -163,6 +163,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
     for (Future<MenuItem> i in items) {
       MenuItem mi = await i;
+      if (mi == null) {
+        continue;
+      }
       Restaurant rs;
       for (Restaurant r in restaurantsNearUser) {
         if (r.id == mi.restaurantId) {
