@@ -189,7 +189,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   void getSearchRestaurant(String s) async {
-    print("searching for restaurant" + s);
+    
+    setState(() {
+      restSearchResults = [];
+    });
+    
+    print("searching for restaurant " + s);
     var restList = await SearchUtil.restaurantByGeoAndName(currentLocation, s);
     
     List<Widget> restWidgets = new List<Widget>();
@@ -226,6 +231,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   void getSearchItem(String s) async {
+
+    setState(() {
+      itemSearchResults = [];
+    });
+
     print("searching for item " + s);
     var itemList = await SearchUtil.menuItemByGeoAndName(currentLocation, 20, s);
     
@@ -302,10 +312,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                               () {
                                 if (val.length <= 2) 
                                   return;
-                                if (mounted) setState(() {
-                                  if (tabIndex == 1) itemSearchResults = [];
-                                  else restSearchResults = [];
-                                });
                                 tabIndex == 0 ? getSearchRestaurant(val) : getSearchItem(val);
                               });
                       },
