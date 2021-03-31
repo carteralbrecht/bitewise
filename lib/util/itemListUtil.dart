@@ -19,9 +19,11 @@ class ItemListUtil {
 
     List<Future<MenuItem>> itemsToReturn = new List();
 
-    for (String itemId in itemIds) {
-      var item = Documenu.getMenuItem(itemId);
-      itemsToReturn.add(item);
+    if (itemIds != null) { 
+      for (String itemId in itemIds) {
+        var item = Documenu.getMenuItem(itemId);
+        itemsToReturn.add(item);
+      }
     }
 
     return itemsToReturn;

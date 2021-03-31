@@ -102,6 +102,9 @@ class _MenuItemListTile extends State<MenuItemListTile> {
                             if(streamAvgRating == "NaN") {
                               streamAvgRating = "0";
                             }
+                            if (double.parse(streamAvgRating) < 0.05) {
+                              streamAvgRating = "0";
+                            }
                           } 
                           catch (e) 
                           {

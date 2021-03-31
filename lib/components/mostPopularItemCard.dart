@@ -13,16 +13,32 @@ import 'package:bitewise/global.dart' as global;
 class MostPopularItemCard extends StatefulWidget {
 
   final MenuItem menuItem;
+  final Future<Restaurant> futureRestaurant;
   final Restaurant restaurant;
   final num avgRating;
 
-  const MostPopularItemCard(this.menuItem, this.restaurant, this.avgRating);
+  const MostPopularItemCard(this.menuItem, this.avgRating, {this.futureRestaurant, this.restaurant});
 
   @override
   _MostPopularItemCardState createState() => _MostPopularItemCardState();
 }
 
 class _MostPopularItemCardState extends State<MostPopularItemCard> {
+
+  Restaurant restaurant;
+
+  @override
+  void initState() {
+    getRestaurant();
+    super.initState();
+  }
+
+  void getRestaurant() async {
+    Restaurant r = widget.restaurant == null ? await widget.futureRestaurant : widget.restaurant;
+    setState(() {
+      restaurant = r;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +49,7 @@ class _MostPopularItemCardState extends State<MostPopularItemCard> {
           Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => RestaurantPage(widget.restaurant)));
+                        builder: (context) => RestaurantPage(restaurant: restaurant)));
         },
         child: Container(
           child: Column(
@@ -60,7 +76,7 @@ class _MostPopularItemCardState extends State<MostPopularItemCard> {
                   SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      widget.restaurant.name,
+                      restaurant.name,
                       style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic, color: global.accentGrayDark,),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

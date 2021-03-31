@@ -6,6 +6,7 @@ import 'package:bitewise/util/itemListUtil.dart';
 import 'package:bitewise/components/prevRatedItemTile.dart';
 import 'package:bitewise/services/documenu.dart';
 import 'package:bitewise/services/fsmanager.dart';
+import 'package:bitewise/pages/restaurantPage.dart';
 
 
 class PrevRatedItemsPage extends StatefulWidget {
@@ -16,9 +17,9 @@ class PrevRatedItemsPage extends StatefulWidget {
 class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
   Color dividerColor = global.accentGrayLight;
   final FirestoreManager _fsm = FirestoreManager();
-  var prevRatedItems;
-  var restaurants;
-  var ratings;
+  List<MenuItem> prevRatedItems;
+  List<Future<Restaurant>> restaurants;
+  List<double> ratings;
 
   @override
   void initState() {
@@ -29,19 +30,22 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
   void getPrevRatedItems() async {
     List<Future<MenuItem>> menuItems = await ItemListUtil.getPreviouslyRatedItems();
     List<MenuItem> items = new List<MenuItem>();
-    List<Restaurant> rest = new List<Restaurant>();
+    List<Future<Restaurant>> rest = new List<Future<Restaurant>>();
     List<double> prevRatings = new List<double>();
-    for (Future<MenuItem> futureItem in menuItems) {
-      MenuItem item = await futureItem;
-      items.add(item);
-      Restaurant r = await Documenu.getRestaurant(item.restaurantId);
-      rest.add(r);
-      var result = await _fsm.getUserRating(global.user.uid, item.id);
-      if (result != null) {
-        var prevRating = await _fsm.getDocData('ratings', result, 'rating');
-        prevRatings.add(prevRating.toDouble());
+    if (menuItems != null) {
+      for (Future<MenuItem> futureItem in menuItems) {
+        MenuItem item = await futureItem;
+        items.add(item);
+        Future<Restaurant> r = Documenu.getRestaurant(item.restaurantId);
+        rest.add(r);
+        var result = await _fsm.getUserRating(global.user.uid, item.id);
+        if (result != null) {
+          var prevRating = await _fsm.getDocData('ratings', result, 'rating');
+          prevRatings.add(prevRating.toDouble());
+        }
       }
     }
+    
     setState(() {
       prevRatedItems = items;
       restaurants = rest;
@@ -100,9 +104,12 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
                 children: [
                   FlatButton(
                       onPressed: () => {
-                        // TODO Figure out how to scroll to certain position in the menu.
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => RestaurantPage(futureRestaurant: restaurants[index - 1], itemId: prevRatedItems[index - 1].id)))
                       },
-                      child: PrevRatedItemTile(prevRatedItems[index], restaurants[index], ratings[index])
+                      child: PrevRatedItemTile(prevRatedItems[index - 1], ratings[index - 1], futureRestaurant: restaurants[index - 1]),
                   ),
                   Divider(
                     color: global.accentGrayLight,
