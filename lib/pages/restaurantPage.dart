@@ -16,6 +16,7 @@ import 'package:flutter/gestures.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SubSectionHeader extends StatefulWidget {
+
   final String subsection;
   final int index;
   final double height;
@@ -35,6 +36,7 @@ class SubSectionHeader extends StatefulWidget {
 }
 
 class _SubSectionHeaderState extends State<SubSectionHeader> {
+
   @override
   void initState() {
     super.initState();
@@ -45,40 +47,34 @@ class _SubSectionHeaderState extends State<SubSectionHeader> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        height: widget.height,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              color: Colors.white,
-              alignment: Alignment.centerLeft,
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              margin: EdgeInsets.only(left: 10, top: 10, bottom: 5),
-              child: Text(
-                widget.subsection,
-                style: TextStyle(
-                  fontSize: 25,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.left,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
+      height: widget.height,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            color: Colors.white,
+            alignment: Alignment.centerLeft,
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            margin: EdgeInsets.only(left: 10, top: 10, bottom: 5),
+            child: Text(
+              widget.subsection,
+              style: TextStyle(fontSize: 25, color: Colors.black, fontWeight: FontWeight.bold,),
+              textAlign: TextAlign.left,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-            Divider(
-              color: dividerColor,
-              thickness: 5,
-              indent: 20,
-              endIndent: 20,
-            ),
-          ],
-        ));
+          ),
+          Divider(color: dividerColor, thickness: 5, indent: 20, endIndent: 20,),
+        ],
+      )
+    );
   }
 }
 
+
 class MenuSubSectionScrollbar extends StatefulWidget {
+
   final Key _key;
   final List<SubSection> subsections;
   final ItemScrollController _sectionController;
@@ -87,17 +83,14 @@ class MenuSubSectionScrollbar extends StatefulWidget {
   final double menuSSHeight;
   final MenuItem target;
 
-  MenuSubSectionScrollbar(this._key, this.subsections, this._sectionController,
-      this._menuController, this.menuItemHeight, this.menuSSHeight,
-      {this.target = null})
-      : super(key: _key);
+  MenuSubSectionScrollbar(this._key, this.subsections, this._sectionController, this._menuController, this.menuItemHeight, this.menuSSHeight, {this.target = null}) : super(key: _key);
 
   @override
-  _MenuSubSectionScrollbarState createState() =>
-      _MenuSubSectionScrollbarState();
+  _MenuSubSectionScrollbarState createState() => _MenuSubSectionScrollbarState();
 }
 
 class _MenuSubSectionScrollbarState extends State<MenuSubSectionScrollbar> {
+
   Stopwatch scrollStart = new Stopwatch();
   int selectedIndex;
 
@@ -117,13 +110,12 @@ class _MenuSubSectionScrollbarState extends State<MenuSubSectionScrollbar> {
       print("Widget is null");
       return;
     }
-
-    if (scrollStart.elapsedMilliseconds < 500 &&
-        scrollStart.elapsedMilliseconds != 0) {
-      print("Didn't update because elapsed time = " +
-          scrollStart.elapsedMilliseconds.toString());
-      return;
-    } else {
+    
+    if (scrollStart.elapsedMilliseconds < 500 && scrollStart.elapsedMilliseconds != 0) {
+      print("Didn't update because elapsed time = " + scrollStart.elapsedMilliseconds.toString());
+      return; 
+    }
+    else {
       for (int i = 0; i < widget.subsections.length; i++) {
         if (widget.subsections[i].name == s) {
           newIndex = i;
@@ -133,48 +125,42 @@ class _MenuSubSectionScrollbarState extends State<MenuSubSectionScrollbar> {
       scrollStart.stop();
       scrollStart.reset();
 
-      widget._sectionController.scrollTo(
-          index: newIndex,
-          duration: Duration(milliseconds: 500),
-          curve: Curves.linear);
+      widget._sectionController.scrollTo(index: newIndex, duration: Duration(milliseconds: 500), curve: Curves.linear);
       scrollStart.start();
-      if (mounted)
-        setState(() {
-          selectedIndex = newIndex;
-        });
+      if (mounted) setState(() {
+        selectedIndex = newIndex;
+      });
       return;
     }
+  
   }
 
   void updateSelectedIndex(int newIndex) {
     scrollStart.stop();
     scrollStart.reset();
     scrollStart.start();
-    if (mounted)
-      setState(() {
-        selectedIndex = newIndex;
-        widget._sectionController.scrollTo(
-            index: newIndex,
-            duration: Duration(milliseconds: 500),
-            curve: Curves.linear);
-        scrollMenu();
-      });
+    if (mounted) setState(() {
+      selectedIndex = newIndex;
+      widget._sectionController.scrollTo(index: newIndex, duration: Duration(milliseconds: 500), curve: Curves.linear);
+      scrollMenu();
+    });
   }
 
   void scrollMenu() {
     double scrollDistance = 0;
-
-    for (int i = 0; i < selectedIndex; i++) {
+    
+    for (int i = 0 ; i < selectedIndex; i++) {
       scrollDistance += menuSubsectionHeight;
       scrollDistance += widget.subsections[i].numItems * menuItemHeight;
     }
-    widget._menuController.animateTo(scrollDistance,
-        duration: Duration(milliseconds: 500), curve: Curves.linear);
-    if (mounted)
-      setState(() {
-        scrollStart.start();
-      });
+    widget._menuController.animateTo(scrollDistance, duration: Duration(milliseconds: 500), curve: Curves.linear);
+    if (mounted) setState(() {
+      scrollStart.start();
+    });
   }
+
+
+  
 
   @override
   void initState() {
@@ -194,6 +180,7 @@ class _MenuSubSectionScrollbarState extends State<MenuSubSectionScrollbar> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -206,36 +193,34 @@ class _MenuSubSectionScrollbarState extends State<MenuSubSectionScrollbar> {
         itemBuilder: (BuildContext context, int index) {
           if (index == selectedIndex) {
             return Container(
-                // width: itemWidth,
-                decoration: new BoxDecoration(
-                  color: Colors.black,
-                  shape: BoxShape.rectangle,
-                  borderRadius: BorderRadius.all(Radius.circular(30)),
-                ),
-                margin: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                child: FlatButton(
-                    onPressed: () {
-                      print("Selected Index : " +
-                          index.toString() +
-                          " was pressed");
-                    },
-                    child: Text(widget.subsections[index].name,
-                        style: TextStyle(color: Colors.white, fontSize: 15))));
-          } else {
+              // width: itemWidth,
+              decoration: new BoxDecoration(
+                color: Colors.black,
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.all(Radius.circular(30)),
+              ),
+              margin: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+              child: FlatButton(
+                onPressed: () {
+                  print("Selected Index : " + index.toString() + " was pressed");
+                },
+                child: Text(widget.subsections[index].name, style: TextStyle(color: Colors.white, fontSize: 15))
+              )
+            );
+          }
+          else {
             return Container(
-                // width: itemWidth,
-                margin: EdgeInsets.symmetric(horizontal: 5),
-                child: FlatButton(
-                  color: Colors.transparent,
-                  onPressed: () {
-                    print("Unselected index : " +
-                        index.toString() +
-                        " was pressed");
-                    updateSelectedIndex(index);
-                  },
-                  child: Text(widget.subsections[index].name,
-                      style: TextStyle(color: Colors.black, fontSize: 15)),
-                ));
+              // width: itemWidth,
+              margin: EdgeInsets.symmetric(horizontal: 5),
+              child: FlatButton(
+                color: Colors.transparent,
+                onPressed: () {
+                  print("Unselected index : " + index.toString() + " was pressed");
+                  updateSelectedIndex(index);
+                },
+                child: Text(widget.subsections[index].name, style: TextStyle(color: Colors.black, fontSize: 15)),
+              )
+            );
           }
         },
       ),
@@ -244,6 +229,7 @@ class _MenuSubSectionScrollbarState extends State<MenuSubSectionScrollbar> {
 }
 
 class SubSection {
+
   String name;
   int numItems;
 
@@ -262,19 +248,21 @@ class SubSection {
   }
 }
 
+
 class RestaurantPage extends StatefulWidget {
+
   final Future<Restaurant> futureRestaurant;
   final Restaurant restaurant;
   final String itemId;
 
-  const RestaurantPage(
-      {this.futureRestaurant, this.itemId = "-1", this.restaurant});
+  const RestaurantPage({this.futureRestaurant, this.itemId = "-1", this.restaurant});
 
   @override
   _RestaurantPageState createState() => _RestaurantPageState();
 }
 
 class _RestaurantPageState extends State<RestaurantPage> {
+
   final GlobalKey<_MenuSubSectionScrollbarState> _key = GlobalKey();
 
   List<MenuItem> menuItems = new List<MenuItem>();
@@ -299,25 +287,26 @@ class _RestaurantPageState extends State<RestaurantPage> {
   bool scrollToItem;
   MenuItem target;
 
+
+
   _scrollListener() {
     if (_menuController.offset >= _menuController.position.maxScrollExtent &&
         !_menuController.position.outOfRange) {
-      if (mounted)
-        setState(() {
-          message = "reach the bottom";
-        });
+      if (mounted) setState(() {
+        message = "reach the bottom";
+      });
     }
     if (_menuController.offset <= _menuController.position.minScrollExtent &&
         !_menuController.position.outOfRange) {
-      if (mounted)
-        setState(() {
-          message = "reach the top";
-        });
-    } else {
-      if (mounted)
-        setState(() {
-          firstIndex = _menuController.position.extentBefore ~/ itemHeight;
-        });
+      if (mounted) setState(() {
+        message = "reach the top";
+      });
+    }
+    else {
+      if (mounted) setState(() {
+        firstIndex = _menuController.position.extentBefore ~/ itemHeight;
+        
+      });
       if (_key.currentState != null && firstIndex != 0 && scrollToItem) {
         _key.currentState.tryUpdateSubSection(target?.subsection);
         scrollToItem = false;
@@ -327,16 +316,17 @@ class _RestaurantPageState extends State<RestaurantPage> {
         if (_key.currentState != null) {
           _key.currentState.tryUpdateSubSection(h.subsection);
           print("Trying to scroll the header!");
-        } else {
+        }
+        else {
           print("Current key state = null :(");
         }
-      }
+      } 
       print(firstIndex.toString());
     }
   }
 
+
   List<Widget> _menu;
-  bool upToDate = false;
   Menu realMenu;
   List<SubSection> sectionList = List<SubSection>();
   final AuthService _auth = AuthService();
@@ -344,6 +334,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
 
   @override
   void initState() {
+    
     _menuController = ScrollController();
     _menuController.addListener(_scrollListener);
     scrollToItem = widget.itemId != "-1";
@@ -352,9 +343,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
   }
 
   void getRestaurant() async {
-    Restaurant r = widget.restaurant == null
-        ? await widget.futureRestaurant
-        : widget.restaurant;
+    Restaurant r = widget.restaurant == null ? await widget.futureRestaurant : widget.restaurant;
     Icon icon = RestaurantUtil.assignIcon(r);
     setState(() {
       restaurant = r;
@@ -366,52 +355,48 @@ class _RestaurantPageState extends State<RestaurantPage> {
   }
 
   void getNumItemsRated() async {
-    var ratedList = await _fsm.getDocData(
-        _fsm.restaurantCollection, restaurant.id, "ratedItems");
+    var ratedList = await _fsm.getDocData(_fsm.restaurantCollection, restaurant.id, "ratedItems");
     int numRated = 0;
     if (ratedList is List) {
       numRated = ratedList.length;
     }
 
-    if (mounted)
-      setState(() {
-        numItemsRated = numRated;
-      });
+    if (mounted) setState(() {
+      numItemsRated = numRated;
+    });
   }
 
   void getCuisineString() {
     String s = "";
-    // print(restaurant.cuisines.length.toString());
+      // print(restaurant.cuisines.length.toString());
 
     for (int i = 0; i < restaurant.cuisines.length && i < 3; i++) {
-      s += restaurant.cuisines[i] +
-          ((i < restaurant.cuisines.length && i < 3) ? ", " : "");
+      s += restaurant.cuisines[i] + ((i < restaurant.cuisines.length && i < 3) ? ", " : "");
     }
-    if (mounted)
-      setState(() {
-        cuisineString = s;
-      });
+    if (mounted) setState(() {
+      cuisineString = s;
+    });
   }
 
+
   void getMenuItems() async {
-    List<MenuItem> menuItemsTemp = new List<MenuItem>();
-    var menu = await MenuUtil.buildMenuForRestaurant(restaurant);
-    var allItems = menu.getAllItems();
+      List<MenuItem> menuItemsTemp = new List<MenuItem>();
+      var menu = await MenuUtil.buildMenuForRestaurant(restaurant);
+      var allItems = menu.getAllItems();
 
-    for (MenuItem menuItem in allItems) menuItemsTemp.add(menuItem);
+      for (MenuItem menuItem in allItems)
+        menuItemsTemp.add(menuItem);
 
-    if (menuItemsTemp.length == 0) {
-      print("No menu items");
-      // TODO: Handle error
-      return;
-    }
+      if (menuItemsTemp.length == 0) {
+        print("No menu items");
+        // TODO: Handle error
+        return; 
+      }
 
-    if (mounted)
-      setState(() {
+      if (mounted) setState(() {
         realMenu = menu;
         menuItems = menuItemsTemp;
         _menu = generateMenu();
-        upToDate = true;
       });
   }
 
@@ -460,16 +445,15 @@ class _RestaurantPageState extends State<RestaurantPage> {
 
     String subsection = menuItems.elementAt(mostPopLen).subsection;
     prevIndex = mostPopLen;
-    listylist
-        .add(new SubSectionHeader(subsection, sectionNum, subSectionHeight));
+    listylist.add(new SubSectionHeader(subsection, sectionNum, subSectionHeight));
+   
 
     for (int i = mostPopLen; i < menuItems.length; i++) {
       if (menuItems[i].subsection != subsection) {
         sectionList.add(new SubSection(subsection, i - prevIndex));
         subsection = menuItems[i].subsection;
         prevIndex = i;
-        listylist.add(
-            new SubSectionHeader(subsection, sectionNum, subSectionHeight));
+        listylist.add( new SubSectionHeader(subsection, sectionNum, subSectionHeight));
       }
       listylist.add(new MenuItemListTile(menuItems[i], restaurant, itemHeight));
     }
@@ -495,205 +479,183 @@ class _RestaurantPageState extends State<RestaurantPage> {
           offset += subSectionHeight;
           offset += (itemIndex - i) * itemHeight;
           break;
-        } else {
+        }
+        else {
           i += s.numItems;
           offset += subSectionHeight;
           offset += s.numItems * itemHeight;
         }
       }
-      _menuController.animateTo(offset + 40,
-          duration: Duration(milliseconds: 500), curve: Curves.linear);
+      _menuController.animateTo(offset + 40, duration: Duration(milliseconds: 500), curve: Curves.linear);
     }
 
-    if (mounted)
-      setState(() {
-        subSectionWidget = new MenuSubSectionScrollbar(_key, sectionList,
-            sectionController, _menuController, itemHeight, subSectionHeight,
-            target: target);
-        // sectionScrollState = subSectionWidget.createState();
-      });
-
+    if (mounted) setState(() {
+      subSectionWidget = new MenuSubSectionScrollbar(_key, sectionList, sectionController, _menuController, itemHeight, subSectionHeight, target: target);
+      // sectionScrollState = subSectionWidget.createState();
+    });
+  
     return listylist;
   }
 
-  @override
+   @override
   Widget build(BuildContext context) {
+    
     return Material(
       child: Container(
         color: Colors.white,
-        child: CustomScrollView(controller: _menuController, slivers: <Widget>[
-          SliverAppBar(
-            pinned: true,
-            expandedHeight: 125,
-            leading: GestureDetector(
+        child: CustomScrollView(
+          controller: _menuController,
+          slivers: <Widget>[
+            SliverAppBar(
+              pinned: true,
+              expandedHeight: 125,
+              leading: GestureDetector(
                 child: Icon(Icons.chevron_left, size: 35, color: Colors.black),
                 onTap: () {
                   Navigator.pop(context);
-                }),
-            actions: <Widget>[
-              Container(
-                  height: 35,
-                  width: 35,
-                  decoration: new BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
+                }
+              ),
+              actions: <Widget>[
+                Container(
+                    height: 35,
+                    width: 35,
+                    decoration: new BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    margin: EdgeInsets.only(right: 10.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        if (global.user == null) {
+                          Navigator.pushNamed(context, '/signin');
+                        } else {
+                          Navigator.pushNamed(context, '/profile');
+                        }
+                      },
+                      child: Icon(
+                        Icons.person,
+                        size: 30,
+                        color: global.mainColor,
+                      ),
+                    )),
+              ],
+              title: Text(restaurant == null ? "Loading" : restaurant.name, style: TextStyle(fontSize: 25, color: Colors.black)),
+              centerTitle: true,
+              backgroundColor: global.mainColor,
+              flexibleSpace: FlexibleSpaceBar(
+                background: Container(
+                  color: global.mainColor,
+                  alignment: Alignment.center,
+                  padding: EdgeInsets.fromLTRB(5, 20, 5, 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        margin: EdgeInsets.only(top: 20, right:10, left: 10),
+                        child: _menu == null ? Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height: 25),
+                            SkeletonAnimation(
+                              shimmerDuration: 1500,
+                              borderRadius: BorderRadius.circular(4.0),
+                              shimmerColor: Colors.grey,
+                              child: Container(
+                                height: 15,
+                                width: MediaQuery.of(context).size.width * 0.4,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(4.0),
+                                    color: Colors.grey[600]),
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            SkeletonAnimation(
+                              shimmerDuration: 1500,
+                              borderRadius: BorderRadius.circular(4.0),
+                              shimmerColor: Colors.white54,
+                              child: Container(
+                                height: 15,
+                                width: MediaQuery.of(context).size.width * 0.6,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(4.0),
+                                    color: Colors.grey[600]),
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            SkeletonAnimation(
+                              shimmerDuration: 1500,
+                              borderRadius: BorderRadius.circular(4.0),
+                              shimmerColor: Colors.grey,
+                              child: Container(
+                                height: 15,
+                                width: MediaQuery.of(context).size.width * 0.3,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(4.0),
+                                    color: Colors.grey[600]),
+                              ),
+                            ),
+                          ],
+                        ) : Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height: 25),
+                            Text(numItemsRated.toString() + " items rated", style: TextStyle(fontSize:15), textAlign: TextAlign.left),
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.65,
+                              child: Text(restaurant == null ? "" : restaurant.address, style: TextStyle(fontSize:15), maxLines: 2, overflow: TextOverflow.ellipsis),
+                            ),
+                            RichText(
+                              text: TextSpan(
+                                text: "Open in maps",
+                                style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = ()  {
+                                      if (restaurant.address != null) {
+                                        MapsLauncher.launchQuery(restaurant.address);
+                                      }
+                                      else {
+                                        MapsLauncher.launchCoordinates(restaurant.geo.latitude, restaurant.geo.longitude);
+                                      }
+                                      
+                                  }
+                              ),
+                            ),
+                          ]
+                        ),
+                      ),
+                      Container(
+                        // padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                        margin: EdgeInsets.only(bottom: 15, left: 10, right: 10),
+                        alignment: Alignment.bottomCenter,
+                        child: restaurantIcon,
+                      ),
+                    ],
                   ),
-                  margin: EdgeInsets.only(right: 10.0),
-                  child: GestureDetector(
-                    onTap: () {
-                      if (global.user == null) {
-                        Navigator.pushNamed(context, '/signin');
-                      } else {
-                        Navigator.pushNamed(context, '/profile');
-                      }
-                    },
-                    child: Icon(
-                      Icons.person,
-                      size: 30,
-                      color: global.mainColor,
-                    ),
-                  )),
-            ],
-            title: Text(restaurant == null ? "Loading" : restaurant.name,
-                style: TextStyle(fontSize: 25, color: Colors.black)),
-            centerTitle: true,
-            backgroundColor: global.mainColor,
-            flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                color: global.mainColor,
-                alignment: Alignment.center,
-                padding: EdgeInsets.fromLTRB(5, 20, 5, 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      margin: EdgeInsets.only(top: 20, right: 10, left: 10),
-                      child: _menu == null
-                          ? Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(height: 25),
-                                SkeletonAnimation(
-                                  shimmerDuration: 1500,
-                                  borderRadius: BorderRadius.circular(4.0),
-                                  shimmerColor: Colors.grey,
-                                  child: Container(
-                                    height: 15,
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.4,
-                                    decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(4.0),
-                                        color: Colors.grey[600]),
-                                  ),
-                                ),
-                                SizedBox(height: 4),
-                                SkeletonAnimation(
-                                  shimmerDuration: 1500,
-                                  borderRadius: BorderRadius.circular(4.0),
-                                  shimmerColor: Colors.white54,
-                                  child: Container(
-                                    height: 15,
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.6,
-                                    decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(4.0),
-                                        color: Colors.grey[600]),
-                                  ),
-                                ),
-                                SizedBox(height: 4),
-                                SkeletonAnimation(
-                                  shimmerDuration: 1500,
-                                  borderRadius: BorderRadius.circular(4.0),
-                                  shimmerColor: Colors.grey,
-                                  child: Container(
-                                    height: 15,
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.3,
-                                    decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(4.0),
-                                        color: Colors.grey[600]),
-                                  ),
-                                ),
-                              ],
-                            )
-                          : Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                  SizedBox(height: 25),
-                                  Text(
-                                      numItemsRated.toString() + " items rated",
-                                      style: TextStyle(fontSize: 15),
-                                      textAlign: TextAlign.left),
-                                  Container(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.65,
-                                    child: Text(
-                                        restaurant == null
-                                            ? ""
-                                            : restaurant.address,
-                                        style: TextStyle(fontSize: 15),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis),
-                                  ),
-                                  RichText(
-                                    text: TextSpan(
-                                        text: "Open in maps",
-                                        style: TextStyle(
-                                            color: Colors.blue,
-                                            decoration:
-                                                TextDecoration.underline),
-                                        recognizer: TapGestureRecognizer()
-                                          ..onTap = () {
-                                            if (restaurant.address != null) {
-                                              MapsLauncher.launchQuery(
-                                                  restaurant.address);
-                                            } else {
-                                              MapsLauncher.launchCoordinates(
-                                                  restaurant.geo.latitude,
-                                                  restaurant.geo.longitude);
-                                            }
-                                          }),
-                                  ),
-                                ]),
-                    ),
-                    Container(
-                      // padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                      margin: EdgeInsets.only(bottom: 15, left: 10, right: 10),
-                      alignment: Alignment.bottomCenter,
-                      child: restaurantIcon,
-                    ),
-                  ],
                 ),
               ),
+              bottom: PreferredSize(
+                preferredSize: firstIndex == 0 ? Size(0,0) : Size.fromHeight(50),
+                child: firstIndex == 0 ? Container(height:0, width: 0) : (subSectionWidget == null ? Text("Loading") : subSectionWidget),
+              ),
             ),
-            bottom: PreferredSize(
-              preferredSize: firstIndex == 0 ? Size(0, 0) : Size.fromHeight(50),
-              child: firstIndex == 0
-                  ? Container(height: 0, width: 0)
-                  : (subSectionWidget == null
-                      ? Text("Loading")
-                      : subSectionWidget),
-            ),
-          ),
-          _menu == null
-              ? SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: Center(
-                      // Display Progress Indicator
-                      child: CircularProgressIndicator(
-                          valueColor: new AlwaysStoppedAnimation<Color>(
-                              global.mainColor))))
-              : SliverList(
-                  delegate: SliverChildListDelegate(
-                    _menu,
-                  ),
+            _menu == null ? SliverFillRemaining(
+              hasScrollBody: false,
+              child: Center(
+                // Display Progress Indicator
+                child: CircularProgressIndicator(
+                    valueColor: new AlwaysStoppedAnimation<Color>(global.mainColor)
                 )
-        ]),
+              )
+            ) : SliverList(
+              delegate: SliverChildListDelegate(
+                _menu,
+              ),
+            ),
+            
+          ]
+        ),
       ),
     );
   }
