@@ -418,18 +418,17 @@ class _RestaurantPageState extends State<RestaurantPage> {
           new SubSectionHeader("Most Popular", sectionNum, subSectionHeight));
       sectionList.add(new SubSection("Most Popular", mostPopLen));
       for (int i = 0; i < mostPopLen; i++) {
+        // Add a stream builder to the list, that way the most popular subsection can update live
         listylist.add(StreamBuilder<Object>(
             stream: (Firestore.instance
                 .collection(_fsm.restaurantCollection)
                 .document(restaurant.id)
                 .snapshots()),
             builder: (BuildContext context, AsyncSnapshot snapshot) {
-              // get menu item i from most popular on restauurant
-              // loop through menuItems till you find the one with a matching id
-              // Use that one
               print(restaurant.id);
               MenuItem item = menuItems[i];
               if (snapshot.hasData) {
+                // Get the item for this tiles position in the updated ratedItems list
                 String id = snapshot.data['ratedItems'][i]['itemId'];
                 for (int m = 0; m < menuItems.length; m++) {
                   if (id == menuItems[m].id) {
