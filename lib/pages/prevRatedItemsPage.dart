@@ -197,22 +197,23 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
         ),
         body: Center(
             child: Column(children: <Widget>[
-          RaisedButton(
+          Row(children: <Widget>[RaisedButton(
             onPressed: () => newestFirst(),
-            child: Text("Newest First"),
+            child: Text("Newest"),
           ),
           RaisedButton(
             onPressed: () => oldestFirst(),
-            child: Text("Oldest First"),
+            child: Text("Oldest"),
           ),
           RaisedButton(
             onPressed: () => loToHi(),
-            child: Text("Sorted Lowest First"),
+            child: Text("Lowest"),
           ),
           RaisedButton(
             onPressed: () => hiToLo(),
-            child: Text("Sorted Highest First"),
+            child: Text("Highest"),
           ),
+          ],),
           Container(
             child: (displayRatings == null
                 ? Center(
