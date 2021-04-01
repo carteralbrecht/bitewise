@@ -29,10 +29,90 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
   List<Future<Restaurant>> restaurantsSorted;
   List<double> ratingsSorted;
 
+  int selectedSortIndex = 0;
+  List<String> sortingTitles = ["newest to oldest", "oldest to newest", "lowest to highest", "highest to lowest"];
+  List<Widget> sortingTiles;
+
   @override
   void initState() {
+    sortingTiles = getSortingTiles();
     getPrevRatedItems();
     super.initState();
+  }
+
+  List<Widget> getSortingTiles() {
+    List<Widget> tiles = [
+      GestureDetector(
+        onTap: () {
+          selectedSortIndex = 0;
+          newestFirst();
+        },
+        child: Container(
+          color: selectedSortIndex == 0 ? Colors.blue[100] : Colors.white,
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(sortingTitles[0], style: TextStyle(fontSize: 18, fontWeight: (selectedSortIndex == 0 ?  FontWeight.bold : FontWeight.normal))),
+              selectedSortIndex == 0 ? Icon(Icons.check) : Container(height: 0, width: 0),
+            ],
+          ),
+        ),
+      ),
+      GestureDetector(
+        onTap: () {
+          selectedSortIndex = 1;
+          oldestFirst();
+        },
+        child: Container(
+          color: selectedSortIndex == 1 ? Colors.blue[100] : Colors.white,
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(sortingTitles[1], style: TextStyle(fontSize: 18, fontWeight: (selectedSortIndex == 1 ?  FontWeight.bold : FontWeight.normal))),
+              selectedSortIndex == 1 ? Icon(Icons.check) : Container(height: 0, width: 0),
+            ],
+          ),
+        ),
+      ),
+      GestureDetector(
+        onTap: () {
+          selectedSortIndex = 2;
+          loToHi();
+        },
+        child: Container(
+          color: selectedSortIndex == 2 ? Colors.blue[100] : Colors.white,
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(sortingTitles[2], style: TextStyle(fontSize: 18, fontWeight: (selectedSortIndex == 2 ?  FontWeight.bold : FontWeight.normal))),
+              selectedSortIndex == 2 ? Icon(Icons.check) : Container(height: 0, width: 0),
+            ],
+          ),
+        ),
+      ),
+      GestureDetector(
+        onTap: () {
+          selectedSortIndex = 3;
+          hiToLo();
+        },
+        child: Container(
+          color: selectedSortIndex == 3 ? Colors.blue[100] : Colors.white,
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(sortingTitles[3], style: TextStyle(fontSize: 18, fontWeight: (selectedSortIndex == 3 ?  FontWeight.bold : FontWeight.normal))),
+              selectedSortIndex == 3 ? Icon(Icons.check) : Container(height: 0, width: 0),
+            ],
+          ),
+        ),
+      ),
+    ];
+
+    return tiles;
   }
 
   void getPrevRatedItems() async {
@@ -134,85 +214,102 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
               style: TextStyle(fontSize: 25, color: Colors.black)),
         ),
         body: Center(
-            child: Column(children: <Widget>[
-          Row(children: <Widget>[RaisedButton(
-            onPressed: () => newestFirst(),
-            child: Text("Newest"),
-          ),
-          RaisedButton(
-            onPressed: () => oldestFirst(),
-            child: Text("Oldest"),
-          ),
-          RaisedButton(
-            onPressed: () => loToHi(),
-            child: Text("Lowest"),
-          ),
-          RaisedButton(
-            onPressed: () => hiToLo(),
-            child: Text("Highest"),
-          ),
-          ],),
-          Container(
-            child: (displayRatings == null
-                ? Center(
-                    child: CircularProgressIndicator(
-                    valueColor:
-                        new AlwaysStoppedAnimation<Color>(global.mainColor),
-                  ))
-                : Expanded(
-                    child: ListView.builder(
-                    itemCount:
-                        displayItems.length == 0 ? 1 : displayItems.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      if (index == 0 && displayItems.length == 0) {
-                        return Container(
-                          height: 90,
-                          child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.fromLTRB(32, 22, 20, 0),
-                                  child: Text("No rating history",
-                                      style: TextStyle(
-                                          color: Colors.black, fontSize: 20)),
-                                ),
-                                Divider(
-                                  thickness: 4,
-                                  color: dividerColor,
-                                ),
-                              ]),
-                        );
-                      }
-                      return new Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          FlatButton(
-                            onPressed: () => {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => RestaurantPage(
-                                          futureRestaurant:
-                                              displayRestaurants[index],
-                                          itemId: displayItems[index].id)))
-                            },
-                            child: PrevRatedItemTile(
-                                displayItems[index], displayRatings[index],
-                                futureRestaurant: displayRestaurants[index]),
-                          ),
-                          Divider(
-                            color: global.accentGrayLight,
-                            height: 5,
-                            thickness: 5,
-                          )
-                        ],
-                      );
-                    },
-                  ))),
-          ),
-        ])));
+          child: Column(
+            children: [
+              ExpansionTile(
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("Sort By:"),
+                    Text(sortingTitles[selectedSortIndex]),
+                  ]
+                ),
+                children: getSortingTiles(),
+              ),
+              // Row(
+              //   children: <Widget>[
+              //     RaisedButton(
+              //       onPressed: () => newestFirst(),
+              //       child: Text("Newest"),
+              //     ),
+              //     RaisedButton(
+              //       onPressed: () => oldestFirst(),
+              //       child: Text("Oldest"),
+              //     ),
+              //     RaisedButton(
+              //       onPressed: () => loToHi(),
+              //       child: Text("Lowest"),
+              //     ),
+              //     RaisedButton(
+              //       onPressed: () => hiToLo(),
+              //       child: Text("Highest"),
+              //     ),
+              //   ],
+              // ),
+              Container(
+                child: (displayRatings == null
+                    ? Center(
+                        child: CircularProgressIndicator(
+                        valueColor:
+                            new AlwaysStoppedAnimation<Color>(global.mainColor),
+                      ))
+                    : Expanded(
+                        child: ListView.builder(
+                        itemCount:
+                            displayItems.length == 0 ? 1 : displayItems.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          if (index == 0 && displayItems.length == 0) {
+                            return Container(
+                              height: 90,
+                              child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.fromLTRB(32, 22, 20, 0),
+                                      child: Text("No rating history",
+                                          style: TextStyle(
+                                              color: Colors.black, fontSize: 20)),
+                                    ),
+                                    Divider(
+                                      thickness: 4,
+                                      color: dividerColor,
+                                    ),
+                                  ]),
+                            );
+                          }
+                          return new Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              FlatButton(
+                                onPressed: () => {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => RestaurantPage(
+                                              futureRestaurant:
+                                                  displayRestaurants[index],
+                                              itemId: displayItems[index].id)))
+                                },
+                                child: PrevRatedItemTile(
+                                    displayItems[index], displayRatings[index],
+                                    futureRestaurant: displayRestaurants[index]),
+                              ),
+                              Divider(
+                                color: global.accentGrayLight,
+                                height: 5,
+                                thickness: 5,
+                              )
+                            ],
+                          );
+                        },
+                      ))),
+              ),
+            ]
+          )
+        )
+    );
   }
 }
 
