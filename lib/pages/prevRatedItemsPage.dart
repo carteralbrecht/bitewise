@@ -82,7 +82,7 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
       ratingsSorted = sortrate;
     });
 
-    oldestFirst();
+    newestFirst();
   }
 
   void oldestFirst() async {
