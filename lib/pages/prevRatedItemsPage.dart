@@ -85,68 +85,6 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
     oldestFirst();
   }
 
-  // Future sortByRatings() async {
-  //   List<MenuItem> menu = new List.from(prevRatedItems);
-  //   List<Future<Restaurant>> rest = new List.from(restaurants);
-  //   List<double> rate = new List.from(ratings);
-
-  //   // make triple list
-
-  //   // sort triple list
-
-  //   // convert back to three lists
-  // }
-
-  // Future sortByRatings() async {
-  //   List<MenuItem> menu = new List.from(prevRatedItems);
-  //   List<Future<Restaurant>> rest = new List.from(restaurants);
-  //   List<double> rate = new List.from(ratings);
-  //   bool b;
-
-  //   print(rate.length);
-  //   // TODO : Change from bubble sort
-  //   for (int i = 0; i < rate.length; i++) {
-  //     for (int j = 1; j < rate.length; j++) {
-  //       if (rate.elementAt(j - 1) > rate.elementAt(j)) {
-  //         int a = j - 1, b = j;
-  //         // b = await swap(menu, rest, rate, j - 1, j);
-  //         MenuItem tempMenuItem = menu.elementAt(a);
-  //         menu.insert(a, menu.elementAt(b));
-  //         menu.insert(b, tempMenuItem);
-  //         Future<Restaurant> tempRest = rest.elementAt(a);
-  //         rest.insert(a, rest.elementAt(b));
-  //         rest.insert(b, tempRest);
-  //         double tempRate = rate.elementAt(a);
-  //         rate.insert(a, rate.elementAt(b));
-  //         rate.insert(b, tempRate);
-  //         //
-  //       }
-  //     }
-  //     print(i);
-  //   }
-
-  //   setState(() {
-  //     prevRatedItemsSorted = menu;
-  //     restaurantsSorted = rest;
-  //     ratingsSorted = rate;
-  //   });
-  //   return b;
-  // }
-
-  // Future swap(List<MenuItem> menu, List<Future<Restaurant>> rest,
-  //     List<double> rate, int a, int b) async {
-  //   MenuItem tempMenuItem = menu.elementAt(a);
-  //   menu.insert(a, menu.elementAt(b));
-  //   menu.insert(b, tempMenuItem);
-  //   Future<Restaurant> tempRest = rest.elementAt(a);
-  //   rest.insert(a, rest.elementAt(b));
-  //   rest.insert(b, tempRest);
-  //   double tempRate = rate.elementAt(a);
-  //   rate.insert(a, rate.elementAt(b));
-  //   rate.insert(b, tempRate);
-  //   return true;
-  // }
-
   void oldestFirst() async {
     setState(() {
       displayItems = new List.from(prevRatedItems);
