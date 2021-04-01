@@ -163,8 +163,8 @@ class _MenuSubSectionScrollbarState extends State<MenuSubSectionScrollbar> {
 
   void scrollMenu() {
     double scrollDistance = 0;
-    
-    for (int i = 0 ; i < selectedIndex; i++) {
+
+    for (int i = 0; i < selectedIndex; i++) {
       scrollDistance += menuSubsectionHeight;
       scrollDistance += widget.subsections[i].numItems * menuItemHeight;
     }
@@ -436,18 +436,21 @@ class _RestaurantPageState extends State<RestaurantPage> {
         listylist.add(StreamBuilder<Object>(
             stream: (Firestore.instance
                 .collection(_fsm.restaurantCollection)
-                .document(widget.restaurant.id)
+                .document(restaurant.id)
                 .snapshots()),
             builder: (BuildContext context, AsyncSnapshot snapshot) {
               // get menu item i from most popular on restauurant
               // loop through menuItems till you find the one with a matching id
               // Use that one
-              String id = snapshot.data['ratedItems'][i]['itemId'];
+              print(restaurant.id);
               MenuItem item = menuItems[i];
-              for (int m = 0; m < menuItems.length; m++) {
-                if (id == menuItems[m].id) {
-                  item = menuItems[m];
-                  break;
+              if (snapshot.hasData) {
+                String id = snapshot.data['ratedItems'][i]['itemId'];
+                for (int m = 0; m < menuItems.length; m++) {
+                  if (id == menuItems[m].id) {
+                    item = menuItems[m];
+                    break;
+                  }
                 }
               }
               return new MenuItemListTile(item, restaurant, itemHeight);
@@ -457,8 +460,8 @@ class _RestaurantPageState extends State<RestaurantPage> {
 
     String subsection = menuItems.elementAt(mostPopLen).subsection;
     prevIndex = mostPopLen;
-    listylist.add(new SubSectionHeader(subsection, sectionNum, subSectionHeight));
-   
+    listylist
+        .add(new SubSectionHeader(subsection, sectionNum, subSectionHeight));
 
     for (int i = mostPopLen; i < menuItems.length; i++) {
       if (menuItems[i].subsection != subsection) {
