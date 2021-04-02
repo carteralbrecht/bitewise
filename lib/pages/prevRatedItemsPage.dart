@@ -30,7 +30,7 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
   List<double> ratingsSorted;
 
   int selectedSortIndex = 0;
-  List<String> sortingTitles = ["newest to oldest", "oldest to newest", "lowest to highest", "highest to lowest"];
+  List<String> sortingTitles = ["Newest to Oldest", "Oldest to Newest", "Lowest to Highest", "Highest to Lowest"];
   List<Widget> sortingTiles;
 
   @override
@@ -216,16 +216,7 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
         body: Center(
           child: Column(
             children: [
-              ExpansionTile(
-                title: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("Sort By:"),
-                    Text(sortingTitles[selectedSortIndex]),
-                  ]
-                ),
-                children: getSortingTiles(),
-              ),
+              
               // Row(
               //   children: <Widget>[
               //     RaisedButton(
@@ -256,7 +247,7 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
                     : Expanded(
                         child: ListView.builder(
                         itemCount:
-                            displayItems.length == 0 ? 1 : displayItems.length,
+                            displayItems.length + 1,
                         itemBuilder: (BuildContext context, int index) {
                           if (index == 0 && displayItems.length == 0) {
                             return Container(
@@ -279,6 +270,27 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
                                   ]),
                             );
                           }
+                          else if (index == 0) {
+                            return Column(
+                              children: [
+                                ExpansionTile(
+                                  title: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text("Sort By:"),
+                                      Text(sortingTitles[selectedSortIndex]),
+                                    ]
+                                  ),
+                                  children: getSortingTiles(),
+                                ),
+                                Divider(
+                                  color: global.accentGrayLight,
+                                  height: 5,
+                                  thickness: 5,
+                                )
+                              ],
+                            );
+                          }
                           return new Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -289,12 +301,12 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
                                       MaterialPageRoute(
                                           builder: (context) => RestaurantPage(
                                               futureRestaurant:
-                                                  displayRestaurants[index],
-                                              itemId: displayItems[index].id)))
+                                                  displayRestaurants[index-1],
+                                              itemId: displayItems[index-1].id)))
                                 },
                                 child: PrevRatedItemTile(
-                                    displayItems[index], displayRatings[index],
-                                    futureRestaurant: displayRestaurants[index]),
+                                    displayItems[index-1], displayRatings[index-1],
+                                    futureRestaurant: displayRestaurants[index-1]),
                               ),
                               Divider(
                                 color: global.accentGrayLight,
