@@ -97,3 +97,30 @@ class _MenuItemSearchTileState extends State<MenuItemSearchTile> {
         ]));
   }
 }
+
+class SearchTileAndData implements Comparable<dynamic> {
+  MenuItemSearchTile m;
+  var dist;
+  var avg;
+
+  SearchTileAndData(MenuItemSearchTile tile, var distance, var rating) {
+    m = tile;
+    dist = distance;
+    avg = rating;
+  }
+
+  Future<dynamic> setVariables() async {
+    dist = await dist;
+    avg = await avg;
+    if (avg == null) avg = 0;
+  }
+
+  @override
+  int compareTo(dynamic other) {
+    int distComp = this.dist.compareTo(other.dist);
+    if (distComp == 0) {
+      return other.avg.compareTo(this.avg);
+    }
+    return distComp;
+  }
+}

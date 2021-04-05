@@ -248,36 +248,36 @@ class _HomePageState extends State<HomePage>
     var itemList =
         await SearchUtil.menuItemByGeoAndName(currentLocation, 20, s);
 
-    List<MenuItemSearchTile> searchTiles = new List<MenuItemSearchTile>();
+    List<SearchTileAndData> searchTiles = new List<SearchTileAndData>();
 
     for (MenuItem i in itemList) {
       Future<Restaurant> r = Documenu.getRestaurant(i.restaurantId);
       Future<dynamic> avg =
           _fsm.getDocData(_fsm.menuItemCollection, i.id, "avgRating");
       Future<double> dist = GeoUtil.distanceToItem(currentLocation, i);
-      searchTiles.add(new MenuItemSearchTile(i, r, avg, dist, i.id));
+      SearchTileAndData next = new SearchTileAndData(
+          new MenuItemSearchTile(i, r, avg, dist, i.id), dist, avg);
+      await next.setVariables();
+      searchTiles.add(next);
     }
-
-    searchTiles.sort((a, b) => a.milesAway.toString().compareTo(b.milesAway.toString()));
+    searchTiles.sort();
 
     List<Widget> itemWidgets = new List<Widget>();
-
-    for (MenuItemSearchTile s in searchTiles) {
+    for (SearchTileAndData s in searchTiles) {
+      print("Adding item: " + s.m.menuItem.name);
       itemWidgets.add(
         FlatButton(
           onPressed: () {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) =>
-                        RestaurantPage(futureRestaurant: s.restaurant, itemId: s.id)));
+                    builder: (context) => RestaurantPage(
+                        futureRestaurant: s.m.restaurant, itemId: s.m.id)));
           },
-          child: s,
+          child: s.m,
         ),
       );
     }
-
-    //itemWidgets.sort((a, b) => a. a.child.milesAway.compareTo(b.milesAway));
 
     if (itemWidgets.length == 0) {
       itemWidgets.add(FlatButton(
