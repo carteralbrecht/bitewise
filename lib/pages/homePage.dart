@@ -22,13 +22,13 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:bitewise/components/menuItemSearchTile.dart';
 
-
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
   final AuthService _auth = AuthService();
   final FirestoreManager _fsm = FirestoreManager();
   GoogleMapController mapController;
@@ -61,38 +61,44 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       _mapStyle = string;
     });
     tabController = TabController(length: 2, vsync: this);
-    tabController.addListener(() { 
-      if (mounted) setState(() {
-        tabIndex = tabController.index;
-        tabIndex == 0 ? getSearchRestaurant(searchController.text) : getSearchItem(searchController.text);
-      });
+    tabController.addListener(() {
+      if (mounted)
+        setState(() {
+          tabIndex = tabController.index;
+          tabIndex == 0
+              ? getSearchRestaurant(searchController.text)
+              : getSearchItem(searchController.text);
+        });
     });
-    
   }
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
     mapController.setMapStyle(_mapStyle);
-
   }
 
   void setPinImage() async {
     ByteData data = await rootBundle.load('assets/pin.png');
-    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(), targetWidth: 120, targetHeight: 130);
+    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
+        targetWidth: 120, targetHeight: 130);
     ui.FrameInfo fi = await codec.getNextFrame();
-    markerIcon = (await fi.image.toByteData(format: ui.ImageByteFormat.png)).buffer.asUint8List();
+    markerIcon = (await fi.image.toByteData(format: ui.ImageByteFormat.png))
+        .buffer
+        .asUint8List();
   }
 
   void getUserLocation() async {
-    Position result = await Geolocator
-        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    if (mounted) setState(() {
-      currentLocation = result;
-    });
+    Position result = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    if (mounted)
+      setState(() {
+        currentLocation = result;
+      });
   }
 
   Future<List<Future<MenuItem>>> getTopNItemsFromResults(int n) async {
-    List<Future<MenuItem>> topItemsNear = await RestaurantUtil.getTopNItemsFromMany(restaurantsNearUser, n);
+    List<Future<MenuItem>> topItemsNear =
+        await RestaurantUtil.getTopNItemsFromMany(restaurantsNearUser, n);
     return topItemsNear;
   }
 
@@ -109,17 +115,19 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
     for (Restaurant restaurant in restaurants) {
       resultsNear.add(restaurant);
-      restDistances.add(await GeoUtil.distanceToRestaurant(currentLocation, restaurant));
+      restDistances
+          .add(await GeoUtil.distanceToRestaurant(currentLocation, restaurant));
     }
 
-    if (mounted) setState(() {
-      restaurantsNearUser = resultsNear;
-      restaurantDistances = restDistances;
+    if (mounted)
+      setState(() {
+        restaurantsNearUser = resultsNear;
+        restaurantDistances = restDistances;
 
-      getTopItems();
-      // create the map when restaurants are finished being fetched
-      _googleMap = createMap();
-    });
+        getTopItems();
+        // create the map when restaurants are finished being fetched
+        _googleMap = createMap();
+      });
   }
 
   Set<Marker> _createMarkers() {
@@ -135,7 +143,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => RestaurantPage(restaurant: restaurant)))
+                          builder: (context) =>
+                              RestaurantPage(restaurant: restaurant)))
                 }),
         icon: BitmapDescriptor.fromBytes(markerIcon),
       ));
@@ -146,19 +155,19 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   Widget createMap() {
     return GoogleMap(
-      onMapCreated: _onMapCreated,
-      initialCameraPosition: CameraPosition(
-        target: LatLng(currentLocation.latitude, currentLocation.longitude),
-        zoom: 15.0,
-      ),
-      markers: _createMarkers(),
-      myLocationEnabled: true,
-      myLocationButtonEnabled: false
-    );
+        onMapCreated: _onMapCreated,
+        initialCameraPosition: CameraPosition(
+          target: LatLng(currentLocation.latitude, currentLocation.longitude),
+          zoom: 15.0,
+        ),
+        markers: _createMarkers(),
+        myLocationEnabled: true,
+        myLocationButtonEnabled: false);
   }
 
   void getTopItems() async {
-    List<Future<MenuItem>> items = await RestaurantUtil.getTopNItemsFromMany(restaurantsNearUser, 3);
+    List<Future<MenuItem>> items =
+        await RestaurantUtil.getTopNItemsFromMany(restaurantsNearUser, 3);
     List<Widget> itemWidgetList = new List<Widget>();
 
     for (Future<MenuItem> i in items) {
@@ -173,14 +182,15 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           break;
         }
       }
-      var avg = await _fsm.getDocData(_fsm.menuItemCollection, mi.id, "avgRating");
+      var avg =
+          await _fsm.getDocData(_fsm.menuItemCollection, mi.id, "avgRating");
       itemWidgetList.add(new MostPopularItemCard(mi, avg, restaurant: rs));
     }
 
-
-    if (mounted) setState(() {
-      mostPopItems = itemWidgetList;
-    });
+    if (mounted)
+      setState(() {
+        mostPopItems = itemWidgetList;
+      });
   }
 
   List<T> map<T>(List list, Function handler) {
@@ -192,90 +202,96 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   void getSearchRestaurant(String s) async {
-    
     setState(() {
       restSearchResults = [];
     });
-    
+
     print("searching for restaurant " + s);
     var restList = await SearchUtil.restaurantByGeoAndName(currentLocation, s);
-    
+
     List<Widget> restWidgets = new List<Widget>();
     for (Restaurant r in restList) {
       restWidgets.add(
         FlatButton(
-          onPressed: () => {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => RestaurantPage(restaurant: r)))
-              },
-          child: RestaurantListTile(r, await GeoUtil.distanceToRestaurant(currentLocation, r))
-        ),
-        
+            onPressed: () => {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => RestaurantPage(restaurant: r)))
+                },
+            child: RestaurantListTile(
+                r, await GeoUtil.distanceToRestaurant(currentLocation, r))),
       );
     }
 
     if (restWidgets.length == 0) {
-      restWidgets.add(
-        FlatButton(
-          color: Colors.white,
-          onPressed: () {
-            
-          },
-          child: Text("No Results", style: TextStyle(fontSize: 20, color: Colors.black)),
-        )
-      );
+      restWidgets.add(FlatButton(
+        color: Colors.white,
+        onPressed: () {},
+        child: Text("No Results",
+            style: TextStyle(fontSize: 20, color: Colors.black)),
+      ));
     }
 
-    if (mounted) setState(() {
-      restSearchResults = restWidgets;
-    });
+    if (mounted)
+      setState(() {
+        restSearchResults = restWidgets;
+      });
   }
 
   void getSearchItem(String s) async {
-
     setState(() {
       itemSearchResults = [];
     });
 
     print("searching for item " + s);
-    var itemList = await SearchUtil.menuItemByGeoAndName(currentLocation, 20, s);
-    
-    List<Widget> itemWidgets = new List<Widget>();
+    var itemList =
+        await SearchUtil.menuItemByGeoAndName(currentLocation, 20, s);
+
+    List<MenuItemSearchTile> searchTiles = new List<MenuItemSearchTile>();
 
     for (MenuItem i in itemList) {
       Future<Restaurant> r = Documenu.getRestaurant(i.restaurantId);
-      Future<dynamic> avg = _fsm.getDocData(_fsm.menuItemCollection, i.id, "avgRating");
+      Future<dynamic> avg =
+          _fsm.getDocData(_fsm.menuItemCollection, i.id, "avgRating");
       Future<double> dist = GeoUtil.distanceToItem(currentLocation, i);
+      searchTiles.add(new MenuItemSearchTile(i, r, avg, dist, i.id));
+    }
+
+    searchTiles.sort((a, b) => a.milesAway.toString().compareTo(b.milesAway.toString()));
+
+    List<Widget> itemWidgets = new List<Widget>();
+
+    for (MenuItemSearchTile s in searchTiles) {
       itemWidgets.add(
         FlatButton(
           onPressed: () {
             Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => RestaurantPage(futureRestaurant: r, itemId: i.id)));
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        RestaurantPage(futureRestaurant: s.restaurant, itemId: s.id)));
           },
-          child: new MenuItemSearchTile(i, r, avg, dist),
+          child: s,
         ),
       );
     }
 
+    //itemWidgets.sort((a, b) => a. a.child.milesAway.compareTo(b.milesAway));
+
     if (itemWidgets.length == 0) {
-      itemWidgets.add(
-        FlatButton(
-          color: Colors.white,
-          onPressed: () {
-            
-          },
-          child: Text("No Results", style: TextStyle(fontSize: 20, color: Colors.black)),
-        )
-      );
+      itemWidgets.add(FlatButton(
+        color: Colors.white,
+        onPressed: () {},
+        child: Text("No Results",
+            style: TextStyle(fontSize: 20, color: Colors.black)),
+      ));
     }
 
-    if (mounted) setState(() {
-      itemSearchResults = itemWidgets;
-    });
+    if (mounted)
+      setState(() {
+        itemSearchResults = itemWidgets;
+      });
   }
 
   @override
@@ -300,7 +316,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 Icon(Icons.search, size: 26.0, color: global.accentGrayDark),
                 Expanded(
                   child: Container(
-                    padding: EdgeInsets.only(left: 5, top:18.5),
+                    padding: EdgeInsets.only(left: 5, top: 18.5),
                     alignment: Alignment.bottomLeft,
                     child: TextFormField(
                       focusNode: searchFocus,
@@ -309,48 +325,51 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       style: TextStyle(fontSize: 20),
                       onChanged: (val) {
                         //print("Tab Index" + tabIndex.toString());
-                        EasyDebounce.debounce(
-                              'restaurant-search-debouncer',
-                              Duration(milliseconds: 500),
-                              () {
-                                if (val.length <= 2) 
-                                  return;
-                                tabIndex == 0 ? getSearchRestaurant(val) : getSearchItem(val);
-                              });
+                        EasyDebounce.debounce('restaurant-search-debouncer',
+                            Duration(milliseconds: 500), () {
+                          if (val.length <= 2) return;
+                          tabIndex == 0
+                              ? getSearchRestaurant(val)
+                              : getSearchItem(val);
+                        });
                       },
                       onTap: () {
-                        if (mounted) setState(() {
-                          isSearchActive = true;
-                        });
+                        if (mounted)
+                          setState(() {
+                            isSearchActive = true;
+                          });
                       },
                       // readOnly: !isSearchActive,
                       decoration: InputDecoration(
                         hintText: 'Search...',
-                        hintStyle: TextStyle(fontSize: 20, color: global.accentGrayDark),
+                        hintStyle: TextStyle(
+                            fontSize: 20, color: global.accentGrayDark),
                         border: InputBorder.none,
                       ),
                     ),
                   ),
                 ),
-                isSearchActive ? Container(
-                  alignment: Alignment.centerRight, 
-                  child: GestureDetector(
-                    onTap: () {
-                      searchController.clear();
-                      searchFocus.unfocus();
-                      if (mounted) setState(() {
-                        getSearchRestaurant("");
-                        itemSearchResults = [];
-                        isSearchActive = false;
-                      });
-                    },
-                    child: Icon(
-                      Icons.clear,
-                      size: 26,
-                      color: global.accentGrayDark,
-                    ),
-                  )
-                ) : Container(height: 0, width: 0),
+                isSearchActive
+                    ? Container(
+                        alignment: Alignment.centerRight,
+                        child: GestureDetector(
+                          onTap: () {
+                            searchController.clear();
+                            searchFocus.unfocus();
+                            if (mounted)
+                              setState(() {
+                                getSearchRestaurant("");
+                                itemSearchResults = [];
+                                isSearchActive = false;
+                              });
+                          },
+                          child: Icon(
+                            Icons.clear,
+                            size: 26,
+                            color: global.accentGrayDark,
+                          ),
+                        ))
+                    : Container(height: 0, width: 0),
               ]),
         ),
         actions: <Widget>[
@@ -378,198 +397,211 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               )),
         ],
       ),
-      body: Stack(
-        children: <Widget>[
-          (_googleMap != null ? _googleMap : Center(
-            child: CircularProgressIndicator(
-              valueColor: new AlwaysStoppedAnimation<Color>(global.mainColor),
-            )
-          )),
-          mostPopItems == null || mostPopItems?.length == 0 ? Container(height:0, width:0) : Positioned(
-            top:0,
-            right:0,
-            child: Container(
-              margin: EdgeInsets.all(10),
-              width: 220,
-              decoration: new BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+      body: Stack(children: <Widget>[
+        (_googleMap != null
+            ? _googleMap
+            : Center(
+                child: CircularProgressIndicator(
+                valueColor: new AlwaysStoppedAnimation<Color>(global.mainColor),
+              ))),
+        mostPopItems == null || mostPopItems?.length == 0
+            ? Container(height: 0, width: 0)
+            : Positioned(
+                top: 0,
+                right: 0,
+                child: Container(
+                  margin: EdgeInsets.all(10),
+                  width: 220,
+                  decoration: new BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  ),
+                  child:
+                      Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+                    CarouselSlider(
+                      options: CarouselOptions(
+                        height: 50,
+                        autoPlay: true,
+                        autoPlayInterval: Duration(seconds: 4),
+                        autoPlayAnimationDuration: Duration(milliseconds: 800),
+                        autoPlayCurve: Curves.fastOutSlowIn,
+                        viewportFraction: 1,
+                        onPageChanged: (index, reason) {
+                          if (mounted)
+                            setState(() {
+                              _currentCarouselIndex = index;
+                            });
+                        },
+                      ),
+                      items: mostPopItems == null
+                          ? [Container(height: 0, width: 0)]
+                          : mostPopItems,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: map<Widget>(mostPopItems, (index, url) {
+                        return Container(
+                          width: 5.0,
+                          height: 5.0,
+                          margin: EdgeInsets.symmetric(
+                              vertical: 2.0, horizontal: 2.0),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: _currentCarouselIndex == index
+                                ? global.accentGrayDark
+                                : global.accentGrayLight,
+                          ),
+                        );
+                      }),
+                    ),
+                  ]),
+                ),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget> [
-                  CarouselSlider(
-                    options: CarouselOptions(
-                      height: 50,
-                      autoPlay: true,
-                      autoPlayInterval: Duration(seconds: 4),
-                      autoPlayAnimationDuration: Duration(milliseconds: 800),
-                      autoPlayCurve: Curves.fastOutSlowIn,
-                      viewportFraction: 1,
-                      onPageChanged: (index, reason) {
-                        if (mounted) setState(() {
-                          _currentCarouselIndex = index;
-                        });
+        restaurantsNearUser == null
+            ? Container(height: 0, width: 0)
+            : DraggableScrollableSheet(
+                initialChildSize: 0.4,
+                minChildSize: 0.2,
+                maxChildSize: 1,
+                builder: (BuildContext context, _scrollController) {
+                  _scrollController.addListener(() {
+                    if (mounted)
+                      setState(() {
+                        isSheetMax = _scrollController.offset >= 0;
+                      });
+                    print(_scrollController.offset.toString());
+                  });
+                  return Container(
+                    decoration: new BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.rectangle,
+                      borderRadius: isSheetMax
+                          ? BorderRadius.zero
+                          : BorderRadius.only(
+                              topLeft: Radius.circular(40.0),
+                              topRight: Radius.circular(40.0)),
+                    ),
+                    child: ListView.builder(
+                      controller: _scrollController,
+                      itemCount: restaurantsNearUser.length + 1,
+                      itemBuilder: (BuildContext context, int index) {
+                        if (index == 0) {
+                          return Container(
+                              alignment: Alignment.topCenter,
+                              child: Container(
+                                height: 5,
+                                width: 60,
+                                margin: EdgeInsetsDirectional.only(
+                                    top: 10, bottom: 5),
+                                decoration: new BoxDecoration(
+                                  color: global.accentGrayDark,
+                                  shape: BoxShape.rectangle,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(8.0)),
+                                ),
+                              ));
+                        }
+                        return new Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            FlatButton(
+                                onPressed: () => {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  RestaurantPage(
+                                                      restaurant:
+                                                          restaurantsNearUser[
+                                                              index - 1])))
+                                    },
+                                child: RestaurantListTile(
+                                    restaurantsNearUser[index - 1],
+                                    restaurantDistances[index - 1])),
+                            Divider(
+                              color: global.accentGrayLight,
+                              height: 5,
+                              thickness: 5,
+                            )
+                          ],
+                        );
                       },
                     ),
-                    items: mostPopItems == null ? [Container(height:0, width:0)] : mostPopItems,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: map<Widget>(mostPopItems, (index, url) {
-                      return Container(
-                        width: 5.0,
-                        height: 5.0,
-                        margin: EdgeInsets.symmetric(vertical: 2.0, horizontal: 2.0),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: _currentCarouselIndex == index ? global.accentGrayDark : global.accentGrayLight,
-                        ),
-                      );
-                    }),
-                  ),
-                ]
+                  );
+                },
               ),
-            ),
-          ),
-          restaurantsNearUser == null ? Container(height: 0, width: 0) : DraggableScrollableSheet(
-            initialChildSize: 0.4,
-            minChildSize: 0.2,
-            maxChildSize: 1,
-            builder: (BuildContext context, _scrollController) {
-              _scrollController.addListener(() {
-                if (mounted) setState(() {
-                  isSheetMax = _scrollController.offset >= 0;
-                });
-                print(_scrollController.offset.toString());
-              });
-              return Container(
-                decoration: new BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.rectangle,
-                  borderRadius: isSheetMax ? BorderRadius.zero : BorderRadius.only(
-                      topLeft: Radius.circular(40.0),
-                      topRight: Radius.circular(40.0)),
-                ),
-                child: ListView.builder(
-                  controller: _scrollController,
-                  itemCount: restaurantsNearUser.length + 1,
-                  itemBuilder: (BuildContext context, int index) {
-                    if (index == 0) {
-                      return Container(
-                          alignment: Alignment.topCenter,
-                          child: Container(
-                            height: 5,
-                            width: 60,
-                            margin: EdgeInsetsDirectional.only(top: 10, bottom: 5),
-                            decoration: new BoxDecoration(
-                              color: global.accentGrayDark,
-                              shape: BoxShape.rectangle,
-                              borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                            ),
-                          ));
-                    }
-                    return new Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        FlatButton(
-                          onPressed: () => {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => RestaurantPage(
-                                            restaurant: restaurantsNearUser[index - 1])))
-                              },
-                          child: RestaurantListTile(restaurantsNearUser[index - 1],
-                              restaurantDistances[index - 1])
+        // isSearchActive ?  Column(
+        //   children: [
+        //     Container(
+        //       child: ToggleButtons(
+        //         children: <Widget>[
+        //           Text("Restaurants"),
+        //           Text("Menu Items"),
+        //         ],
+        //         isSelected: isSelected,
+        //         onPressed: (int index) {
+        //           setState(() {
+        //             isSelected[index] = true;
+        //             isSelected[(index + 1) % 2] = false;
+        //           });
+        //         },
+        //       ),
+        //     ),
+        //     Container(
+        //       color: Colors.white,
+        //       child: ListView(
+        //         children: isSelected[0] ? restSearchResults : itemSearchResults,
+        //       ),
+        //     )
+        //   ],
+        // ) : Container(height: 0, width: 0),
+
+        isSearchActive
+            ? DefaultTabController(
+                length: 2,
+                initialIndex: 0,
+                child: Scaffold(
+                  appBar: AppBar(
+                    backgroundColor: global.mainColor,
+                    title: TabBar(
+                      labelColor: Colors.black,
+                      labelStyle:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      unselectedLabelStyle: TextStyle(fontSize: 20),
+                      indicatorColor: Colors.black,
+                      onTap: (index) {},
+                      tabs: <Widget>[
+                        Tab(
+                          text: "Restaurants",
                         ),
-                        Divider(
-                          color: global.accentGrayLight,
-                          height: 5,
-                          thickness: 5,
-                        )
+                        Tab(
+                          text: "Menu Items",
+                        ),
                       ],
-                    );
-                  },
-                ),
-              );
-            },
-          ),
-          // isSearchActive ?  Column(
-          //   children: [
-          //     Container(
-          //       child: ToggleButtons(
-          //         children: <Widget>[
-          //           Text("Restaurants"),
-          //           Text("Menu Items"),
-          //         ],
-          //         isSelected: isSelected,
-          //         onPressed: (int index) {
-          //           setState(() {
-          //             isSelected[index] = true;
-          //             isSelected[(index + 1) % 2] = false;
-          //           });
-          //         },
-          //       ),
-          //     ),
-          //     Container(
-          //       color: Colors.white,
-          //       child: ListView(
-          //         children: isSelected[0] ? restSearchResults : itemSearchResults,
-          //       ),
-          //     )
-          //   ],
-          // ) : Container(height: 0, width: 0),
-
-          isSearchActive ? DefaultTabController(
-            length: 2,
-            initialIndex: 0,
-            child: Scaffold(
-              appBar: AppBar(
-                backgroundColor: global.mainColor,
-                title: TabBar(
-                  labelColor: Colors.black,
-                  labelStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  unselectedLabelStyle: TextStyle(fontSize: 20),
-                  indicatorColor: Colors.black,
-                  onTap: (index) {
-
-                  },
-                  tabs: <Widget>[
-                    Tab(
-                      text: "Restaurants",
-                    ),
-                    Tab(
-                      text: "Menu Items",
-                    ),
-                  ],
-                  controller: tabController,
-
-                ),
-              ),
-              body: TabBarView(
-                children: <Widget>[
-                  Container(
-                    color: Colors.white,
-                    child: ListView(
-                      children: restSearchResults,
+                      controller: tabController,
                     ),
                   ),
-                  Container(
-                    color: Colors.white,
-                    child: ListView(
-                      children: itemSearchResults,
-                    ),
+                  body: TabBarView(
+                    children: <Widget>[
+                      Container(
+                        color: Colors.white,
+                        child: ListView(
+                          children: restSearchResults,
+                        ),
+                      ),
+                      Container(
+                        color: Colors.white,
+                        child: ListView(
+                          children: itemSearchResults,
+                        ),
+                      ),
+                    ],
+                    controller: tabController,
                   ),
-                ],
-                controller: tabController,
-
-              ),
-            )
-          ) : Container(height: 0, width: 0)
-        ]
-      ),
+                ))
+            : Container(height: 0, width: 0)
+      ]),
     );
   }
 }
