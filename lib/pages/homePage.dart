@@ -264,7 +264,6 @@ class _HomePageState extends State<HomePage>
 
     List<Widget> itemWidgets = new List<Widget>();
     for (SearchTileAndData s in searchTiles) {
-      print("Adding item: " + s.m.menuItem.name);
       itemWidgets.add(
         FlatButton(
           onPressed: () {
