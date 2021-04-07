@@ -13,7 +13,7 @@ import 'package:skeleton_text/skeleton_text.dart';
 import 'package:bitewise/global.dart' as global;
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:flutter/gestures.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SubSectionHeader extends StatefulWidget {
 
@@ -400,9 +400,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
       });
   }
 
-
   List<Widget> generateMenu() {
-
     List listylist = List<Widget>();
 
     List<SubSection> sectionList = List<SubSection>();
@@ -410,19 +408,39 @@ class _RestaurantPageState extends State<RestaurantPage> {
     int sectionNum = 0;
     int prevIndex = 0;
 
-    // TODO: FIX THIS 
+    // TODO: FIX THIS
 
-    int mostPopLen = realMenu.subsectionMap[realMenu.instanceMostPopName].length;
+    int mostPopLen =
+        realMenu.subsectionMap[realMenu.instanceMostPopName].length;
 
     if (mostPopLen != 0) {
-      listylist.add(new SubSectionHeader("Most Popular", sectionNum, subSectionHeight));
+      listylist.add(
+          new SubSectionHeader("Most Popular", sectionNum, subSectionHeight));
       sectionList.add(new SubSection("Most Popular", mostPopLen));
       for (int i = 0; i < mostPopLen; i++) {
-        listylist.add(new MenuItemListTile(menuItems[i], restaurant, itemHeight));
+        // Add a stream builder to the list, that way the most popular subsection can update live
+        listylist.add(StreamBuilder<Object>(
+            stream: (Firestore.instance
+                .collection(_fsm.restaurantCollection)
+                .document(restaurant.id)
+                .snapshots()),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              print(restaurant.id);
+              MenuItem item = menuItems[i];
+              if (snapshot.hasData) {
+                // Get the item for this tiles position in the updated ratedItems list
+                String id = snapshot.data['ratedItems'][i]['itemId'];
+                for (int m = 0; m < menuItems.length; m++) {
+                  if (id == menuItems[m].id) {
+                    item = menuItems[m];
+                    break;
+                  }
+                }
+              }
+              return new MenuItemListTile(item, restaurant, itemHeight);
+            }));
       }
     }
-    
-    
 
     String subsection = menuItems.elementAt(mostPopLen).subsection;
     prevIndex = mostPopLen;
@@ -474,15 +492,11 @@ class _RestaurantPageState extends State<RestaurantPage> {
       subSectionWidget = new MenuSubSectionScrollbar(_key, sectionList, sectionController, _menuController, itemHeight, subSectionHeight, target: target);
       // sectionScrollState = subSectionWidget.createState();
     });
-
-    
-    
-
+  
     return listylist;
   }
 
-
-  @override
+   @override
   Widget build(BuildContext context) {
     
     return Material(
@@ -644,7 +658,4 @@ class _RestaurantPageState extends State<RestaurantPage> {
       ),
     );
   }
-
-  
-
 }
