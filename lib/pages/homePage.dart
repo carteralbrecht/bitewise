@@ -234,48 +234,57 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   void getSearchItem(String s) async {
-
     setState(() {
       itemSearchResults = [];
     });
 
     print("searching for item " + s);
-    var itemList = await SearchUtil.menuItemByGeoAndName(currentLocation, 20, s);
-    
-    List<Widget> itemWidgets = new List<Widget>();
+    var itemList =
+        await SearchUtil.menuItemByGeoAndName(currentLocation, 20, s);
+
+    List<SearchTileAndData> searchTiles = new List<SearchTileAndData>();
 
     for (MenuItem i in itemList) {
       Future<Restaurant> r = Documenu.getRestaurant(i.restaurantId);
-      Future<dynamic> avg = _fsm.getDocData(_fsm.menuItemCollection, i.id, "avgRating");
+      Future<dynamic> avg =
+          _fsm.getDocData(_fsm.menuItemCollection, i.id, "avgRating");
       Future<double> dist = GeoUtil.distanceToItem(currentLocation, i);
+      SearchTileAndData next = new SearchTileAndData(
+          new MenuItemSearchTile(i, r, avg, dist, i.id), dist, avg);
+      await next.setVariables();
+      searchTiles.add(next);
+    }
+    searchTiles.sort();
+
+    List<Widget> itemWidgets = new List<Widget>();
+    for (SearchTileAndData s in searchTiles) {
       itemWidgets.add(
         FlatButton(
           onPressed: () {
             Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => RestaurantPage(futureRestaurant: r, itemId: i.id)));
+                context,
+                MaterialPageRoute(
+                    builder: (context) => RestaurantPage(
+                        futureRestaurant: s.m.restaurant, itemId: s.m.id)));
           },
-          child: new MenuItemSearchTile(i, r, avg, dist),
+          child: s.m,
         ),
       );
     }
 
     if (itemWidgets.length == 0) {
-      itemWidgets.add(
-        FlatButton(
-          color: Colors.white,
-          onPressed: () {
-            
-          },
-          child: Text("No Results", style: TextStyle(fontSize: 20, color: Colors.black)),
-        )
-      );
+      itemWidgets.add(FlatButton(
+        color: Colors.white,
+        onPressed: () {},
+        child: Text("No Results",
+            style: TextStyle(fontSize: 20, color: Colors.black)),
+      ));
     }
 
-    if (mounted) setState(() {
-      itemSearchResults = itemWidgets;
-    });
+    if (mounted)
+      setState(() {
+        itemSearchResults = itemWidgets;
+      });
   }
 
   @override

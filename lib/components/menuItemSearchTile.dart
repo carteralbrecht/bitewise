@@ -11,13 +11,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:bitewise/global.dart' as global;
 
 class MenuItemSearchTile extends StatefulWidget {
-
   final MenuItem menuItem;
   final dynamic restaurant;
   final Future avgRating;
   final Future milesAway;
+  final String id;
 
-  const MenuItemSearchTile(this.menuItem, this.restaurant, this.avgRating, this.milesAway);
+  const MenuItemSearchTile(this.menuItem, this.restaurant, this.avgRating, this.milesAway, this.id);
 
   @override
   _MenuItemSearchTileState createState() => _MenuItemSearchTileState();
@@ -87,5 +87,32 @@ class _MenuItemSearchTileState extends State<MenuItemSearchTile> {
         ]
       )
     );
+  }
+}
+
+class SearchTileAndData implements Comparable<dynamic> {
+  MenuItemSearchTile m;
+  var dist;
+  var avg;
+
+  SearchTileAndData(MenuItemSearchTile tile, var distance, var rating) {
+    m = tile;
+    dist = distance;
+    avg = rating;
+  }
+
+  Future<dynamic> setVariables() async {
+    dist = await dist;
+    avg = await avg;
+    if (avg == null) avg = 0;
+  }
+
+  @override
+  int compareTo(dynamic other) {
+    int distComp = this.dist.compareTo(other.dist);
+    if (distComp == 0) {
+      return other.avg.compareTo(this.avg);
+    }
+    return distComp;
   }
 }
