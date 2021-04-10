@@ -18,15 +18,15 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
   Color dividerColor = global.accentGrayLight;
   final FirestoreManager _fsm = FirestoreManager();
   List<MenuItem> displayItems;
-  List<Future<Restaurant>> displayRestaurants;
+  List<Restaurant> displayRestaurants;
   List<double> displayRatings;
 
   List<MenuItem> prevRatedItems;
-  List<Future<Restaurant>> restaurants;
+  List<Restaurant> restaurants;
   List<double> ratings;
 
   List<MenuItem> prevRatedItemsSorted;
-  List<Future<Restaurant>> restaurantsSorted;
+  List<Restaurant> restaurantsSorted;
   List<double> ratingsSorted;
 
   int selectedSortIndex = 0;
@@ -119,7 +119,7 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
     List<Future<MenuItem>> menuItems =
         await ItemListUtil.getPreviouslyRatedItems();
     List<MenuItem> items = new List<MenuItem>();
-    List<Future<Restaurant>> rest = new List<Future<Restaurant>>();
+    List<Restaurant> rest = new List<Restaurant>();
     List<double> prevRatings = new List<double>();
     List<Triple> pairs = new List<Triple>(); //
     if (menuItems != null) {
@@ -129,7 +129,7 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
           continue;
         }
         items.add(item);
-        Future<Restaurant> r = Documenu.getRestaurant(item.restaurantId);
+        Restaurant r = await Documenu.getRestaurant(item.restaurantId);
         rest.add(r);
         var result = await _fsm.getUserRating(global.user.uid, item.id);
         if (result != null) {
@@ -142,7 +142,7 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
 
     pairs.sort((a, b) => (a.rate.compareTo(b.rate)));
     List<MenuItem> sortitem = new List();
-    List<Future<Restaurant>> sortrest = new List();
+    List<Restaurant> sortrest = new List();
     List<double> sortrate = new List();
 
     for (Triple t in pairs) 
@@ -171,6 +171,10 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
       displayRestaurants = new List.from(restaurants);
       displayRatings = new List.from(ratings);
     });
+    // print("old");
+    // for (Restaurant r in displayRestaurants) {
+    //   print(r.name);
+    // }
   }
 
   void newestFirst() async {
@@ -179,6 +183,10 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
       displayRestaurants = new List.from(restaurants.reversed);
       displayRatings = new List.from(ratings.reversed);
     });
+    // print("new");
+    // for (Restaurant r in displayRestaurants) {
+    //   print(r.name);
+    // }
   }
 
   void loToHi() async {
@@ -187,6 +195,10 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
       displayRestaurants = new List.from(restaurantsSorted);
       displayRatings = new List.from(ratingsSorted);
     });
+    // print("low");
+    // for (Restaurant r in displayRestaurants) {
+    //   print(r.name);
+    // }
   }
 
   void hiToLo() async {
@@ -195,6 +207,10 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
       displayRestaurants = new List.from(restaurantsSorted.reversed);
       displayRatings = new List.from(ratingsSorted.reversed);
     });
+    // print("high");
+    // for (Restaurant r in displayRestaurants) {
+    //   print(r.name);
+    // }
   }
 
   @override
@@ -239,11 +255,13 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
               // ),
               Container(
                 child: (displayRatings == null
-                    ? Center(
-                        child: CircularProgressIndicator(
-                        valueColor:
-                            new AlwaysStoppedAnimation<Color>(global.mainColor),
-                      ))
+                    ? Expanded(
+                        child: Center(
+                          child: CircularProgressIndicator(
+                          valueColor:
+                              new AlwaysStoppedAnimation<Color>(global.mainColor),
+                        ))
+                      )
                     : Expanded(
                         child: ListView.builder(
                         itemCount:
@@ -300,13 +318,13 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) => RestaurantPage(
-                                              futureRestaurant:
+                                              restaurant:
                                                   displayRestaurants[index-1],
                                               itemId: displayItems[index-1].id)))
                                 },
                                 child: PrevRatedItemTile(
                                     displayItems[index-1], displayRatings[index-1],
-                                    futureRestaurant: displayRestaurants[index-1]),
+                                    restaurant: displayRestaurants[index-1]),
                               ),
                               Divider(
                                 color: global.accentGrayLight,
@@ -327,7 +345,7 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
 
 class Triple {
   MenuItem item;
-  Future<Restaurant> rest;
+  Restaurant rest;
   double rate;
   Triple(this.item, this.rest, this.rate);
 }

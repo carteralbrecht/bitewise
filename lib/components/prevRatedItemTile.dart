@@ -13,7 +13,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class PrevRatedItemTile extends StatefulWidget {
   final MenuItem menuItem;
-  final Restaurant restaurant;
+  final restaurant;
   final Future<Restaurant> futureRestaurant;
   final double rating;
   const PrevRatedItemTile(this.menuItem, this.rating, {this.restaurant, this.futureRestaurant});
@@ -26,20 +26,33 @@ class _PrevRatedItemTileState extends State<PrevRatedItemTile> {
 
   Color dividerColor = global.accentGrayLight;
   Restaurant restaurant;
+  String restName = "loading";
 
 
   @override
   initState() {
-    getRestaurant();
+    // getRestaurant();
     super.initState();
 
   }
 
-  void getRestaurant() async {
-    Restaurant r = widget.restaurant == null ? await widget.futureRestaurant : widget.restaurant;
-    setState(() {
-      restaurant = r;
-    });
+  void getRestaurant() {
+    if (widget.restaurant == null) {
+      widget.futureRestaurant.then((rest) {
+        setState(() {
+          restName = rest.name;
+        });
+      });
+    }
+    else {
+      setState(() {
+        restName = widget.restaurant.name;
+      });
+    }
+    // Restaurant r = widget.restaurant == null ? await widget.futureRestaurant : widget.restaurant;
+    // setState(() {
+    //   restaurant = r;
+    // });
   }
 
   @override
@@ -96,7 +109,7 @@ class _PrevRatedItemTileState extends State<PrevRatedItemTile> {
                   children: [
                     Container(
                       padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
-                      child: Text(restaurant == null ? "" : restaurant.name,
+                      child: Text(widget.restaurant?.name == null ? restName : widget.restaurant.name,
                           style: TextStyle(color: global.accentGrayDark, fontSize: 15),
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1),
