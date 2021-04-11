@@ -273,7 +273,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
 
   Restaurant restaurant;
   final double itemHeight = 125.0;
-  final double subSectionHeight = 90;
+  final double subSectionHeight = 95;
   ScrollController _menuController;
   int firstIndex = 0;
   String message = "";
@@ -485,7 +485,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
           offset += s.numItems * itemHeight;
         }
       }
-      _menuController.animateTo(offset + 40, duration: Duration(milliseconds: 500), curve: Curves.linear);
+      _menuController.animateTo(offset + 30, duration: Duration(milliseconds: 500), curve: Curves.linear);
     }
 
     if (mounted) setState(() {
