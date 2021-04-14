@@ -158,10 +158,7 @@ class _RatingModalState extends State<RatingModal> {
                 onPressed: () {
                   if (global.user == null)
                   {
-                    Navigator.push(
-                      context,
-                        MaterialPageRoute(
-                          builder: (context) => SignIn()));
+                    Navigator.popAndPushNamed(context, '/signin');
                   }
                   else
                   {
