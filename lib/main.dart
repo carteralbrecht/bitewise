@@ -38,6 +38,8 @@ class MyApp extends StatelessWidget {
         // Anonymous route for rating modal
       },
 
+      debugShowCheckedModeBanner: false,
+
     );
   }
 }
