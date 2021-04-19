@@ -313,14 +313,15 @@ class _PrevRatedItemsPageState extends State<PrevRatedItemsPage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               FlatButton(
-                                onPressed: () => {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => RestaurantPage(
-                                              restaurant:
-                                                  displayRestaurants[index-1],
-                                              itemId: displayItems[index-1].id)))
+                                onPressed: () async {
+                                  String s = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => RestaurantPage(
+                                            restaurant:
+                                                displayRestaurants[index - 1],
+                                            itemId: displayItems[index - 1].id)));
+                                  getPrevRatedItems();
                                 },
                                 child: PrevRatedItemTile(
                                     displayItems[index-1], displayRatings[index-1],

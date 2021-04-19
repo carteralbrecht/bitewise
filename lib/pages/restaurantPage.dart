@@ -511,7 +511,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
               leading: GestureDetector(
                 child: Icon(Icons.chevron_left, size: 35, color: Colors.black),
                 onTap: () {
-                  Navigator.pop(context);
+                  Navigator.pop(context, "returnFromRestaurantPage");
                 }
               ),
               actions: <Widget>[
