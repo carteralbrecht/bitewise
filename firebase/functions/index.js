@@ -134,7 +134,8 @@ exports.handleRatingsDelete = functions.firestore
 
                 // Compute the new average rating and total
                 const ratingTotal = menuItemDoc.data().avgRating * menuItemDoc.data().numRatings;
-                const newAvgRating = (ratingTotal - rating) / (menuItemDoc.data().numRatings - 1);
+                const hadOneRating = menuItemDoc.data().numRatings === 1;
+                const newAvgRating = hadOneRating ? 0 : (ratingTotal - rating) / (menuItemDoc.data().numRatings - 1);
 
                 // Update the menu item document
                 transaction.update(menuItemRef, {
