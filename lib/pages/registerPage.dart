@@ -58,6 +58,10 @@ class _RegisterState extends State<Register> {
                           email = val;
                         });
                       },
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (input) => RegExp(
+                        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$'
+                        ).hasMatch(input) ? 'null' : 'Invalid email format',
                       decoration: InputDecoration(
                         hintText: 'email',
                         hintStyle: TextStyle(
@@ -79,6 +83,8 @@ class _RegisterState extends State<Register> {
                           password = val;
                         });
                       },
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (input) => input != null && input.length < 6 ? 'Password must be length 6 or greater' : null,
                       decoration: InputDecoration(
                         hintText: 'password',
                         hintStyle: TextStyle(
@@ -100,6 +106,8 @@ class _RegisterState extends State<Register> {
                           confPassword = val;
                         });
                       },
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (input) => input == password ? null : 'Passwords must match',
                       decoration: InputDecoration(
                         hintText: 'confirm password',
                         hintStyle: TextStyle(
@@ -112,33 +120,25 @@ class _RegisterState extends State<Register> {
                   GestureDetector(
                     onTap: () async {
                         // Get current account, and upgrade it to an email/pass account
-                      if (password != confPassword) {
+                      if (password != confPassword || password.length < 6 || !RegExp(r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$').hasMatch(email)) {
                         Flushbar(
-                          message: "Passwords do not match",
+                          message: "Fix errors before registering",
                           duration:  Duration(seconds: 3),
                         )..show(context);
                       }
                       else {
-                        try {
-                          dynamic result = await _auth.registerByEmail(email, password);
-                          if (result == null) {
-                            print('error registering');
-                            Flushbar(
-                              message: "Error Registering",
-                              duration:  Duration(seconds: 3),
-                            )..show(context);
-                          } else {
-                            global.user = result;
-                            print('registered');
-                            print(result);
-                            Navigator.pop(context);
-                          }
-                        }
-                        catch (e) {
+                        dynamic result = await _auth.registerByEmail(email, password);
+                        if (result == null) {
+                          print('error registering');
                           Flushbar(
-                            message: e.toString(),
+                            message: "Error Registering",
                             duration:  Duration(seconds: 3),
                           )..show(context);
+                        } else {
+                          global.user = result;
+                          print('registered');
+                          print(result);
+                          Navigator.pop(context);
                         }
                       }
                     },
