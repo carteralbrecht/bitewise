@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:bitewise/global.dart' as global;
+import 'package:flushbar/flushbar.dart';
 
 class Register extends StatefulWidget {
   @override
@@ -13,6 +14,7 @@ class _RegisterState extends State<Register> {
   //Text Field State
   String email = '';
   String password = '';
+  String confPassword = '';
 
   final AuthService _auth = AuthService();
 
@@ -95,7 +97,7 @@ class _RegisterState extends State<Register> {
                       obscureText: true,
                       onChanged: (val) {
                         setState(() {
-                          password = val;
+                          confPassword = val;
                         });
                       },
                       decoration: InputDecoration(
@@ -110,15 +112,34 @@ class _RegisterState extends State<Register> {
                   GestureDetector(
                     onTap: () async {
                         // Get current account, and upgrade it to an email/pass account
-                      dynamic result =
-                          await _auth.registerByEmail(email, password);
-                      if (result == null) {
-                        print('error registering');
-                      } else {
-                        global.user = result;
-                        print('registered');
-                        print(result);
-                        Navigator.pop(context);
+                      if (password != confPassword) {
+                        Flushbar(
+                          message: "Passwords do not match",
+                          duration:  Duration(seconds: 3),
+                        )..show(context);
+                      }
+                      else {
+                        try {
+                          dynamic result = await _auth.registerByEmail(email, password);
+                          if (result == null) {
+                            print('error registering');
+                            Flushbar(
+                              message: "Error Registering",
+                              duration:  Duration(seconds: 3),
+                            )..show(context);
+                          } else {
+                            global.user = result;
+                            print('registered');
+                            print(result);
+                            Navigator.pop(context);
+                          }
+                        }
+                        catch (e) {
+                          Flushbar(
+                            message: e.toString(),
+                            duration:  Duration(seconds: 3),
+                          )..show(context);
+                        }
                       }
                     },
                     child: Container(

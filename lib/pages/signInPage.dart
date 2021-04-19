@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:bitewise/global.dart' as global;
+import 'package:flushbar/flushbar.dart';
 
 class SignIn extends StatefulWidget {
   @override
@@ -171,6 +172,10 @@ class _SignInState extends State<SignIn> {
                           await _auth.signInByEmail(email, password);
                       if (result == null) {
                         print('error signing in');
+                        Flushbar(
+                          message: "Username and Password Combination Incorrect",
+                          duration:  Duration(seconds: 3),
+                        )..show(context);
                       } else {
                         global.user = result;
                         print('signed in');
@@ -197,6 +202,10 @@ class _SignInState extends State<SignIn> {
                       dynamic result = await _auth.signInByGoogle();
                       if (result == null) {
                         print('error signing in by google!');
+                        Flushbar(
+                          message: "Error signing in by Google",
+                          duration:  Duration(seconds: 3),
+                        )..show(context);
                       } else {
                         global.user = result;
                         print('signed in');
