@@ -36,6 +36,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: global.mainColor,
@@ -115,6 +116,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       newPassword = val;
                     });
                   },
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  validator: (input) => input != null && input.length >= 6 ? null : 'Password must be length 6 or greater',
                   decoration: InputDecoration(
                     hintText: 'new password',
                     hintStyle:
@@ -134,6 +137,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       confirmNewPassword = val;
                     });
                   },
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  validator: (input) => input == newPassword ? null : 'Passwords must match',
                   decoration: InputDecoration(
                     hintText: 'confirm new password',
                     hintStyle:
