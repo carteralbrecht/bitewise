@@ -61,7 +61,7 @@ class _RegisterState extends State<Register> {
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (input) => RegExp(
                         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$'
-                        ).hasMatch(input) ? 'null' : 'Invalid email format',
+                        ).hasMatch(input) ? null : 'Invalid email format',
                       decoration: InputDecoration(
                         hintText: 'email',
                         hintStyle: TextStyle(
