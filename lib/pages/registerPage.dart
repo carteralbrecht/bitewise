@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:bitewise/global.dart' as global;
+import 'package:flushbar/flushbar.dart';
 
 class Register extends StatefulWidget {
   @override
@@ -13,6 +14,7 @@ class _RegisterState extends State<Register> {
   //Text Field State
   String email = '';
   String password = '';
+  String confPassword = '';
 
   final AuthService _auth = AuthService();
 
@@ -56,6 +58,10 @@ class _RegisterState extends State<Register> {
                           email = val;
                         });
                       },
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (input) => RegExp(
+                        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$'
+                        ).hasMatch(input) ? null : 'Invalid email format',
                       decoration: InputDecoration(
                         hintText: 'email',
                         hintStyle: TextStyle(
@@ -77,6 +83,8 @@ class _RegisterState extends State<Register> {
                           password = val;
                         });
                       },
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (input) => input != null && input.length < 6 ? 'Password must be length 6 or greater' : null,
                       decoration: InputDecoration(
                         hintText: 'password',
                         hintStyle: TextStyle(
@@ -95,9 +103,11 @@ class _RegisterState extends State<Register> {
                       obscureText: true,
                       onChanged: (val) {
                         setState(() {
-                          password = val;
+                          confPassword = val;
                         });
                       },
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (input) => input == password ? null : 'Passwords must match',
                       decoration: InputDecoration(
                         hintText: 'confirm password',
                         hintStyle: TextStyle(
@@ -110,15 +120,26 @@ class _RegisterState extends State<Register> {
                   GestureDetector(
                     onTap: () async {
                         // Get current account, and upgrade it to an email/pass account
-                      dynamic result =
-                          await _auth.registerByEmail(email, password);
-                      if (result == null) {
-                        print('error registering');
-                      } else {
-                        global.user = result;
-                        print('registered');
-                        print(result);
-                        Navigator.pop(context);
+                      if (password != confPassword || password.length < 6 || !RegExp(r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$').hasMatch(email)) {
+                        Flushbar(
+                          message: "Fix errors before registering",
+                          duration:  Duration(seconds: 3),
+                        )..show(context);
+                      }
+                      else {
+                        dynamic result = await _auth.registerByEmail(email, password);
+                        if (result == null) {
+                          print('error registering');
+                          Flushbar(
+                            message: "Error Registering",
+                            duration:  Duration(seconds: 3),
+                          )..show(context);
+                        } else {
+                          global.user = result;
+                          print('registered');
+                          print(result);
+                          Navigator.pop(context);
+                        }
                       }
                     },
                     child: Container(
